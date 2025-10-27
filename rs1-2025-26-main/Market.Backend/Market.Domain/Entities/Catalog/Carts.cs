@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Market.Domain.Common;
+
+namespace Market.Domain.Entities.Catalog
+{
+    public class Carts : BaseEntity
+    {
+        public int UserId { get; set; }
+        public Users User { get; set; }
+    }
+}
