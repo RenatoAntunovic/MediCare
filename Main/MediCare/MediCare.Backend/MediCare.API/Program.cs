@@ -18,7 +18,7 @@ public partial class Program
 
         try
         {
-            Log.Information("Starting Market API...");
+            Log.Information("Starting MediCare API...");
 
             //
             // 1) Standard builder (includes appsettings.json, appsettings.{ENV}.json,
@@ -89,7 +89,7 @@ public partial class Program
             // Database migrations + seeding
             await app.Services.InitializeDatabaseAsync(app.Environment);
 
-            Log.Information("Market API started successfully.");
+            Log.Information("MediCare API started successfully.");
             app.Run();
         }
 
@@ -102,7 +102,7 @@ public partial class Program
         catch (Exception ex)
         {
             // Any startup failure will be logged here
-            Log.Fatal(ex, "Market API terminated unexpectedly.");
+            Log.Fatal(ex, "MediCare API terminated unexpectedly.");
         }
         finally
         {

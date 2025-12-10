@@ -1,10 +1,10 @@
-using MediCare.Application.Modules.Catalog.MedicineCategories.Commands.Delete;
-using MediCare.Application.Modules.Catalog.MedicineCategories.Commands.Status.Disable;
-using MediCare.Application.Modules.Catalog.MedicineCategories.Commands.Status.Enable;
-using MediCare.Application.Modules.Catalog.MedicineCategories.Commands.Create;
-using MediCare.Application.Modules.Catalog.MedicineCategories.Commands.Update;
-using MediCare.Application.Modules.Catalog.MedicineCategories.Queries.GetById;
-using MediCare.Application.Modules.Catalog.MedicineCategories.Queries.List;
+using MediCare.Application.Modules.Medicine.MedicineCategories.Commands.Delete;
+using MediCare.Application.Modules.Medicine.MedicineCategories.Commands.Status.Disable;
+using MediCare.Application.Modules.Medicine.MedicineCategories.Commands.Status.Enable;
+using MediCare.Application.Modules.Medicine.MedicineCategories.Commands.Create;
+using MediCare.Application.Modules.Medicine.MedicineCategories.Commands.Update;
+using MediCare.Application.Modules.Medicine.MedicineCategories.Queries.GetById;
+using MediCare.Application.Modules.Medicine.MedicineCategories.Queries.List;
 
 namespace MediCare.API.Controllers;
 
