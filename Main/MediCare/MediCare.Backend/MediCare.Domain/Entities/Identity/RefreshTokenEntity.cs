@@ -2,7 +2,7 @@
 
 // RefreshTokenEntity.cs
 using MediCare.Domain.Common;
-using MediCare.Domain.Entities.Catalog;
+using MediCare.Domain.Entities.HospitalRecords;
 
 namespace MediCare.Domain.Entities.Identity;
 

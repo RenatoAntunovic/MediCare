@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MediCare.Domain.Entities.Catalog;
+using MediCare.Domain.Entities.HospitalRecords;
 
 public class ReceivingItemsConfiguration : IEntityTypeConfiguration<ReceivingItems>
 {

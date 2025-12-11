@@ -23,7 +23,7 @@ public class GetTreatmentsByIdQueryHandler(IAppDbContext context) : IRequestHand
 
         if (treatments == null)
         {
-            throw new MarketNotFoundException($"Product with Id {request.Id} not found.");
+            throw new MediCareNotFoundException($"Product with Id {request.Id} not found.");
         }
 
         return treatments;

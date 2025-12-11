@@ -75,7 +75,7 @@ public static class DependencyInjection
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "MediCare API", Version = "v1" });
-            var xml = Path.Combine(AppContext.BaseDirectory, "Market.API.xml");
+            var xml = Path.Combine(AppContext.BaseDirectory, "MediCare.API.xml");
             if (File.Exists(xml))
                 c.IncludeXmlComments(xml, includeControllerXmlComments: true);
 

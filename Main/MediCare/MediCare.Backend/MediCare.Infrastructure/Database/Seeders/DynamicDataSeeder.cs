@@ -1,4 +1,4 @@
-﻿using MediCare.Domain.Entities.Catalog;
+﻿using MediCare.Domain.Entities.HospitalRecords;
 using Microsoft.IdentityModel.Protocols;
 using System.Runtime.CompilerServices;
 

@@ -6,13 +6,13 @@ public class DeleteTreatmentCategoryCommandHandler(IAppDbContext context, IAppCu
     public async Task<Unit> Handle(DeleteTreatmentCategoryCommand request, CancellationToken cancellationToken)
     {
         if (appCurrentUser.UserId is null)
-            throw new MarketBusinessRuleException("123", "Korisnik nije autentifikovan.");
+            throw new MediCareBusinessRuleException("123", "Korisnik nije autentifikovan.");
 
         var category = await context.TreatmentCategories
             .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
         if (category is null)
-            throw new MarketNotFoundException("Kategorija nije pronađena.");
+            throw new MediCareNotFoundException("Kategorija nije pronađena.");
 
         category.IsDeleted = true; // Soft delete
         category.isEnabled = false;

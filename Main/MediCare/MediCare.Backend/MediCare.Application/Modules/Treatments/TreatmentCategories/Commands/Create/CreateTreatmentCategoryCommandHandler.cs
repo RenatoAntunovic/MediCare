@@ -16,7 +16,7 @@ public class CreateTreatmentCategoryCommandHandler(IAppDbContext context)
 
         if (exists)
         {
-            throw new MarketConflictException("Name already exists.");
+            throw new MediCareConflictException("Name already exists.");
         }
 
         var treatmentCategory = new TreatmentCategories

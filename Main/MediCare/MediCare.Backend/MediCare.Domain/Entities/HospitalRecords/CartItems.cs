@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MediCare.Domain.Common;
-using MediCare.Domain.Entities.Catalog;
+using MediCare.Domain.Entities.HospitalRecords;
 
-namespace MediCare.Domain.Entities.Catalog
+namespace MediCare.Domain.Entities.HospitalRecords
 {
     public class CartItems : BaseEntity
     {

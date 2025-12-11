@@ -10,7 +10,7 @@ public sealed class DisableTreatmentCategoryCommandHandler(IAppDbContext ctx)
 
         if (cat is null)
         {
-            throw new MarketNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
+            throw new MediCareNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
         }
 
         if (!cat.isEnabled) return Unit.Value; // idempotent
@@ -21,7 +21,7 @@ public sealed class DisableTreatmentCategoryCommandHandler(IAppDbContext ctx)
 
         if (hasActiveProducts)
         {
-            throw new MarketBusinessRuleException("category.disable.blocked.activeProducts",
+            throw new MediCareBusinessRuleException("category.disable.blocked.activeProducts",
                 $"Category {cat.CategoryName} cannot be disabled because it contains active products.");
         }
 

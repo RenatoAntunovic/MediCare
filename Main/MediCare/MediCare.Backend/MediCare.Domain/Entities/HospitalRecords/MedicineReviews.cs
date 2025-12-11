@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MediCare.Domain.Common;
 
-namespace MediCare.Domain.Entities.Catalog
+namespace MediCare.Domain.Entities.HospitalRecords
 {
     public class MedicineReviews : BaseEntity
     {

@@ -10,7 +10,7 @@ public sealed class UpdateMedicineCategoryCommandHandler(IAppDbContext ctx)
             .FirstOrDefaultAsync(ct);
 
         if (entity is null)
-            throw new MarketNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
+            throw new MediCareNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
 
         // Check for duplicate name (case-insensitive, except for the same ID)
         var exists = await ctx.MedicineCategories
@@ -18,7 +18,7 @@ public sealed class UpdateMedicineCategoryCommandHandler(IAppDbContext ctx)
 
         if (exists)
         {
-            throw new MarketConflictException("Name already exists.");
+            throw new MediCareConflictException("Name already exists.");
         }
 
         entity.Name = request.Name.Trim();

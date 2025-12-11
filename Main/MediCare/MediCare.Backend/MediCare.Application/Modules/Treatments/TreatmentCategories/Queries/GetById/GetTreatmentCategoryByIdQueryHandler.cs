@@ -16,7 +16,7 @@ public class GetTreatmentCategoryByIdQueryHandler(IAppDbContext context) : IRequ
 
         if (category == null)
         {
-            throw new MarketNotFoundException($"Product category with Id {request.Id} not found.");
+            throw new MediCareNotFoundException($"Product category with Id {request.Id} not found.");
         }
 
         return category;

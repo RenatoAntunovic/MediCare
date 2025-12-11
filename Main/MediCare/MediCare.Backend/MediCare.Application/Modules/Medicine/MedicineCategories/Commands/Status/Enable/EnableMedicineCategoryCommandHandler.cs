@@ -9,7 +9,7 @@ public sealed class EnableMedicineCategoryCommandHandler(IAppDbContext ctx)
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
         if (entity is null)
-            throw new MarketNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
+            throw new MediCareNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
 
         if (!entity.IsEnabled)
         {

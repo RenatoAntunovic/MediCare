@@ -12,11 +12,11 @@ public sealed class LoginCommandHandler(
 
         var user = await ctx.Users.Include(x => x.Role)
             .FirstOrDefaultAsync(x => x.Email.ToLower() == email && x.IsEnabled && !x.IsDeleted, ct)
-            ?? throw new MarketNotFoundException("Korisnik nije pronađen ili je onemogućen.");
+            ?? throw new MediCareNotFoundException("The user is not found or is disabled.");
 
         var verify = hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (verify == PasswordVerificationResult.Failed)
-            throw new MarketConflictException("Pogrešni kredencijali.");
+            throw new MediCareConflictException("Wrong credentials.");
 
         var tokens = jwt.IssueTokens(user);
 

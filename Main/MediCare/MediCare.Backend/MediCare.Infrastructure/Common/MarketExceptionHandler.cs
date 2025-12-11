@@ -40,8 +40,8 @@ public sealed class MarketExceptionHandler(
         ctx.Response.ContentType = "application/json";
         ctx.Response.StatusCode = ex switch
         {
-            MarketNotFoundException => StatusCodes.Status404NotFound,
-            MarketConflictException or MarketBusinessRuleException => StatusCodes.Status409Conflict,
+            MediCareNotFoundException => StatusCodes.Status404NotFound,
+            MediCareConflictException or MediCareBusinessRuleException => StatusCodes.Status409Conflict,
             ValidationException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
@@ -59,9 +59,9 @@ public sealed class MarketExceptionHandler(
 
         switch (ex)
         {
-            case MarketNotFoundException:
-            case MarketConflictException:
-            case MarketBusinessRuleException:
+            case MediCareNotFoundException:
+            case MediCareConflictException:
+            case MediCareBusinessRuleException:
                 code = "entity.error";
                 message = ex.Message;
                 break;

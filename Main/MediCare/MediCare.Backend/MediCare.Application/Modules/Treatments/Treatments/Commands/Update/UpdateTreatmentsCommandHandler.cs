@@ -12,7 +12,7 @@ public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
             .FirstOrDefaultAsync(ct);
 
         if (entity is null)
-            throw new MarketNotFoundException($"Treatment (ID={request.Id}) not found.");
+            throw new MediCareNotFoundException($"Treatment (ID={request.Id}) not found.");
     
         // Check for duplicate name (case-insensitive, except for the same ID)
         var exists = await ctx.Treatments
@@ -20,7 +20,7 @@ public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
 
         if (exists)
         {
-            throw new MarketConflictException("Name already exists.");
+            throw new MediCareConflictException("Name already exists.");
         }
 
         entity.ServiceName = request.ServiceName;

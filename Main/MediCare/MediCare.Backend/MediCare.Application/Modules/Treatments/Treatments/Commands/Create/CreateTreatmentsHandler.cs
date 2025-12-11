@@ -16,7 +16,7 @@ public class CreateTreatmentsCommandHandler(IAppDbContext context)
 
         if (exists)
         {
-            throw new MarketConflictException("Name already exists.");
+            throw new MediCareConflictException("Name already exists.");
         }
 
         var treatment = new Treatments

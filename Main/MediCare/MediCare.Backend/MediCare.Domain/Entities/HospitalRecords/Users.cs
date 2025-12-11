@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MediCare.Domain.Common;
 using MediCare.Domain.Entities.Identity;
 
-namespace MediCare.Domain.Entities.Catalog
+namespace MediCare.Domain.Entities.HospitalRecords
 {
     public class Users : BaseEntity
     {

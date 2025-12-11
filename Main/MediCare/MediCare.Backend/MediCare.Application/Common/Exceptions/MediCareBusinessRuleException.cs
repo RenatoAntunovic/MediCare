@@ -9,17 +9,17 @@
 ///
 /// Example: attempting to disable a category that still contains active products.
 /// </summary>
-public sealed class MarketBusinessRuleException : Exception
+public sealed class MediCareBusinessRuleException : Exception
 {
     public string Code { get; }
 
-    public MarketBusinessRuleException(string code, string message)
+    public MediCareBusinessRuleException(string code, string message)
         : base(message)
     {
         Code = code;
     }
 
-    public MarketBusinessRuleException(string code, string message, Exception? innerException)
+    public MediCareBusinessRuleException(string code, string message, Exception? innerException)
         : base(message, innerException)
     {
         Code = code;
