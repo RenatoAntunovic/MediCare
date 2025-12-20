@@ -1,0 +1,146 @@
+<div class="container">
+  <!-- Header -->
+  <div class="header-card mat-elevation-z2">
+    <h1>{{ 'TREATMENTS.EDIT.TITLE' | translate }}</h1>
+  </div>
+
+  <!-- Form Card -->
+  <div class="form-card mat-elevation-z2">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!isLoading || form">
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="error-banner">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      
+
+      <!-- Product Name -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'TREATMENTS.FORM.NAME' | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          [placeholder]="'TREATMENTS.FORM.NAME_PLACEHOLDER' | translate"
+        />
+        <mat-icon matSuffix>inventory_2</mat-icon>
+        <mat-error *ngIf="hasError('name')">
+          {{ getErrorMessage('name') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Description -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'TREATMENTS.FORM.DESCRIPTION' | translate }}</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          [placeholder]="'TREATMENTS.FORM.DESCRIPTION_PLACEHOLDER' | translate"
+          rows="4"
+        ></textarea>
+        <mat-icon matSuffix>description</mat-icon>
+        <mat-error *ngIf="hasError('description')">
+          {{ getErrorMessage('description') }}
+        </mat-error>
+      </mat-form-field>
+
+<!-- IMAGE UPLOAD -->
+<div class="image-upload-container">
+  <label class="image-label">
+    {{ 'TREATMENTS.FORM.PICTURE' | translate }}
+  </label>
+
+  <div class="image-upload-box">
+    <button
+      mat-stroked-button
+      color="primary"
+      type="button"
+      (click)="fileInput.click()"
+    >
+      <mat-icon>upload</mat-icon>
+      {{'TREATMENTS.FORM.CHOOSE' | translate}} 
+    </button>
+
+    <span class="file-name" *ngIf="selectedFile">
+      {{ selectedFile.name }}
+    </span>
+  </div>
+
+  <input
+    #fileInput
+    type="file"
+    hidden
+    accept="image/*"
+    (change)="onFileSelected($event)"
+  />
+</div>
+
+
+<!-- Opcionalno: prikaz trenutne slike -->
+<img *ngIf="currentImageSrc" [src]="currentImageSrc" alt="Current Image" width="150" />
+
+
+
+
+      <!-- Price and Category Row -->
+      <div class="form-row">
+        <!-- Price -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>{{ 'TREATMENTS.FORM.PRICE' | translate }}</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="price"
+            step="0.01"
+            [placeholder]="'TREATMENT.FORM.PRICE_PLACEHOLDER' | translate"
+          />
+          <span matTextPrefix>KM&nbsp;</span>
+          <mat-icon matSuffix>payments</mat-icon>
+          <mat-error *ngIf="hasError('price')">
+            {{ getErrorMessage('price') }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Category -->
+  <mat-form-field appearance="outline" class="half-width">
+    <mat-label>{{ 'TREATMENTS.FORM.CATEGORY' | translate }}</mat-label>
+    <mat-select formControlName="categoryId">
+      <mat-option *ngFor="let category of categories" [value]="category.id">
+        {{ category.categoryName }}
+      </mat-option>
+    </mat-select>
+    <mat-icon matSuffix>category</mat-icon>
+    <mat-error *ngIf="hasError('categoryId')">
+      {{ getErrorMessage('categoryId') }}
+    </mat-error>
+  </mat-form-field>
+      </div>
+
+      
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" mat-stroked-button (click)="onCancel()" [disabled]="isLoading">
+          <mat-icon>close</mat-icon>
+          {{ 'TREATMENTS.FORM.CANCEL' | translate }}
+        </button>
+
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          [disabled]="form.invalid || isLoading"
+        >
+          <mat-icon>save</mat-icon>
+          {{ 'TREATMENTS.FORM.UPDATE' | translate }}
+        </button>
+      </div>
+    </form>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading && !form" class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>{{ 'TREATMENTS.EDIT.LOADING' | translate }}</p>
+    </div>
+  </div>
+</div>
