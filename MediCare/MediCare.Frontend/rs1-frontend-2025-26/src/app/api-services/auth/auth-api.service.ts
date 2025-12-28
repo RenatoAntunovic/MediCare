@@ -16,6 +16,7 @@ import {
 export class AuthApiService {
   private readonly baseUrl = `${environment.apiUrl}/api/Auth`;
   private http = inject(HttpClient);
+  currentUserId: number | null = null;
 
   /**
    * POST /Auth/login
@@ -32,6 +33,28 @@ export class AuthApiService {
   refresh(payload: RefreshTokenCommand): Observable<RefreshTokenCommandDto> {
     return this.http.post<RefreshTokenCommandDto>(`${this.baseUrl}/refresh`, payload);
   }
+
+
+  setCurrentUserId(id: number) {
+    this.currentUserId = id;
+    localStorage.setItem('currentUserId', id.toString()); // opcionalno za reload
+    console.log('User logged in, currentUserId set to:', id);
+  }
+
+  // dohvat userId za checkout
+  getCurrentUserId(): number {
+    if (this.currentUserId === null) {
+      // pokušaj dohvatiti iz localStorage
+      const stored = localStorage.getItem('currentUserId');
+      if (stored) {
+        this.currentUserId = parseInt(stored, 10);
+      } else {
+        throw new Error('No user logged in');
+      }
+    }
+    return this.currentUserId;
+  }
+
 
   /**
    * POST /Auth/logout

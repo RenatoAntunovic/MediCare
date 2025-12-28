@@ -13,6 +13,8 @@ import { DialogHelperService } from '../../../shared/services/dialog-helper.serv
 import { DialogButton } from '../../../shared/models/dialog-config.model';
 import { ListMedicineCategoriesQueryDto, ListMedicineCategoriesRequest } from '../../../../api-services/medicine-categories/medicine-categories-api.model';
 import { MedicineCategoriesApiService } from '../../../../api-services/medicine-categories/medicine-categories-api.service';
+import { FavouritesService } from '../../../../api-services/favourites/favourites-api.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-medicine',
@@ -29,6 +31,9 @@ export class MedicineComponent
   private router = inject(Router);
   private toaster = inject(ToasterService);
   private dialogHelper = inject(DialogHelperService);
+  private favoritesService = inject(FavouritesService);
+  private snackbar = inject(MatSnackBar);
+  isDarkMode=false;
 
   displayedColumns: string[] = [
     'imageFile',
@@ -43,14 +48,35 @@ export class MedicineComponent
 categories: ListMedicineCategoriesQueryDto[] = [];
 categoryFilter: number | null = null;
 
+private lastRequestTime = 0;
+private requestCooldown = 2000;
+
   constructor() {
     super();
     this.request = new ListMedicineRequest();
   }
 
+
+  
+  toggleDarkMode(): void {
+    this.isDarkMode = !this.isDarkMode;
+    document.body.classList.toggle('dark-mode', this.isDarkMode);
+    localStorage.setItem('darkMode', this.isDarkMode ? 'true' : 'false');
+  }
+
+goToMedicineDetail(medicine: any) {
+  this.router.navigate(['/client/medicine', medicine.id]);
+}
+
+
+
   ngOnInit(): void {
     this.initList();
     this.loadCategories();
+    const darkMode = localStorage.getItem('darkMode');
+  if (darkMode === 'true') {
+    document.body.classList.add('dark-mode');
+  }
   }
 
   onCategoryFilterChange(categoryId: number | null): void {
@@ -71,32 +97,64 @@ private loadCategories():void{
   });
 }
 
+  addToFavourites(item: any) {
+    const command = { medicineId: item.id }; // AddToFavouritesCommand payload
+
+    this.favoritesService.addToFavourites(command).subscribe({
+      next: (res: { favouriteId: number }) => {
+        this.snackbar.open('Dodano u favorite', '', {
+          duration: 2000,
+          panelClass: ['custom-snackbar']
+        });
+
+        // opciono: ažurirati item ili dataSource da pokaže da je već u favorite
+        item.isFavourite = true;
+      },
+      error: () => {
+        this.snackbar.open('Greška prilikom dodavanja u favorite', '', {
+          duration: 2000,
+          panelClass: ['custom-snackbar']
+        });
+      }
+    });
+  }
+
+
 onCreate() {}
 onEdit(medicine: any) {}
 onDelete(medicine: any) {}
 onToggleStatus(medicine: any) {}
 
-  protected loadPagedData(): void {
-    this.startLoading();
+protected loadPagedData(): void {
+  const now = Date.now();
+  if (now - this.lastRequestTime < this.requestCooldown) {
+    this.toaster.error('Too many requests, please wait a few seconds.');
+    return;
+  }
+  this.lastRequestTime = now;
 
-this.api.list(this.request).subscribe({
-  next: (response) => {
-    console.log('Medicines:', response.items);
-    this.items = response.items;
-    this.stopLoading();
-  },
-  error: (err) => {
-    console.error('Load error:', err);
-    this.stopLoading('Failed to load medicines');
-  }
-});
-  }
+  this.startLoading();
+
+  this.api.list(this.request).subscribe({
+    next: (response) => {
+      console.log('Medicines:', response.items);
+      this.items = response.items;
+      this.stopLoading();
+    },
+    error: (err) => {
+      console.error('Load error:', err);
+      this.stopLoading('Failed to load medicines');
+    }
+  });
+}
 
   // === UI Actions ===
 
 
   onSearch(): void {
     this.request.paging.page = 1;
+
     this.loadPagedData();
   }
+
 }

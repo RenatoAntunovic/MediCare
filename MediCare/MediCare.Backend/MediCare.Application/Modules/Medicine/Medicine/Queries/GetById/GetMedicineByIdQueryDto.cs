@@ -17,5 +17,8 @@ namespace MediCare.Application.Modules.Medicine.Medicine.Queries.GetById
         public required string ImagePath { get; set; }
         public required int Weight { get; set; }
         public required bool isEnabled { get; set; }
+
+        public List<string> Doses { get; set; } = new();
+        public List<string> Packages { get; set; } = new();
     }
 }

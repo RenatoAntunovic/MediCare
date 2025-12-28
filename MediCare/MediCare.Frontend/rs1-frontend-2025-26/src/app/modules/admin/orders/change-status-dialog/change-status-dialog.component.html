@@ -13,7 +13,7 @@
     <div class="order-info">
       <div class="order-ref">
         <mat-icon>confirmation_number</mat-icon>
-        <span>{{ data.order.referenceNumber }}</span>
+        <span>{{ data.order.id }}</span>
       </div>
       <div class="customer-name">
         <mat-icon>person</mat-icon>
@@ -45,15 +45,15 @@
       </div>
 
       <mat-radio-group
-        [(ngModel)]="selectedStatus"
+        [(ngModel)]="selectedStatusId"
         class="status-radio-group"
         *ngIf="availableStatuses.length > 0">
         <mat-radio-button
           *ngFor="let status of availableStatuses"
-          [value]="status"
+          [value]="status.id"
           class="status-radio-option">
-          <div class="status-badge" [ngClass]="getStatusClass(status)">
-            <mat-icon>{{ getStatusIcon(status) }}</mat-icon>
+          <div class="status-badge" [ngClass]="getStatusClass(status.id)">
+            <mat-icon>{{ getStatusIcon(status.id) }}</mat-icon>
             <span>{{ getStatusLabel(status) | translate }}</span>
           </div>
         </mat-radio-button>
@@ -61,7 +61,7 @@
     </div>
 
     <!-- Warning Message -->
-    <div class="warning-message" *ngIf="selectedStatus === OrderStatusType.Cancelled">
+    <div class="warning-message" *ngIf="selectedStatusId === 5">
       <mat-icon>warning</mat-icon>
       <p>{{ 'ORDERS.CHANGE_STATUS.CANCEL_WARNING' | translate }}</p>
     </div>

@@ -1,0 +1,75 @@
+<!-- Glavni sadržaj: slika lijevo, detalji desno -->
+<div class="container">
+  <!-- Header -->
+  <div class="header-card mat-elevation-z2">
+    <div class="header-card-content">
+      <h1>{{ 'MEDICINE.TITLE' | translate }}</h1>
+      
+      <button mat-icon-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="detail-content">
+    <!-- Lijevo: slika -->
+    <div class="left">
+      <img [src]="'https://localhost:7260/' + medicine.imagePath" alt="{{medicine.name}}">
+    </div>
+
+    <!-- Desno: detalji -->
+    <div class="right" *ngIf="medicine">
+      <p class="medicine-categoryname"><strong>{{medicine.medicineCategoryName}}</strong></p>
+      <h1 class="medicine-name">{{ medicine.name }}</h1>
+      <hr>
+      <p><strong>Opis:</strong></p>
+      <p class="desc">{{ medicine.description }}</p>
+      <div class="mini-flex">
+      <p><strong>Težina:</strong> {{ medicine.weight }} Mg</p>
+      <p><strong>Cijena:</strong> {{ medicine.price }} KM</p>
+      </div>
+      <div class="add-to-cart-wrapper">
+
+  <!-- Količina -->
+  <mat-form-field appearance="outline" class="quantity-field">
+    <mat-label>Količina</mat-label>
+    <input
+      matInput
+      type="number"
+      min="1"
+      [(ngModel)]="quantity"
+    />
+  </mat-form-field>
+
+  <!-- Add to cart dugme -->
+  <button
+    mat-raised-button
+    class="add-to-cart-btn"
+    (click)="addToCart()">
+    <mat-icon>shopping_cart</mat-icon>
+    Dodaj u korpu
+  </button>
+
+    <button
+    mat-icon-button
+    class="add-to-favourites-btn"
+    (click)="addToFavourites()">
+    <mat-icon>favorite_border</mat-icon>
+  </button>
+
+      <button
+    mat-icon-button
+    class="add-to-for-later-btn"
+    (click)="addToForLater()">
+    <mat-icon>bookmark_border</mat-icon>
+  </button>
+
+</div>
+
+
+    </div>
+  </div>
+</div>
+

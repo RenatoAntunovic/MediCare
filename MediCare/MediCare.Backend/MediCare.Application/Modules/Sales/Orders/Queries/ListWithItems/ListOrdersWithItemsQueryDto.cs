@@ -8,7 +8,8 @@
     public Medicine Medicine { get; set; }
     public int Quantity { get; set; }
     public decimal Price { get; set; }
-    public required OrderStatus OrderStatus { get; set; }
+    public int StatusId { get; set; }
+    public string StatusName { get; set; }
     public required List<ListOrdersWithItemsQueryDtoItem> Items { get; set; }
 
 

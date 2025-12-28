@@ -1,6 +1,6 @@
 // products.component.ts
 
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit,ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   ListTreatmentsRequest,
@@ -11,6 +11,8 @@ import { BaseListPagedComponent } from '../../../../core/components/base-classes
 import { ToasterService } from '../../../../core/services/toaster.service';
 import { DialogHelperService } from '../../../shared/services/dialog-helper.service';
 import { DialogButton } from '../../../shared/models/dialog-config.model';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-treatment',
@@ -29,18 +31,25 @@ export class TreatmentComponent
 
   displayedColumns: string[] = [
     'imageFile',
-    'name',
+    'serviceName',
     'treatmentsCategoryName',
     'price',
     'isEnabled',
     'actions'
   ];
+  dataSource = new MatTableDataSource<any>([]);
+
+  @ViewChild(MatSort) sort!:MatSort;
 
   constructor() {
     super();
     this.request = new ListTreatmentsRequest();
     console.log('ADMIN TREATMENT COMPONENT');
   }
+
+    ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
+    } 
 
   ngOnInit(): void {
     this.initList();
@@ -55,6 +64,7 @@ this.api.list(this.request).subscribe({
   next: (response) => {
     console.log('Treatments:', response.items);
     this.items = response.items;
+    this.dataSource.data = this.items;
     this.stopLoading();
   },
   error: (err) => {

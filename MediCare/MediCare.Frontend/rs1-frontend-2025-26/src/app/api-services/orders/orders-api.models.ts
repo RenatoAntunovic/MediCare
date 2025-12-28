@@ -1,24 +1,6 @@
 import { PageResult } from '../../core/models/paging/page-result';
 import { BasePagedQuery } from '../../core/models/paging/base-paged-query';
 
-// === ENUMS ===
-
-/**
- * Order status enum
- * Corresponds to: OrderStatusType.cs
- */
-export enum OrderStatusType {
-  /** Order is created but not yet confirmed */
-  Draft = 1,
-  /** Order is confirmed and awaiting payment */
-  Confirmed = 2,
-  /** Payment received and order is being processed */
-  Paid = 3,
-  /** Order has been shipped or delivered */
-  Completed = 4,
-  /** Order has been cancelled */
-  Cancelled = 5
-}
 
 // === QUERIES (READ) ===
 
@@ -58,13 +40,16 @@ export interface ListOrdersQueryDtoUser {
  */
 export interface ListOrdersQueryDto {
   id: number;
-  referenceNumber: string | null;
-  user: ListOrdersQueryDtoUser;
-  orderedAtUtc: string; // ISO date string
-  paidAtUtc: string | null; // ISO date string
-  status: OrderStatusType;
+  user: {
+    userFirstname: string;
+    userLastname: string;
+    userAddress: string;
+    userCity: string;
+  };
   totalAmount: number;
-  note: string | null;
+  orderDate: string; // ISO string
+  statusId: number;
+  statusName: string;
 }
 
 /**
@@ -105,16 +90,29 @@ export interface ListOrdersWithItemsQueryDtoUser {
  * Corresponds to: ListOrdersWithItemsQueryDto.cs
  */
 export interface ListOrdersWithItemsQueryDto {
-  id: number;
-  referenceNumber: string | null;
-  user: ListOrdersWithItemsQueryDtoUser;
-  orderedAtUtc: string; // ISO date string
-  paidAtUtc: string | null; // ISO date string
-  status: OrderStatusType;
-  totalAmount: number;
-  note: string | null;
-  items: ListOrdersWithItemsQueryDtoItem[];
+  orderId: number;
+  user: {
+    userFirstname: string;
+    userLastname: string;
+    userAddress: string;
+    userCity: string;
+    phoneNumber: string;
+  };
+  orderDate: string;
+  statusId: number;
+  statusName: string;
+  items: {
+    id: number;
+    medicine: {
+      medicineId: number;
+      medicineName: string;
+      medicineCategoryName: string;
+    };
+    quantity: number;
+    price: number;
+  }[];
 }
+
 
 /**
  * User info in GetById response
@@ -155,15 +153,27 @@ export interface GetByIdOrderQueryDtoItem {
  */
 export interface GetOrderByIdQueryDto {
   id: number;
-  referenceNumber: string | null;
-  user: GetByIdOrderQueryDtoUser;
-  orderedAtUtc: string; // ISO date string
-  paidAtUtc: string | null; // ISO date string
-  status: OrderStatusType;
-  totalAmount: number;
-  note: string | null;
-  items: GetByIdOrderQueryDtoItem[];
+  user: {
+    userFirstname: string;
+    userLastname: string;
+    userAddress: string;
+    userCity: string;
+  };
+  orderDate: string;
+  statusId: number;
+  statusName: string;
+  items: {
+    orderId: number;
+    medicine: {
+      medicineId: number;
+      medicineName: string;
+      medicineCategoryName: string;
+    };
+    quantity: number;
+    price: number;
+  }[];
 }
+
 
 /**
  * Paged response for GET /Orders

@@ -35,24 +35,35 @@ export class MedicineCategoriesComponent
     this.request.onlyEnabled = true;
   }
 
+  private lastRequestTime = 0;
+  private requestCooldown = 2000;
+
   ngOnInit(): void {
     this.initList();
   }
 
-  protected loadPagedData(): void {
-    this.startLoading();
-
-    this.api.list(this.request).subscribe({
-      next: (response) => {
-        this.handlePageResult(response);
-        this.stopLoading();
-      },
-      error: (err) => {
-        this.stopLoading('Failed to load categories');
-        console.error('Load categories error:', err);
-      },
-    });
+protected loadPagedData(): void {
+  const now = Date.now();
+  if (now - this.lastRequestTime < this.requestCooldown) {
+    this.toaster.error('Too many requests, please wait a few seconds.');
+    return;
   }
+  this.lastRequestTime = now;
+
+  this.startLoading();
+
+  this.api.list(this.request).subscribe({
+    next: (response) => {
+      console.log('Categories:', response.items);
+      this.items = response.items;
+      this.stopLoading();
+    },
+    error: (err) => {
+      console.error('Load error:', err);
+      this.stopLoading('Failed to load categories');
+    }
+  });
+}
 
   // === Filters ===
 
@@ -136,7 +147,7 @@ export class MedicineCategoriesComponent
         // Show error dialog instead of toast
         this.dialogHelper.showError(
           'DIALOGS.TITLES.ERROR',
-          'PRODUCT_CATEGORIES.DIALOGS.ERROR_DELETE'
+          'MEDICINE_CATEGORIES.DIALOGS.ERROR_DELETE'
         ).subscribe();
 
         console.error('Delete category error:', err);
@@ -166,7 +177,7 @@ export class MedicineCategoriesComponent
           // Business rule conflict - show dialog for important errors
           this.dialogHelper.showWarning(
             'DIALOGS.TITLES.WARNING',
-            errorMessage || 'PRODUCT_CATEGORIES.DIALOGS.ERROR_TOGGLE',
+            errorMessage || 'MEDICINE_CATEGORIES.DIALOGS.ERROR_TOGGLE',
             { name: category.name }
           ).subscribe();
         } else {

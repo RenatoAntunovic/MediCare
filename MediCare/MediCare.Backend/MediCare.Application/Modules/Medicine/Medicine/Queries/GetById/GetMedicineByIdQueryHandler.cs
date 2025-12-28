@@ -16,7 +16,7 @@ public class GetMedicineByIdQueryHandler(IAppDbContext context) : IRequestHandle
                 MedicineCategoryName = x.MedicineCategory.Name,
                 ImagePath = x.ImagePath,
                 Weight = x.Weight,
-                isEnabled = x.isEnabled,
+                isEnabled = x.isEnabled
             })
             .FirstOrDefaultAsync(cancellationToken);
 

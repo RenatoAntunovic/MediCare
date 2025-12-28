@@ -16,6 +16,12 @@ import { ToasterService } from '../services/toaster.service';
  * - Re-throws errors so components can handle them
  */
 export const errorLoggingInterceptor: HttpInterceptorFn = (req, next) => {
+    console.log('HTTP Request SENT:', {
+    url: req.url,
+    method: req.method,
+    headers: req.headers.keys(),
+    body: req.body
+  });
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       // Log error to console

@@ -61,8 +61,23 @@
       </div>
 
       <a mat-list-item routerLink="/client/medicine" routerLinkActive="active">
-        <mat-icon matListItemIcon>inventory_2</mat-icon>
+        <mat-icon matListItemIcon> local_pharmacy</mat-icon>
         <span matListItemTitle>{{ 'CLIENT_PANEL.MENU.MEDICINE' | translate }}</span>
+      </a> 
+
+      <a mat-list-item routerLink="/client/cart" routerLinkActive="active">
+        <mat-icon matListItemIcon> shopping_cart</mat-icon>
+        <span matListItemTitle>{{ 'CLIENT_PANEL.MENU.CARTS' | translate }}</span>
+      </a>
+
+      <a mat-list-item routerLink="/client/favourites" routerLinkActive="active">
+        <mat-icon matListItemIcon> favorite_border</mat-icon>
+        <span matListItemTitle>{{ 'CLIENT_PANEL.MENU.FAVOURITES' | translate }}</span>
+      </a>
+
+      <a mat-list-item routerLink="/client/for-later" routerLinkActive="active">
+        <mat-icon matListItemIcon> bookmark_border</mat-icon>
+        <span matListItemTitle>{{ 'CLIENT_PANEL.MENU.FOR_LATER' | translate }}</span>
       </a>
 
       <mat-divider></mat-divider>
@@ -72,11 +87,24 @@
       </div>
 
       <a mat-list-item routerLink="/client/treatments" routerLinkActive="active">
-        <mat-icon matListItemIcon>inventory_2</mat-icon>
+        <mat-icon matListItemIcon>local_hospital</mat-icon>
         <span matListItemTitle>{{ 'CLIENT_PANEL.MENU.TREATMENT' | translate }}</span>
       </a>
 
       <mat-divider></mat-divider>
+
+      <div class="nav-section-title">
+        {{ 'CLIENT_PANEL.MENU.ORDERS' | translate }}
+      </div>
+
+      <a mat-list-item routerLink="/client/orders" routerLinkActive="active">
+        <mat-icon matListItemIcon>list_alt</mat-icon>
+        <span matListItemTitle>{{ 'CLIENT_PANEL.MENU.ORDERS' | translate }}</span>
+      </a>
+
+      <mat-divider></mat-divider>
+
+
 
       <!-- SYSTEM SECTION -->
       <div class="nav-section-title">

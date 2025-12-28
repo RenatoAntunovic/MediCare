@@ -48,6 +48,9 @@
     },
     "MENU": {
       "PHARMACY": "Apoteka",
+      "CARTS":"Košara",
+      "FAVOURITES":"Favoriti",
+      "FOR_LATER":"Za kasnije",
       "CATEGORIES": "Kategorije lijekova",
       "MEDICINE": "Lijekovi",
       "HOSPITAL": "Bolnica",
@@ -60,6 +63,35 @@
       "LOGOUT": "Odjava"
     }
   },
+"CART":{
+  "TITLE":"Košara",
+"TABLE": {
+      "QUANTITY": "Količina",
+      "PRICE": "Cijena (KM)",
+      "ACTIONS": "Akcije",
+      "TOTAL":"Ukupno"
+    },
+    "NO_DATA":"Nema lijekova za prikaz",
+    "NO_DATA_FILTER":"Nema rezultata za pretragu"
+},
+"FAVOURITES":{
+  "TITLE":"Favoriti",
+"TABLE": {
+      "PRICE": "Cijena (KM)",
+      "ACTIONS": "Akcije"
+    },
+    "NO_DATA":"Nema lijekova za prikaz",
+    "NO_DATA_FILTER":"Nema rezultata za pretragu"
+},
+"FOR_LATER":{
+  "TITLE":"Za kasnije",
+"TABLE": {
+      "PRICE": "Cijena (KM)",
+      "ACTIONS": "Akcije"
+    },
+    "NO_DATA":"Nema lijekova za prikaz",
+    "NO_DATA_FILTER":"Nema rezultata za pretragu"
+},
   "MEDICINE_CATEGORIES": {
     "TITLE": "Kategorije lijekova",
     "SUBTITLE": "Upravljanje kategorijama lijekova",
@@ -132,7 +164,8 @@
     },
     "ACTIONS": {
       "EDIT_TOOLTIP": "Uredi lijek",
-      "DELETE_TOOLTIP": "Obriši lijek"
+      "DELETE_TOOLTIP": "Obriši lijek",
+      "ADD_TO_FAVOURITES_TOOLTIP":"Dodaj u favorite"
     },
     "ADD": {
       "TITLE": "Dodaj Novi lijek",
@@ -310,7 +343,7 @@
       "CANCELLED": "Narudžba otkazana"
     },
     "TABLE": {
-      "ORDER_NUMBER": "Broj Narudžbe",
+      "ID": "Broj Narudžbe",
       "CUSTOMER": "Kupac",
       "TOTAL_AMOUNT": "Ukupno",
       "STATUS": "Status",

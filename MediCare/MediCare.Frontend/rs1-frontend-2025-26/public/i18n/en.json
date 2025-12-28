@@ -50,6 +50,9 @@
       "PHARMACY": "Pharmacy",
       "CATEGORIES": "Medicine Categories",
       "MEDICINE": "Medicine",
+      "CARTS":"Cart",
+      "FAVOURITES":"Favorites",
+      "FOR_LATER":"For later",
       "HOSPITAL": "Hospital",
       "TREATMENT_CATEGORIES":"Treatment categories",
       "TREATMENT":"Treatment",
@@ -60,6 +63,35 @@
       "LOGOUT": "Logout"
     }
   },
+  "CART":{
+    "TITLE":"Cart",
+"TABLE": {
+      "QUANTITY": "Quantity",
+      "PRICE": "Price (KM)",
+      "ACTIONS": "Action",
+      "TOTAL":"Total"
+    },
+    "NO_DATA":"No medicines to display",
+    "NO_DATA_FILTER":"No results found for search"
+},
+"FAVOURITES":{
+    "TITLE":"Favourites",
+"TABLE": {
+      "PRICE": "Price (KM)",
+      "ACTIONS": "Action"
+    },
+    "NO_DATA":"No medicines to display",
+    "NO_DATA_FILTER":"No results found for search"
+},
+"FOR_LATER":{
+    "TITLE":"For later",
+"TABLE": {
+      "PRICE": "Price (KM)",
+      "ACTIONS": "Action"
+    },
+    "NO_DATA":"No medicines to display",
+    "NO_DATA_FILTER":"No results found for search"
+},
   "MEDICINE_CATEGORIES": {
     "TITLE": "Medicine Categories",
     "SUBTITLE": "Manage medicine categories",
@@ -132,7 +164,8 @@
     },
     "ACTIONS": {
       "EDIT_TOOLTIP": "Edit medicine",
-      "DELETE_TOOLTIP": "Delete medicine"
+      "DELETE_TOOLTIP": "Delete medicine",
+      "ADD_TO_FAVOURITES_TOOLTIP":"Add to favorites"
     },
     "ADD": {
       "TITLE": "Add New Medicine",
@@ -309,7 +342,7 @@
       "CANCELLED": "Order has been cancelled"
     },
     "TABLE": {
-      "ORDER_NUMBER": "Order #",
+      "ID": "Order number",
       "CUSTOMER": "Customer",
       "TOTAL_AMOUNT": "Total",
       "STATUS": "Status",

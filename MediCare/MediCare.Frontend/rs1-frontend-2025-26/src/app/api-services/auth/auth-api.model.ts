@@ -15,6 +15,7 @@ export interface LoginCommand {
  * Corresponds to: LoginCommandDto.cs
  */
 export interface LoginCommandDto {
+  id: number;
   accessToken: string;
   refreshToken: string;
   /**

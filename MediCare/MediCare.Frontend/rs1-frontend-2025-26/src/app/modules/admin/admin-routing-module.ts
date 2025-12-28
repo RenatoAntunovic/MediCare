@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
+import { OrderDetailsDialogComponent } from './orders/admin-orders-details-dialog/order-details-dialog.component';
 import { AdminLayoutComponent } from './admin-layout/admin-layout.component';
 import { MedicineComponent } from './catalogs/products/medicine.component';
 import { MedicineAddComponent } from './catalogs/products/medicine-add/medicine-add.component';
@@ -58,7 +58,6 @@ const routes: Routes = [
         path: 'orders',
         component: AdminOrdersComponent,
       },
-
       {
         path: 'settings',
         component: AdminSettingsComponent,

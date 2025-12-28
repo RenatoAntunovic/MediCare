@@ -8,6 +8,7 @@ namespace MediCare.Application.Modules.Sales.Orders.Commands.Create
 {
     public class CreateOrderCommand : IRequest<int>
     {
+        public int UserId { get; set; }
         public List<CreateOrderCommandItem> Items { get; set; } = [];
     }
 

@@ -11,5 +11,4 @@ public class CreateMedicineCommand : IRequest<int>
     public required IFormFile ImageFile { get; set; }
     public required int Weight { get; set; }
     public required bool isEnabled { get; set; }
-
 }

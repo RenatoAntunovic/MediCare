@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MediCare.Domain.Common;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +19,6 @@ namespace MediCare.Domain.Entities.HospitalRecords
         public MedicineCategories MedicineCategory { get; set; }
         public string ImagePath { get; set; }
         public int Weight { get; set; }
-
         public bool isEnabled { get; set; }
         public ICollection<ReceivingItems> ReceivingItems { get; set; } = new List<ReceivingItems>();
 

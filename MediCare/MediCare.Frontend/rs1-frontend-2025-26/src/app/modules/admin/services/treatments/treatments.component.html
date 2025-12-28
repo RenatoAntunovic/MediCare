@@ -36,8 +36,8 @@
   </div>
 
   <!-- Tabela -->
-  <div class="mat-elevation-z8" *ngIf="!isLoading && !errorMessage">
-    <table mat-table [dataSource]="items">
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort [hidden]="isLoading || errorMessage">
 
 <ng-container matColumnDef="imageFile">
   <th mat-header-cell *matHeaderCellDef>{{'TREATMENTS.TABLE.PICTURE' | translate}}</th>
@@ -52,8 +52,8 @@
       </ng-container>
 
       <!-- Naziv -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.NAME' | translate }}</th>
+      <ng-container matColumnDef="serviceName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="serviceName">{{ 'TREATMENTS.TABLE.NAME' | translate }}</th>
         <td mat-cell *matCellDef="let treatment">
           <span style="font-weight: 500">{{ treatment.serviceName }}</span>
         </td>
@@ -61,7 +61,7 @@
 
       <!-- Kategorija -->
       <ng-container matColumnDef="treatmentsCategoryName">
-        <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.CATEGORY' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="treatmentsCategoryName">{{ 'TREATMENTS.TABLE.CATEGORY' | translate }}</th>
         <td mat-cell *matCellDef="let treatment">
           {{ treatment.treatmentsCategoryName }}
         </td>
@@ -69,7 +69,7 @@
 
       <!-- Cijena -->
       <ng-container matColumnDef="price">
-        <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.PRICE' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="price">{{ 'TREATMENTS.TABLE.PRICE' | translate }}</th>
         <td mat-cell *matCellDef="let treatment">
           <span style="font-weight: 600; color: #4976b5"
             >{{ treatment.price | number : '1.2-2' }} KM</span
@@ -79,7 +79,7 @@
 
       <!-- Aktivno -->
 <ng-container matColumnDef="isEnabled">
-  <th mat-header-cell *matHeaderCellDef>
+  <th mat-header-cell *matHeaderCellDef mat-sort-header="isEnabled">
     {{ 'TREATMENTS.TABLE.STATUS' | translate }}
   </th>
 

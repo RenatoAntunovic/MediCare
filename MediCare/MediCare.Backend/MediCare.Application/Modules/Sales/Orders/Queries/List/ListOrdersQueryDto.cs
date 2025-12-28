@@ -5,7 +5,9 @@ public sealed class ListOrdersQueryDto
     public required int Id { get; init; }
     public required ListOrdersQueryDtoUser User { get; init; }
     public required DateTime OrderDate { get; set; }
-    public required OrderStatus Status { get; set; }
+    public required int StatusId { get; set; }
+    public string StatusName { get; set; }
+    public decimal TotalAmount { get; set; }
 
 }
 public sealed class ListOrdersQueryDtoUser

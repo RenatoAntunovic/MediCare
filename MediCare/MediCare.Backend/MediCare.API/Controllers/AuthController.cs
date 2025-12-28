@@ -1,11 +1,12 @@
-﻿using MediCare.Application.Modules.Auth.Commands.Login;
+﻿using MediatR;
+using MediCare.Application.Modules.Auth.Commands.Login;
 using MediCare.Application.Modules.Auth.Commands.Logout;
 using MediCare.Application.Modules.Auth.Commands.Refresh;
 using MediCare.Application.Modules.Auth.Commands.Register;
-using MediatR;
+using MediCare.Application.Modules.Auth.Queries.GetUserById;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MediCare.Application.Modules.Auth.Queries.GetUserById;
+using Microsoft.AspNetCore.RateLimiting;
 
 [ApiController]
 [Route("api/auth")]
@@ -19,6 +20,7 @@ public sealed class AuthController : ControllerBase
         _sender = sender;
     }
 
+    [EnableRateLimiting("login")]
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<ActionResult<LoginCommandDto>> Login([FromBody] LoginCommand command, CancellationToken ct)

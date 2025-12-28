@@ -3,7 +3,8 @@
     public required int Id { get; init; }
     public required GetByIdOrderQueryDtoUser User { get; init; }
     public required DateTime OrderDate { get; set; }
-    public required OrderStatus Status { get; set; }
+    public required int StatusId { get; set; }
+    public required string StatusName { get; set; }
     public required List<GetByIdOrderQueryDtoItems> Items { get; set; }
 
 }

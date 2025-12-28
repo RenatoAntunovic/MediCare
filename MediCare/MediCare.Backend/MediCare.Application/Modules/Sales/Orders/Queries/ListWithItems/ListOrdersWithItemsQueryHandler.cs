@@ -27,7 +27,8 @@ public sealed class ListOrdersWithItemsQueryHandler(IAppDbContext ctx, IAppCurre
                     PhoneNumber = x.User!.PhoneNumber
                 },
                 OrderDate = x.OrderDate,
-                OrderStatus = x.OrderStatus,
+                StatusId = x.OrderStatusId,
+                StatusName = x.OrderStatus.StatusName,
                 //"x.Items" ili "ctx.OrderItems.Where(x => x.OrderId == x.Id)"
                 Items = x.OrderItems.Select(i => new ListOrdersWithItemsQueryDtoItem
                 {
@@ -39,7 +40,7 @@ public sealed class ListOrdersWithItemsQueryHandler(IAppDbContext ctx, IAppCurre
                         MedicineCategoryName = i.Medicine.MedicineCategory.Name
                     },
                     Quantity = i.Quantity,
-                    Price = i.Price,           
+                    Price = i.Price,
                 }).ToList()
             });
 

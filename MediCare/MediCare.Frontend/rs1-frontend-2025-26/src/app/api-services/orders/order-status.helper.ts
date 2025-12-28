@@ -1,4 +1,3 @@
-import { OrderStatusType } from './orders-api.models';
 
 /**
  * Helper class for working with Order Status
@@ -14,20 +13,14 @@ export class OrderStatusHelper {
    * @param status - Order status enum value
    * @returns Translated label key or default label
    */
-  static getLabel(status: OrderStatusType): string {
-    switch (status) {
-      case OrderStatusType.Draft:
-        return 'ORDERS.STATUS.DRAFT';
-      case OrderStatusType.Confirmed:
-        return 'ORDERS.STATUS.CONFIRMED';
-      case OrderStatusType.Paid:
-        return 'ORDERS.STATUS.PAID';
-      case OrderStatusType.Completed:
-        return 'ORDERS.STATUS.COMPLETED';
-      case OrderStatusType.Cancelled:
-        return 'ORDERS.STATUS.CANCELLED';
-      default:
-        return 'ORDERS.STATUS.UNKNOWN';
+  static getLabel(status: { id: number; name: string }): string {
+    switch (status.id) {
+    case 1: return 'status-draft';
+    case 2: return 'status-confirmed';
+    case 3: return 'status-paid';
+    case 4: return 'status-completed';
+    case 5: return 'status-cancelled';
+    default: return 'status-unknown';
     }
   }
 
@@ -39,20 +32,14 @@ export class OrderStatusHelper {
    * @param status - Order status enum value
    * @returns CSS class name for status color
    */
-  static getColorClass(status: OrderStatusType): string {
-    switch (status) {
-      case OrderStatusType.Draft:
-        return 'status-draft'; // Gray
-      case OrderStatusType.Confirmed:
-        return 'status-confirmed'; // Blue
-      case OrderStatusType.Paid:
-        return 'status-paid'; // Green
-      case OrderStatusType.Completed:
-        return 'status-completed'; // Dark Green
-      case OrderStatusType.Cancelled:
-        return 'status-cancelled'; // Red
-      default:
-        return 'status-unknown'; // Gray
+  static getColorClass(status: { id: number; name: string }): string {
+    switch (status.id) {
+    case 1: return 'status-draft';
+    case 2: return 'status-confirmed';
+    case 3: return 'status-paid';
+    case 4: return 'status-completed';
+    case 5: return 'status-cancelled';
+    default: return 'status-unknown';
     }
   }
 
@@ -62,22 +49,17 @@ export class OrderStatusHelper {
    * @param status - Order status enum value
    * @returns Material icon name
    */
-  static getIcon(status: OrderStatusType): string {
-    switch (status) {
-      case OrderStatusType.Draft:
-        return 'edit_note'; // Draft/note icon
-      case OrderStatusType.Confirmed:
-        return 'check_circle'; // Check circle
-      case OrderStatusType.Paid:
-        return 'payment'; // Payment icon
-      case OrderStatusType.Completed:
-        return 'done_all'; // Double check
-      case OrderStatusType.Cancelled:
-        return 'cancel'; // Cancel X icon
-      default:
-        return 'help_outline'; // Question mark
-    }
+static getIcon(status: { id: number; name: string }): string {
+  switch (status.id) {
+    case 1: return 'edit_note';
+    case 2: return 'check_circle';
+    case 3: return 'payment';
+    case 4: return 'done_all';
+    case 5: return 'cancel';
+    default: return 'help_outline';
   }
+}
+
 
   /**
    * Get all available statuses
@@ -86,28 +68,30 @@ export class OrderStatusHelper {
    *
    * @returns Array of all order statuses
    */
-  static getAllStatuses(): OrderStatusType[] {
-    return [
-      OrderStatusType.Draft,
-      OrderStatusType.Confirmed,
-      OrderStatusType.Paid,
-      OrderStatusType.Completed,
-      OrderStatusType.Cancelled
-    ];
-  }
+static getAllStatuses(): { id: number; name: string }[] {
+  return [
+    { id: 1, name: 'Draft' },
+    { id: 2, name: 'Confirmed' },
+    { id: 3, name: 'Paid' },
+    { id: 4, name: 'Completed' },
+    { id: 5, name: 'Cancelled' }
+  ];
+}
+
 
   /**
    * Get status options for dropdown
    *
    * @returns Array of status options with label and value
    */
-  static getStatusOptions(): Array<{ label: string; value: OrderStatusType; icon: string }> {
-    return this.getAllStatuses().map(status => ({
-      label: this.getLabel(status),
-      value: status,
-      icon: this.getIcon(status)
-    }));
-  }
+static getStatusOptions(): Array<{ label: string; value: { id: number; name: string }; icon: string }> {
+  return this.getAllStatuses().map(status => ({
+    label: status.name,         
+    value: status,              
+    icon: this.getIcon(status)  
+  }));
+}
+
 
   /**
    * Check if status allows editing
@@ -115,25 +99,16 @@ export class OrderStatusHelper {
    * @param status - Order status enum value
    * @returns true if order can be edited
    */
-  static canEdit(status: OrderStatusType): boolean {
-    // Only Draft and Confirmed orders can be edited
-    return status === OrderStatusType.Draft ||
-      status === OrderStatusType.Confirmed;
-  }
+static canEdit(status: { id: number; name: string }): boolean {
+  // Only Draft (id:1) and Confirmed (id:2) orders can be edited
+  return status.id === 1 || status.id === 2;
+}
 
-  /**
-   * Check if status allows cancellation
-   *
-   * @param status - Order status enum value
-   * @returns true if order can be cancelled
-   */
-  static canCancel(status: OrderStatusType): boolean {
-    // Can cancel Draft, Confirmed, and Paid orders
-    // Cannot cancel Completed or already Cancelled orders
-    return status === OrderStatusType.Draft ||
-      status === OrderStatusType.Confirmed ||
-      status === OrderStatusType.Paid;
-  }
+static canCancel(status: { id: number; name: string }): boolean {
+  // Can cancel Draft (1), Confirmed (2), and Paid (3) orders
+  return status.id === 1 || status.id === 2 || status.id === 3;
+}
+
 
   /**
    * Get next possible status transitions
@@ -141,20 +116,13 @@ export class OrderStatusHelper {
    * @param currentStatus - Current order status
    * @returns Array of possible next statuses
    */
-  static getNextStatuses(currentStatus: OrderStatusType): OrderStatusType[] {
-    switch (currentStatus) {
-      case OrderStatusType.Draft:
-        return [OrderStatusType.Confirmed, OrderStatusType.Cancelled];
-      case OrderStatusType.Confirmed:
-        return [OrderStatusType.Paid, OrderStatusType.Cancelled];
-      case OrderStatusType.Paid:
-        return [OrderStatusType.Completed, OrderStatusType.Cancelled];
-      case OrderStatusType.Completed:
-        return []; // Final status
-      case OrderStatusType.Cancelled:
-        return []; // Final status
-      default:
-        return [];
-    }
+static getNextStatuses(currentStatus: { id: number; name: string }): { id: number; name: string }[] {
+  switch (currentStatus.id) {
+    case 1: return [{ id: 2, name: 'Confirmed' }, { id: 5, name: 'Cancelled' }];
+    case 2: return [{ id: 3, name: 'Paid' }, { id: 5, name: 'Cancelled' }];
+    case 3: return [{ id: 4, name: 'Completed' }, { id: 5, name: 'Cancelled' }];
+    default: return [];
   }
+}
+
 }

@@ -4,18 +4,17 @@ import { BasePagedQuery } from '../../core/models/paging/base-paged-query';
 // === QUERIES (READ) ===
 
 /**
- * Query parameters for GET /Products
- * Corresponds to: ListProductsQuery.cs
+ * Query parameters for GET /Medicine
+ * Corresponds to: ListMedicineQuery.cs
  */
 export class ListMedicineRequest extends BasePagedQuery {
   search?: string | null;
   categoryId?:number | null;
-  // Future filters: categoryId?, isEnabled?, priceMin?, priceMax?
 }
 
 /**
- * Response item for GET /Products
- * Corresponds to: ListProductsQueryDto.cs
+ * Response item for GET /Medicine
+ * Corresponds to: ListMedicineQueryDto.cs
  */
 export interface ListMedicineQueryDto {
   id: number;
@@ -31,8 +30,8 @@ export interface ListMedicineQueryDto {
 
 
 /**
- * Response for GET /Products/{id}
- * Corresponds to: GetProductByIdQueryDto.cs
+ * Response for GET /Medicine/{id}
+ * Corresponds to: GetMedicineByIdQueryDto.cs
  */
 export interface GetMedicineByIdQueryDto {
   id: number;
@@ -40,7 +39,7 @@ export interface GetMedicineByIdQueryDto {
   description: string;
   price: number;
   medicineCategoryId: number;
-  categoryName: string;
+  medicineCategoryName: string;
   imagePath: string;
   weight: number;
   isEnabled: boolean;
@@ -59,15 +58,15 @@ export interface GetMedicineByCategoryIdQueryDto {
 }
 
 /**
- * Paged response for GET /Products
+ * Paged response for GET /Medicine
  */
 export type ListMedicineResponse = PageResult<ListMedicineQueryDto>;
 
 // === COMMANDS (WRITE) ===
 
 /**
- * Command for POST /Products
- * Corresponds to: CreateProductCommand.cs
+ * Command for POST /Medicine
+ * Corresponds to: CreateMedicineCommand.cs
  */
 export interface CreateMedicineCommand {
   name: string;
@@ -81,8 +80,8 @@ export interface CreateMedicineCommand {
 
 
 /**
- * Command for PUT /Products/{id}
- * Corresponds to: UpdateProductCommand.cs
+ * Command for PUT /Medicine/{id}
+ * Corresponds to: UpdateMedicineCommand.cs
  */
 export interface UpdateMedicineCommand {
   id: number;

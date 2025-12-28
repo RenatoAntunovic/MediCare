@@ -9,8 +9,7 @@ import {
   ListOrdersWithItemsResponse,
   GetOrderByIdQueryDto,
   CreateOrderCommand,
-  UpdateOrderCommand,
-  OrderStatusType
+  UpdateOrderCommand
 } from './orders-api.models';
 import { buildHttpParams } from '../../core/models/build-http-params';
 
@@ -78,9 +77,7 @@ export class OrdersApiService {
    * Change order status.
    * Validates status transitions on backend.
    */
-  changeStatus(id: number, newStatus: OrderStatusType): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${id}/change-status`, {
-      newStatus: newStatus
-    });
+  changeStatus(id: number, newStatusId: number): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${id}/change-status`, {newStatusId});
   }
 }

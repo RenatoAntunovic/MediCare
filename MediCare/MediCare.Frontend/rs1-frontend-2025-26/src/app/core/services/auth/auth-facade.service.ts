@@ -60,15 +60,32 @@ export class AuthFacadeService {
    * Login korisnika (email + password).
    * Snima tokene u storage, dekodira JWT i popunjava current user state.
    */
-  login(payload: LoginCommand): Observable<void> {
-    return this.api.login(payload).pipe(
-      tap((response: LoginCommandDto) => {
-        this.storage.saveLogin(response);           // access + refresh + expiries
-        this.decodeAndSetUser(response.accessToken); // popuni _currentUser
-      }),
-      map(() => void 0)
-    );
-  }
+login(payload: LoginCommand): Observable<CurrentUserDto> {
+  return this.api.login(payload).pipe(
+    tap((response: LoginCommandDto) => {
+      this.storage.saveLogin(response);           
+    }),
+    map((response: LoginCommandDto) => {
+      const token = response.accessToken;
+      const payloadDecoded = jwtDecode<any>(token);
+
+      const roleName = payloadDecoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? '';
+      const user: CurrentUserDto = {
+        userId: Number(payloadDecoded.sub),
+        email: payloadDecoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+        isAdmin: roleName === 'Admin',
+        isManager: roleName === 'Manager',
+        isEmployee: roleName === 'User',
+        tokenVersion: Number(payloadDecoded.ver),
+      };
+
+      this._currentUser.set(user);
+
+      return user;  // ← vraća user za frontend
+    })
+  );
+}
+
 
   /**
    * Logout korisnika:

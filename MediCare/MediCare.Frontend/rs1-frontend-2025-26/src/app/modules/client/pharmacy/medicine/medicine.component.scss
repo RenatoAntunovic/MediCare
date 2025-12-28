@@ -83,7 +83,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       position: relative;
 
       &::after {
-        content: 'inventory_2';
+        content: 'local_pharmacy';
         font-family: 'Material Icons';
         font-size: 28px;
         color: white;
@@ -224,6 +224,8 @@ $hover-bg: rgba(73, 118, 181, 0.04);
     font-size: 28px;
   }
 }
+
+
 
 // Table Card
 .mat-elevation-z8 {
@@ -414,6 +416,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       }
     }
   }
+
 }
 
 @media (max-width: 480px) {

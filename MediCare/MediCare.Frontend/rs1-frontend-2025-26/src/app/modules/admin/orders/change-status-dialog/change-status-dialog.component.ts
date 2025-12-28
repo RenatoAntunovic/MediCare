@@ -1,6 +1,6 @@
 import { Component, inject, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import {ListOrdersQueryDto, OrderStatusType} from '../../../../api-services/orders/orders-api.models';
+import {ListOrdersQueryDto} from '../../../../api-services/orders/orders-api.models';
 import {OrderStatusHelper} from '../../../../api-services/orders/order-status.helper';
 
 export interface ChangeStatusDialogData {
@@ -16,49 +16,96 @@ export interface ChangeStatusDialogData {
 export class ChangeStatusDialogComponent {
   private dialogRef = inject(MatDialogRef<ChangeStatusDialogComponent>);
 
-  selectedStatus?: OrderStatusType;
-  availableStatuses: OrderStatusType[] = [];
+  selectedStatusId?: number;
+  availableStatuses: { id: number; name: string }[] = [
+  { id: 1, name: 'Draft' },
+  { id: 2, name: 'Confirmed' },
+  { id: 3, name: 'Paid' },
+  { id: 4, name: 'Completed' },
+  { id: 6, name: 'Cancelled' },
+];
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: ChangeStatusDialogData) {
-    this.availableStatuses = OrderStatusHelper.getNextStatuses(data.order.status);
+    this.selectedStatusId = data.order.statusId;
 
     // Pre-select first available status
-    if (this.availableStatuses.length > 0) {
-      this.selectedStatus = this.availableStatuses[0];
+   if (!this.selectedStatusId && this.availableStatuses.length > 0) {
+    this.selectedStatusId = this.availableStatuses[0].id;
     }
+
   }
 
   // === Status Helpers ===
 
-  getStatusLabel(status: OrderStatusType): string {
-    return OrderStatusHelper.getLabel(status);
-  }
+getStatusLabel(status: { id: number; name: string }): string {
+  return status.name;
+}
 
-  getStatusIcon(status: OrderStatusType): string {
-    return OrderStatusHelper.getIcon(status);
+getNextStatuses(currentStatusId: number): { id: number; name: string }[] {
+  switch (currentStatusId) {
+    case 1: // Draft
+      return [
+        { id: 2, name: 'Confirmed' },
+        { id: 6, name: 'Cancelled' }
+      ];
+    case 2: // Confirmed
+      return [
+        { id: 3, name: 'Paid' },
+        { id: 6, name: 'Cancelled' }
+      ];
+    case 3: // Paid
+      return [
+        { id: 4, name: 'Completed' },
+        { id: 6, name: 'Cancelled' }
+      ];
+    default:
+      return []; // Completed i Cancelled nemaju dalje
   }
+}
 
-  getStatusClass(status: OrderStatusType): string {
-    return OrderStatusHelper.getColorClass(status);
-  }
 
-  getCurrentStatusLabel(): string {
-    return OrderStatusHelper.getLabel(this.data.order.status);
+getStatusIcon(statusId: number): string {
+  switch(statusId) {
+    case 1: return 'draft_icon';
+    case 2: return 'check_circle';
+    case 3: return 'payment';
+    case 4: return 'done_all';
+    case 6: return 'cancel';
+    default: return 'help';
   }
+}
 
-  getCurrentStatusIcon(): string {
-    return OrderStatusHelper.getIcon(this.data.order.status);
+getStatusClass(statusId: number): string {
+  switch(statusId) {
+    case 1: return 'status-draft';
+    case 2: return 'status-confirmed';
+    case 3: return 'status-paid';
+    case 4: return 'status-completed';
+    case 6: return 'status-cancelled';
+    default: return '';
   }
+}
 
-  getCurrentStatusClass(): string {
-    return OrderStatusHelper.getColorClass(this.data.order.status);
-  }
+getCurrentStatusLabel(): string {
+  return this.data.order.statusName;
+}
+
+getCurrentStatusClass(): string {
+  return this.getStatusClass(this.data.order.statusId);
+}
+
+getCurrentStatusIcon(): string {
+  return this.getStatusIcon(this.data.order.statusId);
+}
+
 
   // === Actions ===
 
   onConfirm(): void {
-    if (this.selectedStatus !== undefined) {
-      this.dialogRef.close(this.selectedStatus);
+    if (this.selectedStatusId !== undefined &&
+        this.selectedStatusId !== this.data.order.statusId) {
+
+      this.dialogRef.close(this.selectedStatusId);
     }
   }
 
@@ -67,9 +114,8 @@ export class ChangeStatusDialogComponent {
   }
 
   canConfirm(): boolean {
-    return this.selectedStatus !== undefined &&
-      this.selectedStatus !== this.data.order.status;
+    return this.selectedStatusId !== undefined &&
+           this.selectedStatusId !== this.data.order.statusId;
   }
 
-  protected readonly OrderStatusType = OrderStatusType;
 }

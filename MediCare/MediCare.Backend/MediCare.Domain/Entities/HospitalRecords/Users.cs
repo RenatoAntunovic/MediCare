@@ -25,6 +25,7 @@ namespace MediCare.Domain.Entities.HospitalRecords
         public bool IsEnabled { get; set; }
         public string PasswordHash { get; set; }
         public int TokenVersion { get; set; } = 0;// For global revocation
+        public string? FcmToken { get; set; }
         public ICollection<RefreshTokenEntity> RefreshTokens { get; private set; } = new List<RefreshTokenEntity>();
     }
 }

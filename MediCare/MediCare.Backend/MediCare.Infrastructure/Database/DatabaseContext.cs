@@ -18,7 +18,7 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     public DbSet<OrderStatus> OrderStatus => Set<OrderStatus>();
     public DbSet<Payments> Payments => Set<Payments>();
     public DbSet<PaymentStatus> PaymentStatus => Set<PaymentStatus>();
-    public DbSet<ProductReviews> ProductReviews => Set<ProductReviews>();
+    public DbSet<ForLater> ForLater => Set<ForLater>();
     public DbSet<ReceivingItems> ReceivingItems => Set<ReceivingItems>();
     public DbSet<Receivings> Receivings => Set<Receivings>();
     public DbSet<ReservationReviews> ReservationReviews => Set<ReservationReviews>();

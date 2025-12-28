@@ -11,5 +11,7 @@ namespace MediCare.Domain.Entities.HospitalRecords
     {
         public int UserId { get; set; }
         public Users User { get; set; }
+
+        public ICollection<CartItems> CartItems { get; set; } = new List<CartItems>();
     }
 }

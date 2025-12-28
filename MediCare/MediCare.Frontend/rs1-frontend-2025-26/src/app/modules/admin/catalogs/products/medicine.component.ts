@@ -1,6 +1,6 @@
 // products.component.ts
 
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   ListMedicineRequest,
@@ -11,6 +11,8 @@ import { BaseListPagedComponent } from '../../../../core/components/base-classes
 import { ToasterService } from '../../../../core/services/toaster.service';
 import { DialogHelperService } from '../../../shared/services/dialog-helper.service';
 import { DialogButton } from '../../../shared/models/dialog-config.model';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-medicine',
@@ -36,10 +38,20 @@ export class MedicineComponent
     'isEnabled',
     'actions'
   ];
+  dataSource = new MatTableDataSource<any>([]);
+
+  @ViewChild(MatSort) sort!:MatSort;
+
+  private lastRequestTime = 0;
+  private requestCooldown = 2000;
 
   constructor() {
     super();
     this.request = new ListMedicineRequest();
+  }
+
+    ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
   }
 
   ngOnInit(): void {
@@ -53,6 +65,7 @@ this.api.list(this.request).subscribe({
   next: (response) => {
     console.log('Medicines:', response.items);
     this.items = response.items;
+    this.dataSource.data = this.items;
     this.stopLoading();
   },
   error: (err) => {

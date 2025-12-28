@@ -21,7 +21,7 @@ public interface IAppDbContext
     DbSet<OrderStatus> OrderStatus { get; }
     DbSet<Payments> Payments { get; }
     DbSet<PaymentStatus> PaymentStatus { get; }
-    DbSet<ProductReviews> ProductReviews { get; }
+    DbSet<ForLater> ForLater { get; }
     DbSet<ReservationReviews> ReservationReviews { get; }
     DbSet<Reservations> Reservations { get; }
     DbSet<Roles> Roles { get; }

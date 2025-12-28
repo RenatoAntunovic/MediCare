@@ -5,6 +5,7 @@
 /// </summary>
 public sealed class LoginCommandDto
 {
+    public int Id { get; set; }
     /// <summary>
     /// JWT access token – used for authorized API calls.
     /// </summary>

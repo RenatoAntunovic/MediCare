@@ -17,6 +17,119 @@ html {
   ));
 }
 
+
+body.dark-mode {
+
+  /* GLOBAL */
+  color-scheme: dark;
+  color: #ffffff;
+
+  --mat-sys-surface: #121212;       // pozadina tijela
+  --mat-sys-on-surface: #ffffff;    // tekst
+  --mat-sys-primary: #000000;       // tvoja primarna boja
+  --mat-sys-secondary: #1e293b; 
+
+  --header-bg: #020617;
+  --header-color: #93c5fd;
+
+  --mat-table-header-container-color: #020617;
+
+  /* Header tekst */
+  --mat-table-header-headline-color: #93c5fd;
+
+  /* Header border */
+  --mat-table-header-divider-color: rgba(255, 255, 255, 0.1);
+
+  /* Row background */
+  --mat-table-row-item-container-color: #111827;
+
+  /* Row hover */
+  --mat-table-row-item-hover-state-layer-color: #1e293b;
+
+    background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  /* CARDS / CONTAINERS */
+  .header-card,
+  .mat-elevation-z8,
+  .loading {
+    background-color: #1e1e1e !important;
+    color: #ffffff;
+    border-color: rgba(255,255,255,0.1);
+  }
+
+:host-context(.dark-mode) .header-card { background-color: #1e1e1e !important; }
+
+.mat-mdc-row {
+  background-color: #111827;
+}
+
+.mat-mdc-row:hover {
+  background-color: #1e293b;
+}
+
+  /* TABLE */
+  table {
+    background-color: #1e1e1e !important;
+  }
+
+  th {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+  }
+
+  td {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+  }
+
+  tr:hover {
+    background-color: rgba(255,255,255,0.05) !important;
+  }
+
+  /* MATERIAL INPUT / SELECT */
+  .mdc-text-field--filled {
+    background-color: #2a2a2a !important;
+  }
+
+  .mdc-text-field__input {
+    color: #ffffff !important;
+  }
+
+  .mdc-floating-label {
+    color: #b0bec5 !important;
+  }
+
+  /* MAT SELECT PANEL */
+  .mat-mdc-select-panel {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+  }
+
+  .mat-mdc-option {
+    color: #ffffff !important;
+  }
+
+  .mat-mdc-option:hover {
+    background-color: rgba(255,255,255,0.08) !important;
+  }
+
+  /* ICONS */
+  mat-icon {
+    color: #ffffff;
+  }
+
+  /* PAGINATOR */
+  app-fit-paginator-bar {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+}
+
+
+
+
 body {
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the
@@ -34,6 +147,9 @@ body {
   margin: 0;
 }
 
+.mat-mdc-table {
+  background-color: white !important;
+}
 
 html, body {
   height: 100%;

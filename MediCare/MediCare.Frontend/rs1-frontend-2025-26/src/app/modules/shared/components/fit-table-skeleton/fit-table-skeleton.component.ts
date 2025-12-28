@@ -1,10 +1,11 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ViewEncapsulation} from '@angular/core';
 
 @Component({
   selector: 'app-fit-table-skeleton',
   standalone: false,
   templateUrl: './fit-table-skeleton.component.html',
   styleUrl: './fit-table-skeleton.component.scss',
+  encapsulation:ViewEncapsulation.None
 })
 export class FitTableSkeletonComponent {
   @Input() rows: number = 5;

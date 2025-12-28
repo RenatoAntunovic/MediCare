@@ -2,9 +2,14 @@
 using Market.API.Middlewares;
 using Market.Application;
 using Market.Infrastructure;
+using MediCare.API.FCM;
 using MediCare.Application.Common.Behaviors;
+using MediCare.Application.Modules.FCM.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 public partial class Program
 {
@@ -26,6 +31,19 @@ public partial class Program
             //    environment variables, user-secrets (Dev), and command-line args)
             //
             var builder = WebApplication.CreateBuilder(args);
+
+            var firebasePath = Path.Combine(
+                builder.Environment.ContentRootPath,
+                "Firebase/medicare-a919a-firebase-adminsdk-fbsvc-1516c7db3f.json"
+            );
+
+            if (!FirebaseApp.DefaultInstance?.Options?.Credential?.ToString().Any() ?? true)
+            {
+                FirebaseApp.Create(new AppOptions
+                {
+                    Credential = GoogleCredential.FromFile(firebasePath)
+                });
+            }
 
             // 2) Promote Serilog to full configuration from builder.Configuration
             //    (reads "Serilog" section from appsettings + ENV overrides)
@@ -51,6 +69,26 @@ public partial class Program
                 .AddInfrastructure(builder.Configuration, builder.Environment)
                 .AddApplication();
 
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                // Default limiter (npr za većinu API-ja)
+                options.AddFixedWindowLimiter("default", limiter =>
+                {
+                    limiter.PermitLimit = 100; // 100 requesta
+                    limiter.Window = TimeSpan.FromMinutes(1);
+                    limiter.QueueLimit = 0;
+                });
+
+                // Login limiter (strožiji)
+                options.AddFixedWindowLimiter("login", limiter =>
+                {
+                    limiter.PermitLimit = 5; // 5 pokušaja
+                    limiter.Window = TimeSpan.FromMinutes(1);
+                    limiter.QueueLimit = 0;
+                });
+            });
 
             //Kaze sejtan da pomocu ovog ispisuje Ime mora biti puno i to gresku baci ali ne radi moraju se skinuti ovi
             //paketi tako da moramo skontati nesto drugo
@@ -74,6 +112,12 @@ public partial class Program
 
             // Registracija pipeline behavior za MediatR i FluentValidation
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+           builder.Services.AddSingleton<IFcmService,FcmService>();  
+            builder.Services.AddHttpClient(); // HttpClient za FcmService
+
+            // Registracija FcmService
+
+
 
             var app = builder.Build();
 
@@ -103,11 +147,11 @@ public partial class Program
                     ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=600");
                 }
             });
-            app.UseCors("AllowAngularDev");
             app.UseHttpsRedirection();
+            app.UseCors("AllowAngularDev");
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseRateLimiter();
             app.MapControllers();
 
             // Database migrations + seeding

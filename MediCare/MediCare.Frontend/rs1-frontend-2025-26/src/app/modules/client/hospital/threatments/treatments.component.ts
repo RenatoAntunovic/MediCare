@@ -36,6 +36,9 @@ export class TreatmentComponent
     'actions'
   ];
 
+  private lastRequestTime = 0;
+  private requestCooldown = 2000;
+
   constructor() {
     super();
     this.request = new ListTreatmentsRequest();
@@ -46,24 +49,28 @@ export class TreatmentComponent
     this.initList();
   }
 
-  protected loadPagedData(): void {
-    this.startLoading();
-  
-
-console.log(this.items);
-
-this.api.list(this.request).subscribe({
-  next: (response) => {
-    console.log('Treatments:', response.items);
-    this.items = response.items;
-    this.stopLoading();
-  },
-  error: (err) => {
-    console.error('Load error:', err);
-    this.stopLoading('Failed to load treatments');
+protected loadPagedData(): void {
+  const now = Date.now();
+  if (now - this.lastRequestTime < this.requestCooldown) {
+    this.toaster.error('Too many requests, please wait a few seconds.');
+    return;
   }
-});
-  }
+  this.lastRequestTime = now;
+
+  this.startLoading();
+
+  this.api.list(this.request).subscribe({
+    next: (response) => {
+      console.log('Treatments:', response.items);
+      this.items = response.items;
+      this.stopLoading();
+    },
+    error: (err) => {
+      console.error('Load error:', err);
+      this.stopLoading('Failed to load treatments');
+    }
+  });
+}
 
   // === UI Actions ===
 

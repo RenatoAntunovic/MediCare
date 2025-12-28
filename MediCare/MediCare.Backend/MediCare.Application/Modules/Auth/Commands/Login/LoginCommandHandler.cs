@@ -31,6 +31,7 @@ public sealed class LoginCommandHandler(
 
         return new LoginCommandDto
         {
+            Id = user.Id,
             AccessToken = tokens.AccessToken,
             RefreshToken = tokens.RefreshTokenRaw,
             ExpiresAtUtc = tokens.RefreshTokenExpiresAtUtc,

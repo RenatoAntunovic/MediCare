@@ -14,5 +14,4 @@ public sealed class UpdateMedicineCommand : IRequest<Unit>
     public int Weight { get; set; } 
     public decimal Price { get; set; }
     public bool isEnabled { get; set; }
-    
 }

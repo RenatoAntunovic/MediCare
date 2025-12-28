@@ -7,15 +7,32 @@ public sealed class GetOrderByIdQueryHandler(IAppDbContext ctx, IAppCurrentUser 
 
     public async Task<GetOrderByIdQueryDto> Handle(GetOrderByIdQuery request, CancellationToken ct)
     {
-        var q = ctx.Orders
-            .Where(c => c.Id == request.Id);
 
-        if (!currentUser.IsAdmin)
+        Console.WriteLine($"GetOrderByIdQuery received with Id = {request.Id}");
+        var order = ctx.Orders
+            .Include(o => o.User) // ako treba User
+            .Include(o => o.OrderItems) // ako treba stavke
+            .Where(o => o.Id == request.Id);
+
+        if (order == null)
         {
-            q = q.Where(x => x.UserId == currentUser.UserId);
+            Console.WriteLine($"Order with Id {request.Id} not found!");
+            throw new MediCareNotFoundException($"Order with Id {request.Id} not found");
         }
 
-        var dto = await q.OrderBy(x => x.OrderDate)
+        var currentUserEntity = await ctx.Users.Include(x => x.Role)
+              .FirstOrDefaultAsync(u => u.Id == currentUser.UserId, ct);
+
+        if (currentUserEntity == null)
+            throw new Exception("Current user not found");
+
+        // Ako nije admin, filtriraj po korisniku
+        if (!string.Equals(currentUserEntity.Role.Name, "Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            order = order.Where(x => x.UserId == currentUser.UserId);
+        }
+
+        var dto = await order.OrderBy(x => x.OrderDate)
             .Select(x => new GetOrderByIdQueryDto
             {
                 Id = x.Id,
@@ -27,7 +44,8 @@ public sealed class GetOrderByIdQueryHandler(IAppDbContext ctx, IAppCurrentUser 
                     UserCity = x.User!.City
                 },
                 OrderDate = x.OrderDate,
-                Status = x.OrderStatus,
+                StatusId = x.OrderStatusId,
+                StatusName = x.OrderStatus.StatusName,
                 //"x.Items" ili "ctx.OrderItems.Where(x => x.OrderId == x.Id)"
                 Items = x.OrderItems.Select(i => new GetByIdOrderQueryDtoItems
                 {

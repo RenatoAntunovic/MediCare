@@ -1,4 +1,6 @@
-﻿namespace MediCare.Application.Modules.Medicine.Medicine.Commands.Update;
+﻿using MediCare.Domain.Entities.HospitalRecords;
+
+namespace MediCare.Application.Modules.Medicine.Medicine.Commands.Update;
 
 public sealed class UpdateMedicineCommandHandler(IAppDbContext ctx)
     : IRequestHandler<UpdateMedicineCommand, Unit>

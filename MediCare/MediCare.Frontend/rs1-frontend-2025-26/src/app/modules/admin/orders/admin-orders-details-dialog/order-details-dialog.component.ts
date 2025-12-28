@@ -1,5 +1,5 @@
 import {Component, inject, Inject} from '@angular/core';
-import {GetOrderByIdQueryDto, OrderStatusType} from '../../../../api-services/orders/orders-api.models';
+import {GetOrderByIdQueryDto} from '../../../../api-services/orders/orders-api.models';
 import { OrderStatusHelper } from '../../../../api-services/orders/order-status.helper';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {OrdersApiService} from '../../../../api-services/orders/orders-api.service';
@@ -25,7 +25,9 @@ export class OrderDetailsDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: OrderDetailsDialogData) {}
 
   ngOnInit(): void {
+  setTimeout(() => {
     this.loadOrderDetails();
+  });
   }
 
   private loadOrderDetails(): void {
@@ -45,19 +47,50 @@ export class OrderDetailsDialogComponent {
     });
   }
 
+  getTotalAmount(): number {
+  if (!this.order?.items) return 0;
+  return this.order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+}
   // === Status Helpers ===
 
-  getStatusLabel(status: OrderStatusType): string {
-    return OrderStatusHelper.getLabel(status);
+getStatusLabel(status: { id: number; name: string } | number): string {
+  // Ako je broj, možeš vratiti odgovarajući label ili koristiti statusName
+  if (typeof status === 'number') {
+    switch (status) {
+      case 1: return 'ORDERS.STATUS.DRAFT';
+      case 2: return 'ORDERS.STATUS.CONFIRMED';
+      case 3: return 'ORDERS.STATUS.PAID';
+      case 4: return 'ORDERS.STATUS.COMPLETED';
+      case 5: return 'ORDERS.STATUS.CANCELLED';
+      default: return 'ORDERS.STATUS.UNKNOWN';
+    }
+  } else {
+    // status je objekat {id, name}
+    return status.name;
   }
+}
 
-  getStatusIcon(status: OrderStatusType): string {
-    return OrderStatusHelper.getIcon(status);
+getStatusIcon(statusId: number): string {
+  switch(statusId) {
+    case 1: return 'edit_note';
+    case 2: return 'check_circle';
+    case 3: return 'payment';
+    case 4: return 'done_all';
+    case 6: return 'cancel';
+    default: return 'help_outline';
   }
+}
 
-  getStatusClass(status: OrderStatusType): string {
-    return OrderStatusHelper.getColorClass(status);
+getStatusClass(statusId: number): string {
+  switch(statusId) {
+    case 1: return 'status-draft';
+    case 2: return 'status-confirmed';
+    case 3: return 'status-paid';
+    case 4: return 'status-completed';
+    case 6: return 'status-cancelled';
+    default: return 'status-unknown';
   }
+}
 
   // === Display Helpers ===
 
