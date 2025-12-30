@@ -1,0 +1,6 @@
+<img 
+  src="https://via.placeholder.com/300" 
+  [style.transform]="isZoomed ? 'scale(2)' : 'scale(1)'" 
+  style="transition: transform 0.3s; cursor: pointer;"
+  (click)="toggleZoom()"
+  alt="Zoomable image">
