@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MediCare.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251106184943_AddIsEnabledColumn")]
-    partial class AddIsEnabledColumn
+    [Migration("20251229172354_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace MediCare.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.CartItems", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.CartItems", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -64,7 +64,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("CartItems");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Carts", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Carts", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,7 +91,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Carts");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Favourites", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Favourites", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -123,7 +123,39 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Favourites");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Inventories", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.ForLater", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MedicineId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicineId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ForLater");
+                });
+
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Inventories", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -153,7 +185,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Inventories");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Medicine", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Medicine", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -202,7 +234,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Medicine");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.MedicineCategories", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.MedicineCategories", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -231,7 +263,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("MedicineCategories");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.MedicineReviews", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.MedicineReviews", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -273,7 +305,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("MedicineReviews");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.MedicineSuppliers", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.MedicineSuppliers", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -305,7 +337,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("MedicineSuppliers");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.OrderItems", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.OrderItems", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -344,7 +376,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.OrderStatus", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.OrderStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -370,7 +402,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("OrderStatus");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Orders", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Orders", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -409,7 +441,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.PaymentStatus", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.PaymentStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -435,7 +467,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("PaymentStatus");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Payments", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Payments", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -482,49 +514,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.ProductReviews", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MedicineId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ModifiedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ReviewDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MedicineId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ProductReviews");
-                });
-
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.ReceivingItems", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.ReceivingItems", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -564,7 +554,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("ReceivingItems");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Receivings", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Receivings", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -594,7 +584,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Receivings");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.ReservationReviews", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.ReservationReviews", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -636,7 +626,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("ReservationReviews");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Reservations", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Reservations", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -675,7 +665,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Reservations");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Roles", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Roles", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -701,7 +691,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.SavedItems", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.SavedItems", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -736,7 +726,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("SavedItems");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Suppliers", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Suppliers", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -774,7 +764,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Suppliers");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.TreatmentCategories", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.TreatmentCategories", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -803,7 +793,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("TreatmentCategories");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Treatments", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Treatments", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -849,7 +839,7 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("Treatments");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Users", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Users", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -873,6 +863,9 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FcmToken")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
@@ -964,15 +957,15 @@ namespace MediCare.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.CartItems", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.CartItems", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Carts", "Cart")
-                        .WithMany()
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Carts", "Cart")
+                        .WithMany("CartItems")
                         .HasForeignKey("CartId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Medicine", "Medicine")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Medicine", "Medicine")
                         .WithMany()
                         .HasForeignKey("MedicineId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -983,9 +976,9 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("Medicine");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Carts", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Carts", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Users", "User")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Users", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -994,15 +987,15 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Favourites", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Favourites", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Medicine", "Medicine")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Medicine", "Medicine")
                         .WithMany()
                         .HasForeignKey("MedicineId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Users", "User")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Users", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1013,9 +1006,28 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Inventories", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.ForLater", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Medicine", "Medicine")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Medicine", "Medicine")
+                        .WithMany()
+                        .HasForeignKey("MedicineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Medicine");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Inventories", b =>
+                {
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Medicine", "Medicine")
                         .WithMany()
                         .HasForeignKey("MedicineId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1024,9 +1036,9 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("Medicine");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Medicine", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Medicine", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.MedicineCategories", "MedicineCategory")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.MedicineCategories", "MedicineCategory")
                         .WithMany("Medicine")
                         .HasForeignKey("MedicineCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1035,15 +1047,15 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("MedicineCategory");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.MedicineReviews", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.MedicineReviews", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Medicine", "Medicine")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Medicine", "Medicine")
                         .WithMany()
                         .HasForeignKey("MedicineId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Users", "User")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Users", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1054,15 +1066,15 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.MedicineSuppliers", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.MedicineSuppliers", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Medicine", "Medicine")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Medicine", "Medicine")
                         .WithMany()
                         .HasForeignKey("MedicineId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Suppliers", "Supplier")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Suppliers", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1073,16 +1085,16 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("Supplier");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.OrderItems", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.OrderItems", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Medicine", "Medicine")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Medicine", "Medicine")
                         .WithMany()
                         .HasForeignKey("MedicineId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Orders", "Order")
-                        .WithMany()
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Orders", "Order")
+                        .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1092,15 +1104,15 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Orders", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Orders", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.OrderStatus", "OrderStatus")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.OrderStatus", "OrderStatus")
                         .WithMany()
                         .HasForeignKey("OrderStatusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Users", "User")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Users", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1111,15 +1123,15 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Payments", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Payments", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Orders", "Order")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Orders", "Order")
                         .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.PaymentStatus", "PaymentStatus")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.PaymentStatus", "PaymentStatus")
                         .WithMany()
                         .HasForeignKey("PaymentStatusId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1130,40 +1142,21 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("PaymentStatus");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.ProductReviews", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.ReceivingItems", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Medicine", "Medicine")
-                        .WithMany()
-                        .HasForeignKey("MedicineId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Users", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Medicine");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.ReceivingItems", b =>
-                {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Inventories", "Inventory")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Inventories", "Inventory")
                         .WithMany("ReceivingItems")
                         .HasForeignKey("InventoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Medicine", "Medicine")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Medicine", "Medicine")
                         .WithMany("ReceivingItems")
                         .HasForeignKey("MedicineId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Receivings", "Receiving")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Receivings", "Receiving")
                         .WithMany("Items")
                         .HasForeignKey("ReceivingId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1176,9 +1169,9 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("Receiving");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Receivings", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Receivings", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Suppliers", "Supplier")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Suppliers", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1187,15 +1180,15 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("Supplier");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.ReservationReviews", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.ReservationReviews", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Reservations", "Reservation")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Reservations", "Reservation")
                         .WithMany()
                         .HasForeignKey("ReservationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Users", "User")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Users", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1206,15 +1199,15 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Reservations", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Reservations", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Treatments", "Treatment")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Treatments", "Treatment")
                         .WithMany()
                         .HasForeignKey("TreatmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Users", "User")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Users", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1225,15 +1218,15 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.SavedItems", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.SavedItems", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Medicine", "Medicine")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Medicine", "Medicine")
                         .WithMany()
                         .HasForeignKey("MedicineId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Users", "User")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Users", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1244,9 +1237,9 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Treatments", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Treatments", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.TreatmentCategories", "TreatmentCategory")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.TreatmentCategories", "TreatmentCategory")
                         .WithMany("Treatments")
                         .HasForeignKey("TreatmentCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1255,9 +1248,9 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("TreatmentCategory");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Users", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Users", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Roles", "Role")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Roles", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1268,7 +1261,7 @@ namespace MediCare.Infrastructure.Migrations
 
             modelBuilder.Entity("MediCare.Domain.Entities.Identity.RefreshTokenEntity", b =>
                 {
-                    b.HasOne("MediCare.Domain.Entities.Catalog.Users", "User")
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.Users", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1277,32 +1270,42 @@ namespace MediCare.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Inventories", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Carts", b =>
+                {
+                    b.Navigation("CartItems");
+                });
+
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Inventories", b =>
                 {
                     b.Navigation("ReceivingItems");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Medicine", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Medicine", b =>
                 {
                     b.Navigation("ReceivingItems");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.MedicineCategories", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.MedicineCategories", b =>
                 {
                     b.Navigation("Medicine");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Receivings", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Orders", b =>
+                {
+                    b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Receivings", b =>
                 {
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.TreatmentCategories", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.TreatmentCategories", b =>
                 {
                     b.Navigation("Treatments");
                 });
 
-            modelBuilder.Entity("MediCare.Domain.Entities.Catalog.Users", b =>
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Users", b =>
                 {
                     b.Navigation("RefreshTokens");
                 });

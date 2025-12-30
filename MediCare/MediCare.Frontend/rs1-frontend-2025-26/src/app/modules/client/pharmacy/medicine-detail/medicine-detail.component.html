@@ -15,9 +15,24 @@
   <!-- Content -->
   <div class="detail-content">
     <!-- Lijevo: slika -->
-    <div class="left">
-      <img [src]="'https://localhost:7260/' + medicine.imagePath" alt="{{medicine.name}}">
-    </div>
+<div class="left" 
+     (mousedown)="startDrag($event)" 
+     (mousemove)="drag($event)" 
+     (mouseup)="stopDrag()" 
+     (mouseleave)="stopDrag()"
+     (click)="toggleZoom($event)">
+  <img
+    [src]="'https://localhost:7260/' + medicine.imagePath"
+    alt="{{ medicine.name }}"
+    [style.transform]="'scale(' + zoomLevel + ') translate(' + offsetX + 'px, ' + offsetY + 'px)'"
+    style="transition: transform 0.2s ease; user-select: none;"
+    [style.cursor]="isDragging ? 'grabbing' : (zoomLevel > 1 ? 'grab' : 'pointer')"
+  >
+</div>
+
+
+
+
 
     <!-- Desno: detalji -->
     <div class="right" *ngIf="medicine">
