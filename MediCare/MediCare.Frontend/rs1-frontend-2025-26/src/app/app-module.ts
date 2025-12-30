@@ -11,14 +11,13 @@ import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {CustomTranslateLoader} from './core/services/custom-translate-loader';
 import {materialModules} from './modules/shared/material-modules';
 import {SharedModule} from './modules/shared/shared-module';
-import { environment } from '../environments/environment'
-import { provideFirebaseApp,initializeApp } from '@angular/fire/app';
-import { provideMessaging, getMessaging } from '@angular/fire/messaging';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { environment } from '../environments/environment';
+import { ImageZoomComponent } from './image-zoom/image-zoom.component';
+
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
@@ -32,13 +31,12 @@ import { provideFirestore, getFirestore } from '@angular/fire/firestore';
     }),
     SharedModule,
     materialModules,
+    ImageZoomComponent,
   ],
   providers: [
     provideAnimations(),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection(),
-  provideFirebaseApp(() => initializeApp(environment.firebase)),
-  provideMessaging(() => getMessaging()),
     provideHttpClient(
       withInterceptors([
         loadingBarInterceptor,

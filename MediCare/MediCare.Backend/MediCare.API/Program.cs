@@ -32,19 +32,6 @@ public partial class Program
             //
             var builder = WebApplication.CreateBuilder(args);
 
-            var firebasePath = Path.Combine(
-                builder.Environment.ContentRootPath,
-                "Firebase/medicare-a919a-firebase-adminsdk-fbsvc-1516c7db3f.json"
-            );
-
-            if (!FirebaseApp.DefaultInstance?.Options?.Credential?.ToString().Any() ?? true)
-            {
-                FirebaseApp.Create(new AppOptions
-                {
-                    Credential = GoogleCredential.FromFile(firebasePath)
-                });
-            }
-
             // 2) Promote Serilog to full configuration from builder.Configuration
             //    (reads "Serilog" section from appsettings + ENV overrides)
             //

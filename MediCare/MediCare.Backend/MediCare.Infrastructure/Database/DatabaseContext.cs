@@ -31,8 +31,10 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     public DbSet<Users> Users => Set<Users>();
 
     private readonly TimeProvider _clock;
-    public DatabaseContext(DbContextOptions<DatabaseContext> options, TimeProvider clock) : base(options)
+    public DatabaseContext(DbContextOptions<DatabaseContext> options, TimeProvider clock)
+        : base(options)
     {
         _clock = clock;
     }
+
 }

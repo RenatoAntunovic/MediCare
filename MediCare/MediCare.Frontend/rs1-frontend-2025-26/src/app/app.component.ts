@@ -1,6 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { MessagingService } from './core/services/messaging.service';
 import { environment } from '../environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -8,7 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   selector: 'app-root',
   templateUrl: './app.component.html',
   standalone: false,
-  styleUrl: './app.component.scss'
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
   protected readonly title = signal('rs1-frontend-2025-26');
@@ -16,7 +15,6 @@ export class AppComponent implements OnInit {
 
   constructor(
     private translate: TranslateService, 
-    private messagingService:MessagingService,
     private snackBar: MatSnackBar) {
     console.log('AppComponent constructor - initializing TranslateService');
 
@@ -55,30 +53,11 @@ export class AppComponent implements OnInit {
       }
     });
 
-     this.messagingService.receiveMessage(payload => {
-    console.log('New FCM message received:', payload);
-    if (payload.notification) {
-      this.snackBar.open(
-        `${payload.notification.title}: ${payload.notification.body}`,
-        'OK',
-        { duration: 5000 }
-      );
-    }
-  });
+    
 }
 
   // app.component.ts
-requestNotifications() {
-  this.messagingService.requestPermission(environment.firebase.vapidKey)
-    .then(token => {
-      console.log('FCM Token:', token);
-      this.snackBar.open('Push notifikacije omogućene!', 'OK', { duration: 3000 });
-    })
-    .catch(err => {
-      console.error('Permission denied for notifications', err);
-      this.snackBar.open('Dozvola odbijena!', 'OK', { duration: 3000 });
-    });
-}
+
 
 
   switchLanguage(lang: string): void {

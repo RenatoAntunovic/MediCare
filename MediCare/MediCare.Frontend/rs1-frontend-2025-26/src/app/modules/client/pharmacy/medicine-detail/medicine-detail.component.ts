@@ -20,6 +20,17 @@ export class MedicineDetailComponent implements OnInit {
   selectedPackage: string = '';
   errorMessage: string = '';
   isLoading: boolean = true;
+
+    zoomLevel = 1;
+  offsetX = 0;
+  offsetY = 0;
+  isDragging = false;
+  dragStartX = 0;
+  dragStartY = 0;
+  lastOffsetX = 0;
+  lastOffsetY = 0;
+
+
   private cartApi = inject(CartsApiService);
   private favApi = inject(FavouritesService);
   private forLaterApi = inject(ForLaterApiService);
@@ -36,6 +47,8 @@ export class MedicineDetailComponent implements OnInit {
   imagePath: '',
   weight: 0,
   isEnabled: false,
+
+ 
 };
 
   constructor(
@@ -124,5 +137,53 @@ addToForLater() {
     }
   });
 }
+
+ startDrag(event: MouseEvent): void {
+    if (this.zoomLevel === 1) return;
+    
+    event.preventDefault();
+    this.isDragging = true;
+    this.dragStartX = event.clientX;
+    this.dragStartY = event.clientY;
+    this.lastOffsetX = this.offsetX;
+    this.lastOffsetY = this.offsetY;
+  }
+
+   drag(event: MouseEvent): void {
+    if (!this.isDragging) return;
+    
+    event.preventDefault();
+    const deltaX = event.clientX - this.dragStartX;
+    const deltaY = event.clientY - this.dragStartY;
+    
+    this.offsetX = this.lastOffsetX + deltaX;
+    this.offsetY = this.lastOffsetY + deltaY;
+  }
+
+  stopDrag(): void {
+    this.isDragging = false;
+  }
+
+  toggleZoom(event: MouseEvent): void {
+    if (this.isDragging) return; // Ne zumira ako je korisnik drag-ao
+    
+    if (this.zoomLevel === 1) {
+      // Zumira gdje je korisnik kliknuo
+      const rect = (event.target as HTMLImageElement).getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const clickY = event.clientY - rect.top;
+      
+      // Pomjeri sliku tako da je klik u centru
+      this.offsetX = -clickX + rect.width / 2;
+      this.offsetY = -clickY + rect.height / 2;
+      
+      this.zoomLevel = 2;
+    } else {
+      // Vrati na normalu
+      this.zoomLevel = 1;
+      this.offsetX = 0;
+      this.offsetY = 0;
+    }
+  }
 
 }
