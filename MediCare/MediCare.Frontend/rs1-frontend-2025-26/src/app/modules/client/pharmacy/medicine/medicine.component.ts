@@ -1,5 +1,3 @@
-// products.component.ts
-
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
@@ -11,7 +9,10 @@ import { BaseListPagedComponent } from '../../../../core/components/base-classes
 import { ToasterService } from '../../../../core/services/toaster.service';
 import { DialogHelperService } from '../../../shared/services/dialog-helper.service';
 import { DialogButton } from '../../../shared/models/dialog-config.model';
-import { ListMedicineCategoriesQueryDto, ListMedicineCategoriesRequest } from '../../../../api-services/medicine-categories/medicine-categories-api.model';
+import {
+  ListMedicineCategoriesQueryDto,
+  ListMedicineCategoriesRequest
+} from '../../../../api-services/medicine-categories/medicine-categories-api.model';
 import { MedicineCategoriesApiService } from '../../../../api-services/medicine-categories/medicine-categories-api.service';
 import { FavouritesService } from '../../../../api-services/favourites/favourites-api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -33,7 +34,8 @@ export class MedicineComponent
   private dialogHelper = inject(DialogHelperService);
   private favoritesService = inject(FavouritesService);
   private snackbar = inject(MatSnackBar);
-  isDarkMode=false;
+
+  isDarkMode = false;
 
   displayedColumns: string[] = [
     'imageFile',
@@ -45,60 +47,54 @@ export class MedicineComponent
     'actions'
   ];
 
-categories: ListMedicineCategoriesQueryDto[] = [];
-categoryFilter: number | null = null;
-
-private lastRequestTime = 0;
-private requestCooldown = 2000;
+  categories: ListMedicineCategoriesQueryDto[] = [];
+  categoryFilter: number | null = null;
 
   constructor() {
     super();
     this.request = new ListMedicineRequest();
   }
 
-
-  
   toggleDarkMode(): void {
     this.isDarkMode = !this.isDarkMode;
     document.body.classList.toggle('dark-mode', this.isDarkMode);
     localStorage.setItem('darkMode', this.isDarkMode ? 'true' : 'false');
   }
 
-goToMedicineDetail(medicine: any) {
-  this.router.navigate(['/client/medicine', medicine.id]);
-}
-
-
+  goToMedicineDetail(medicine: any) {
+    this.router.navigate(['/client/medicine', medicine.id]);
+  }
 
   ngOnInit(): void {
     this.initList();
     this.loadCategories();
+
     const darkMode = localStorage.getItem('darkMode');
-  if (darkMode === 'true') {
-    document.body.classList.add('dark-mode');
-  }
+    if (darkMode === 'true') {
+      document.body.classList.add('dark-mode');
+    }
   }
 
   onCategoryFilterChange(categoryId: number | null): void {
-  this.categoryFilter = categoryId;        // čuva selektovanu kategoriju
-  this.request.categoryId = categoryId;    // postavlja filter u request
-  this.request.paging.page = 1;            // resetuje paging
-  this.loadPagedData();                    // reload medicine liste
-}
+    this.categoryFilter = categoryId;
+    this.request.categoryId = categoryId;
+    this.request.paging.page = 1;
+    this.loadPagedData();
+  }
 
-private loadCategories():void{
-  const request = new ListMedicineCategoriesRequest();
-  request.onlyEnabled = true;
-  request.paging.page = 1;
-  request.paging.pageSize = 100; // dovoljno za dropdown
+  private loadCategories(): void {
+    const request = new ListMedicineCategoriesRequest();
+    request.onlyEnabled = true;
+    request.paging.page = 1;
+    request.paging.pageSize = 100;
 
-  this.categoryApi.list(request).subscribe(res => {
-    this.categories = res.items;
-  });
-}
+    this.categoryApi.list(request).subscribe(res => {
+      this.categories = res.items;
+    });
+  }
 
   addToFavourites(item: any) {
-    const command = { medicineId: item.id }; // AddToFavouritesCommand payload
+    const command = { medicineId: item.id };
 
     this.favoritesService.addToFavourites(command).subscribe({
       next: (res: { favouriteId: number }) => {
@@ -106,8 +102,6 @@ private loadCategories():void{
           duration: 2000,
           panelClass: ['custom-snackbar']
         });
-
-        // opciono: ažurirati item ili dataSource da pokaže da je već u favorite
         item.isFavourite = true;
       },
       error: () => {
@@ -119,42 +113,66 @@ private loadCategories():void{
     });
   }
 
+  onCreate() {}
+  onEdit(medicine: any) {}
+  onDelete(medicine: any) {}
+  onToggleStatus(medicine: any) {}
 
-onCreate() {}
-onEdit(medicine: any) {}
-onDelete(medicine: any) {}
-onToggleStatus(medicine: any) {}
-
-protected loadPagedData(): void {
-  const now = Date.now();
-  if (now - this.lastRequestTime < this.requestCooldown) {
-    this.toaster.error('Too many requests, please wait a few seconds.');
-    return;
-  }
-  this.lastRequestTime = now;
-
+  // Glavno učitavanje: bez query -> SQL lista, sa query -> Elasticsearch
+  protected loadPagedData(): void {
   this.startLoading();
 
-  this.api.list(this.request).subscribe({
-    next: (response) => {
-      console.log('Medicines:', response.items);
-      this.items = response.items;
-      this.stopLoading();
-    },
-    error: (err) => {
-      console.error('Load error:', err);
-      this.stopLoading('Failed to load medicines');
-    }
-  });
+  const query = this.request.search?.trim() ?? '';
+  console.log('FRONT QUERY =', query); // DEBUG
+
+  if (!query) {
+    // Bez pretrage – klasična lista iz SQL-a
+    this.api.list(this.request).subscribe({
+      next: (response) => {
+        this.items = response.items;
+        this.stopLoading();
+      },
+      error: (err) => {
+        console.error('Load error (SQL):', err);
+        this.stopLoading('Failed to load medicines');
+      }
+    });
+  } else {
+    // Sa pretragom – Elasticsearch (ime + opis + kategorija)
+    this.api.searchMedicines(query, this.request.paging.page, this.request.paging.pageSize)
+      .subscribe({
+        next: (response) => {
+          console.log('SEARCH RESPONSE', response); // DEBUG
+          this.items = response.results ?? response;
+          this.stopLoading();
+        },
+        error: (err) => {
+          console.error('Load error (ES):', err);
+          this.stopLoading('Failed to load medicines');
+        }
+      });
+  }
 }
 
-  // === UI Actions ===
 
+  // Enter search
+  private lastSearchTime: number = 0;
+private searchCooldownMs: number = 500; // 500ms između search-eva
 
-  onSearch(): void {
-    this.request.paging.page = 1;
+onSearch(): void {
+  const now = Date.now();
+  const timeSinceLastSearch = now - this.lastSearchTime;
 
-    this.loadPagedData();
+  if (timeSinceLastSearch < this.searchCooldownMs) {
+    // Previše zahtjeva - prikaži poruku
+    this.toaster.error('Molim vas, sacekajte malo prije nego sto ponovo pretrazujete');
+    return;
   }
+
+  this.lastSearchTime = now;
+  this.request.paging.page = 1;
+  this.loadPagedData(); // ← Direktno pozovi loadPagedData(), bez searchSubject
+}
+
 
 }

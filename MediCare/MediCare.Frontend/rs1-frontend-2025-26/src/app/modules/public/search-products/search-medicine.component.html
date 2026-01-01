@@ -1,1 +1,27 @@
-<p>search-products works!</p>
+<div class="search-container">
+  <input 
+    type="text" 
+    class="search-input"
+    placeholder="Pretraži medicine..."
+    [(ngModel)]="searchQuery"
+    (keyup)="onSearchChange(searchQuery)"
+  />
+
+  <div *ngIf="isLoading" class="loading">
+    ⏳ Pretraživanje...
+  </div>
+
+  <div *ngIf="medicines.length > 0" class="results">
+    <h3>Rezultati ({{ medicines.length }})</h3>
+    <ul>
+      <li *ngFor="let medicine of medicines" class="medicine-item">
+        <strong>{{ medicine.name }}</strong>
+        <p>{{ medicine.description }}</p>
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="searchQuery && medicines.length === 0 && !isLoading" class="no-results">
+    ❌ Nema rezultata za "{{ searchQuery }}"
+  </div>
+</div>

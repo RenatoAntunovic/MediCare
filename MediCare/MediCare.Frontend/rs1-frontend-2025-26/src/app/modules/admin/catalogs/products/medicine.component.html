@@ -12,7 +12,7 @@
           <input
             matInput
             [placeholder]="'MEDICINE.SEARCH_INPUT_PLACEHOLDER' | translate"
-            (keyup.enter)="request.paging.page = 1; loadPagedData()"
+            (keyup)="request.paging.page = 1; loadPagedData()"
             [(ngModel)]="request.search"
           />
           <mat-icon matSuffix>search</mat-icon>
