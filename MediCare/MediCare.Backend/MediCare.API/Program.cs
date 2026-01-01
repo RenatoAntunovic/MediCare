@@ -1,15 +1,21 @@
-﻿using Market.API;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Market.API;
 using Market.API.Middlewares;
 using Market.Application;
 using Market.Infrastructure;
 using MediCare.API.FCM;
+using MediCare.Application.Abstractions;
 using MediCare.Application.Common.Behaviors;
 using MediCare.Application.Modules.FCM.Services;
+using MediCare.Infrastructure.Services;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
+
 
 public partial class Program
 {
@@ -75,6 +81,14 @@ public partial class Program
                     limiter.Window = TimeSpan.FromMinutes(1);
                     limiter.QueueLimit = 0;
                 });
+
+                // Search limiter (strogi)
+                options.AddFixedWindowLimiter("search", limiter =>
+                {
+                    limiter.PermitLimit = 2;  // Max 2 requesta
+                    limiter.Window = TimeSpan.FromSeconds(5); // U 5 sekundi
+                    limiter.QueueLimit = 0;
+                });
             });
 
             //Kaze sejtan da pomocu ovog ispisuje Ime mora biti puno i to gresku baci ali ne radi moraju se skinuti ovi
@@ -99,11 +113,25 @@ public partial class Program
 
             // Registracija pipeline behavior za MediatR i FluentValidation
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-           builder.Services.AddSingleton<IFcmService,FcmService>();  
+            builder.Services.AddSingleton<IFcmService, FcmService>();
             builder.Services.AddHttpClient(); // HttpClient za FcmService
 
             // Registracija FcmService
 
+            // ===== ELASTICSEARCH CONFIGURATION =====
+            var esUri = builder.Configuration["Elasticsearch:Uri"];
+            var esUsername = builder.Configuration["Elasticsearch:Username"];
+            var esPassword = builder.Configuration["Elasticsearch:Password"];
+
+            var settings = new ElasticsearchClientSettings(new Uri(esUri))
+                .Authentication(new BasicAuthentication(esUsername, esPassword))
+                .ServerCertificateValidationCallback((o, certificate, chain, errors) => true);
+
+            var elasticClient = new ElasticsearchClient(settings);
+            builder.Services.AddSingleton(elasticClient);
+
+            // ===== REGISTER ELASTICSEARCH SERVICE =====
+            builder.Services.AddSingleton<ElasticsearchService>();
 
 
             var app = builder.Build();
@@ -144,6 +172,23 @@ public partial class Program
             // Database migrations + seeding
             await app.Services.InitializeDatabaseAsync(app.Environment);
 
+            // ===== ELASTICSEARCH INDEX INITIALIZATION =====
+            var elasticsearchService = app.Services.GetRequiredService<ElasticsearchService>();
+
+            // Obriši stari index
+            await elasticsearchService.DeleteProductIndexAsync();
+
+            // Kreiraj novi sa novim mappingom
+            await elasticsearchService.CreateProductIndexAsync();
+
+            // ===== SYNC MEDICINES FROM DATABASE TO ELASTICSEARCH =====
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
+                await elasticsearchService.SyncMedicinesFromDatabaseAsync(dbContext);
+                Log.Information("Medicines synced to Elasticsearch.");
+            }
+
             Log.Information("MediCare API started successfully.");
             app.Run();
         }
@@ -164,9 +209,5 @@ public partial class Program
             // Ensure all logs are flushed before the app exits
             Log.CloseAndFlush();
         }
-
-
-        //Dodano radi ispisivanja gresaka unosenja
-
     }
 }
