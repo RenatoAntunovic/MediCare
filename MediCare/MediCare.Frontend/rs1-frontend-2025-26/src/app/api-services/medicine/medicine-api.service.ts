@@ -85,4 +85,19 @@ updateFormData(id: number, formData: FormData): Observable<void> {
   enable(id: number): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${id}/enable`, {});
   }
+
+    /**
+   * ELASTICSEARCH SEARCH
+   */
+  searchMedicines(query: string, page: number = 1, pageSize: number = 10): Observable<any> {
+    const params = buildHttpParams({
+      query: query,
+      page: page,
+      pageSize: pageSize
+    } as any);
+
+    return this.http.get(`${environment.apiUrl}/api/search`, { params });
+  }
 }
+
+

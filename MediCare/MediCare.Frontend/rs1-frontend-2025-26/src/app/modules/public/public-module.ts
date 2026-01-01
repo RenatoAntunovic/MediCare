@@ -8,12 +8,13 @@ import {SharedModule} from '../shared/shared-module';
 
 @NgModule({
   declarations: [
-    PublicLayoutComponent,
-    SearchMedicineComponent
+    PublicLayoutComponent 
+    
   ],
   imports: [
     SharedModule,
     PublicRoutingModule,
+    SearchMedicineComponent
   ]
 })
 export class PublicModule { }

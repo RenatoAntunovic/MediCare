@@ -88,7 +88,7 @@ const payload: RegisterCommand = {
     .split('T')[0]
 };
 
-fetch('https://localhost:7260/auth/register', {
+fetch('https://localhost:7260/api/auth/register', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
