@@ -67,8 +67,11 @@ createFormData(formData: FormData) {
 }
 
 updateFormData(id: number, formData: FormData): Observable<void> {
-  return this.http.put<void>(`/api/Medicine/${id}`, formData);
+  return this.http.put<void>(`${environment.apiUrl}/api/Medicine/${id}`, formData);
 }
+
+
+
 
   /**
    * DELETE /Products/{id}
