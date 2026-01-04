@@ -1,4 +1,6 @@
 ﻿using MediCare.Application.Modules.Medicine.Medicine.Commands.Update;
+using MediCare.Domain.Entities.HospitalRecords;
+using FluentValidation;
 
 public sealed class UpdateMedicineCommandValidator
     : AbstractValidator<UpdateMedicineCommand>
@@ -15,7 +17,8 @@ public sealed class UpdateMedicineCommandValidator
             .WithMessage($"Name can be at most {Medicine.Constraints.NameMaxLength} characters long.");
 
         RuleFor(x => x.Description)
-            .NotEmpty().WithMessage("Description is required.");
+            .MaximumLength(Medicine.Constraints.DescriptionMaxLength)
+            .WithMessage($"Description can be at most {Medicine.Constraints.DescriptionMaxLength} characters long.");
 
         RuleFor(x => x.MedicineCategoryId)
             .GreaterThan(0)
@@ -29,8 +32,7 @@ public sealed class UpdateMedicineCommandValidator
             .GreaterThan(0)
             .WithMessage("Weight must be greater than 0.");
 
-        RuleFor(x => x.ImageFile)
-            .NotEmpty()
-            .WithMessage("ImageFile is required.");
+        // ImageFile je OPCIONALNO - može biti null ili prazan
+        // Za inline edit - nema slike!
     }
 }

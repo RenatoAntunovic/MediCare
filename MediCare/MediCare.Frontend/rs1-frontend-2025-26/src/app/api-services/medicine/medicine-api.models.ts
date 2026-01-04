@@ -22,7 +22,7 @@ export interface ListMedicineQueryDto {
   description: string;
   price: number;
   medicineCategoryId: number;
-  categoryName: string;
+  medicineCategoryName: string;
   imagePath: string;
   weight: number;
   isEnabled: boolean;
