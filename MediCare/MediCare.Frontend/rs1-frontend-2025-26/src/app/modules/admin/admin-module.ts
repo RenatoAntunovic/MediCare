@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-
+import { ReactiveFormsModule } from '@angular/forms';
 import {AdminRoutingModule} from './admin-routing-module';
 import {MedicineComponent} from './catalogs/products/medicine.component';
 import {MedicineAddComponent} from './catalogs/products/medicine-add/medicine-add.component';
@@ -40,7 +40,8 @@ import { TreatmentsEditComponent } from './services/treatments/treatments-edit/t
   ],
   imports: [
     AdminRoutingModule,
-    SharedModule
+    SharedModule,
+    ReactiveFormsModule
   ]
 })
 export class AdminModule { }

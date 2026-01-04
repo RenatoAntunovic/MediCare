@@ -39,106 +39,209 @@
   <div class="mat-elevation-z8">
     <table mat-table [dataSource]="dataSource" matSort [hidden]="isLoading || errorMessage">
 
-<ng-container matColumnDef="imageFile">
-  <th mat-header-cell *matHeaderCellDef>{{'MEDICINE.TABLE.PICTURE' | translate}}</th>
-  <td mat-cell *matCellDef="let medicine">
-    <img
-      [src]="'https://localhost:7260/' + medicine.imagePath"
-      alt="{{ medicine.name }}"
-      style="width:100px; height:100px; object-fit:contain;"
-    />
-
-    </td>
+      <!-- SLIKA -->
+      <ng-container matColumnDef="imageFile">
+        <th mat-header-cell *matHeaderCellDef>{{'MEDICINE.TABLE.PICTURE' | translate}}</th>
+        <td mat-cell *matCellDef="let medicine">
+          <img
+            [src]="'https://localhost:7260/' + medicine.imagePath"
+            alt="{{ medicine.name }}"
+            style="width:100px; height:100px; object-fit:contain;"
+          />
+        </td>
       </ng-container>
 
-      <!-- Naziv -->
+      <!-- NAZIV - EDITABLE -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header="name">{{ 'MEDICINE.TABLE.NAME' | translate }}</th>
-        <td mat-cell *matCellDef="let medicine">
-          <span style="font-weight: 500">{{ medicine.name }}</span>
+        <td mat-cell *matCellDef="let medicine" (dblclick)="startEditing(medicine)">
+          <!-- VIEW MODE -->
+          <ng-container *ngIf="!isEditing(medicine.id); else editName">
+            <span style="font-weight: 500; cursor: pointer; padding: 8px; border-radius: 4px; display: inline-block;">
+              {{ medicine.name }}
+            </span>
+          </ng-container>
+          
+          <!-- EDIT MODE -->
+          <ng-template #editName>
+            <mat-form-field appearance="outline" class="inline-edit-field">
+              <input 
+                matInput 
+                [formControl]="getFormControl('name')!"
+              />
+              <mat-error *ngIf="hasError('name')">
+                {{ getErrorMessage('name') }}
+              </mat-error>
+            </mat-form-field>
+          </ng-template>
         </td>
       </ng-container>
 
-      <!-- Kategorija -->
+      <!-- KATEGORIJA - EDITABLE -->
       <ng-container matColumnDef="medicineCategoryName">
         <th mat-header-cell *matHeaderCellDef mat-sort-header="medicineCategoryName">{{ 'MEDICINE.TABLE.CATEGORY' | translate }}</th>
-        <td mat-cell *matCellDef="let medicine">
-          {{ medicine.medicineCategoryName }}
+        <td mat-cell *matCellDef="let medicine" (dblclick)="startEditing(medicine)">
+          <!-- VIEW MODE -->
+          <ng-container *ngIf="!isEditing(medicine.id); else editCategory">
+            <span style="cursor: pointer; padding: 8px; border-radius: 4px; display: inline-block;">
+              {{ medicine.medicineCategoryName }}
+            </span>
+          </ng-container>
+          
+          <!-- EDIT MODE -->
+          <ng-template #editCategory>
+            <mat-form-field appearance="outline" class="inline-edit-field">
+              <mat-select [formControl]="getFormControl('medicineCategoryId')!">
+                <mat-option *ngFor="let cat of categories" [value]="cat.id">
+                  {{ cat.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="hasError('medicineCategoryId')">
+                {{ getErrorMessage('medicineCategoryId') }}
+              </mat-error>
+            </mat-form-field>
+          </ng-template>
         </td>
       </ng-container>
 
-      <!-- Tezina -->
-      <ng-container matColumnDef="weight">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header="weight">{{'MEDICINE.TABLE.WEIGHT' | translate}}</th>
-      <td mat-cell *matCellDef="let medicine">
-        {{ medicine.weight }}
-      </td>
-      </ng-container>
-
-      <!-- Cijena -->
+      <!-- CIJENA - EDITABLE -->
       <ng-container matColumnDef="price">
         <th mat-header-cell *matHeaderCellDef mat-sort-header="price">{{ 'MEDICINE.TABLE.PRICE' | translate }}</th>
-        <td mat-cell *matCellDef="let medicine">
-          <span style="font-weight: 600; color: #4976b5"
-            >{{ medicine.price | number : '1.2-2' }} KM</span
-          >
+        <td mat-cell *matCellDef="let medicine" (dblclick)="startEditing(medicine)">
+          <!-- VIEW MODE -->
+          <ng-container *ngIf="!isEditing(medicine.id); else editPrice">
+            <span style="font-weight: 600; color: #4976b5; cursor: pointer; padding: 8px; border-radius: 4px; display: inline-block;">
+              {{ medicine.price | number : '1.2-2' }} KM
+            </span>
+          </ng-container>
+          
+          <!-- EDIT MODE -->
+          <ng-template #editPrice>
+            <mat-form-field appearance="outline" class="inline-edit-field">
+              <input 
+                matInput 
+                type="number"
+                step="0.01"
+                [formControl]="getFormControl('price')!"
+              />
+              <mat-error *ngIf="hasError('price')">
+                {{ getErrorMessage('price') }}
+              </mat-error>
+            </mat-form-field>
+          </ng-template>
         </td>
       </ng-container>
 
-      <!-- Aktivno -->
-<ng-container matColumnDef="isEnabled">
-  <th mat-header-cell *matHeaderCellDef mat-sort-header="isEnabled">
-    {{ 'MEDICINE.TABLE.STATUS' | translate }}
-  </th>
+      <!-- TEZINA - EDITABLE -->
+      <ng-container matColumnDef="weight">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="weight">{{'MEDICINE.TABLE.WEIGHT' | translate}} (g)</th>
+        <td mat-cell *matCellDef="let medicine" (dblclick)="startEditing(medicine)">
+          <!-- VIEW MODE -->
+          <ng-container *ngIf="!isEditing(medicine.id); else editWeight">
+            <span style="cursor: pointer; padding: 8px; border-radius: 4px; display: inline-block;">
+              {{ medicine.weight }} g
+            </span>
+          </ng-container>
+          
+          <!-- EDIT MODE -->
+          <ng-template #editWeight>
+            <mat-form-field appearance="outline" class="inline-edit-field">
+              <input 
+                matInput 
+                type="number"
+                [formControl]="getFormControl('weight')!"
+              />
+              <mat-error *ngIf="hasError('weight')">
+                {{ getErrorMessage('weight') }}
+              </mat-error>
+            </mat-form-field>
+          </ng-template>
+        </td>
+      </ng-container>
 
-  <td mat-cell *matCellDef="let medicine">
-    <mat-slide-toggle
-      [checked]="medicine.isEnabled"
-      (change)="onToggleStatus(medicine)"
-      color="primary"
-      [disabled]="isLoading"
-      class="status-toggle"
-    >
-      <span
-        class="status-label"
-        [class.enabled]="medicine.isEnabled"
-        [class.disabled]="!medicine.isEnabled"
-      >
-        {{
-          medicine.isEnabled
-            ? ('MEDICINE.TABLE.ENABLED' | translate)
-            : ('MEDICINE.TABLE.DISABLED' | translate)
-        }}
-      </span>
-    </mat-slide-toggle>
-  </td>
-</ng-container>
+      <!-- STATUS -->
+      <ng-container matColumnDef="isEnabled">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="isEnabled">
+          {{ 'MEDICINE.TABLE.STATUS' | translate }}
+        </th>
 
-      <!-- Akcije -->
+        <td mat-cell *matCellDef="let medicine">
+          <mat-slide-toggle
+            [checked]="medicine.isEnabled"
+            (change)="onToggleStatus(medicine)"
+            color="primary"
+            [disabled]="isLoading"
+            class="status-toggle"
+          >
+            <span
+              class="status-label"
+              [class.enabled]="medicine.isEnabled"
+              [class.disabled]="!medicine.isEnabled"
+            >
+              {{
+                medicine.isEnabled
+                  ? ('MEDICINE.TABLE.ENABLED' | translate)
+                  : ('MEDICINE.TABLE.DISABLED' | translate)
+              }}
+            </span>
+          </mat-slide-toggle>
+        </td>
+      </ng-container>
+
+      <!-- AKCIJE -->
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>{{ 'MEDICINE.TABLE.ACTIONS' | translate }}</th>
         <td mat-cell *matCellDef="let medicine">
-          <button
-            mat-icon-button
-            color="primary"
-            (click)="onEdit(medicine)"
-            [matTooltip]="'MEDICINE.ACTIONS.EDIT_TOOLTIP' | translate"
-          >
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            color="warn"
-            (click)="onDelete(medicine)"
-            [matTooltip]="'MEDICINE.ACTIONS.DELETE_TOOLTIP' | translate"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
+          <!-- VIEW MODE - samo edit i delete dugme -->
+          <ng-container *ngIf="!isEditing(medicine.id); else editActions">
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="onEdit(medicine)"
+              [matTooltip]="'MEDICINE.ACTIONS.EDIT_TOOLTIP' | translate"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="onDelete(medicine)"
+              [matTooltip]="'MEDICINE.ACTIONS.DELETE_TOOLTIP' | translate"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </ng-container>
+
+          <!-- EDIT MODE - Save i Cancel dugme -->
+          <ng-template #editActions>
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="saveRow(medicine)"
+              [disabled]="editForm!.invalid || isLoading"
+              matTooltip="Spremi promjene"
+            >
+              <mat-icon>done</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="cancelEditing()"
+              [disabled]="isLoading"
+              matTooltip="Odustani"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </ng-template>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr 
+        mat-row 
+        *matRowDef="let row; columns: displayedColumns;"
+        [class.editing-row]="isEditing(row.id)"
+      ></tr>
 
       <!-- No data -->
       <tr class="mat-row" *matNoDataRow>
@@ -154,5 +257,11 @@
     </table>
 
     <app-fit-paginator-bar [vm]="this" />
+  </div>
+
+  <!-- Info message -->
+  <div style="margin-top: 20px; padding: 12px 16px; background: rgba(33, 150, 243, 0.1); border-left: 4px solid #2196F3; border-radius: 4px; color: #1976D2; font-size: 13px;">
+    <mat-icon style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle; margin-right: 8px;">info</mat-icon>
+    <span>💡 Double-click na lijek koji želite urediti</span>
   </div>
 </div>
