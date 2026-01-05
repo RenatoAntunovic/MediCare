@@ -134,12 +134,12 @@
 
       <!-- TEZINA - EDITABLE -->
       <ng-container matColumnDef="weight">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header="weight">{{'MEDICINE.TABLE.WEIGHT' | translate}} (g)</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="weight">{{'MEDICINE.TABLE.WEIGHT' | translate}} (mg)</th>
         <td mat-cell *matCellDef="let medicine" (dblclick)="startEditing(medicine)">
           <!-- VIEW MODE -->
           <ng-container *ngIf="!isEditing(medicine.id); else editWeight">
             <span style="cursor: pointer; padding: 8px; border-radius: 4px; display: inline-block;">
-              {{ medicine.weight }} g
+              {{ medicine.weight }} mg
             </span>
           </ng-container>
           

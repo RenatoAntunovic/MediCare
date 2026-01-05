@@ -1,5 +1,6 @@
 // Import order status styles
-@import 'admin-orders-status-styles';
+@use 'admin-orders-status-styles';
+
 
 // Main colors
 $primary-color: #4976b5;
@@ -7,15 +8,20 @@ $primary-light: #6b96d1;
 $primary-lighter: #e8f0f9;
 $primary-dark: #3a5e91;
 
+
 $text-primary: #2c3e50;
 $text-secondary: #546e7a;
 $text-muted: #90a4ae;
 
+
 $success-color: #66bb6a;
 $error-color: #ef5350;
+$pdf-color: #DC143C; // Adobe crvena za PDF
+
 
 $border-color: rgba(73, 118, 181, 0.15);
 $hover-bg: rgba(73, 118, 181, 0.04);
+
 
 // Container
 .container {
@@ -26,6 +32,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   min-height: 100vh;
 }
 
+
 // Header Card
 .header-card {
   background: white;
@@ -35,6 +42,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   box-shadow: 0 2px 8px rgba(73, 118, 181, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
   border: 1px solid $border-color;
 
+
   .header-card-content {
     display: flex;
     justify-content: space-between;
@@ -42,10 +50,12 @@ $hover-bg: rgba(73, 118, 181, 0.04);
     gap: 24px;
     flex-wrap: wrap;
 
+
     .title-section {
       display: flex;
       align-items: center;
       gap: 16px;
+
 
       .title-icon {
         width: 48px;
@@ -57,6 +67,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
         justify-content: center;
         box-shadow: 0 4px 12px rgba(73, 118, 181, 0.25);
 
+
         mat-icon {
           color: white;
           font-size: 28px;
@@ -64,6 +75,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
           height: 28px;
         }
       }
+
 
       h1 {
         margin: 0;
@@ -74,15 +86,18 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       }
     }
 
+
     .actions-container {
       display: flex;
       align-items: center;
       gap: 16px;
       flex-wrap: wrap;
 
+
       .filter-field,
       .search-field {
         min-width: 200px;
+
 
         ::ng-deep {
           .mat-form-field-wrapper {
@@ -91,10 +106,12 @@ $hover-bg: rgba(73, 118, 181, 0.04);
         }
       }
 
+
       .status-option {
         display: flex;
         align-items: center;
         gap: 8px;
+
 
         mat-icon {
           font-size: 18px;
@@ -103,18 +120,22 @@ $hover-bg: rgba(73, 118, 181, 0.04);
         }
       }
 
+
       .clear-filters-btn {
         height: 44px;
         border-color: $primary-color;
         color: $primary-color;
 
+
         mat-icon {
           margin-right: 8px;
         }
 
+
         &:hover:not(:disabled) {
           background-color: rgba(73, 118, 181, 0.08);
         }
+
 
         &:disabled {
           opacity: 0.5;
@@ -123,6 +144,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
     }
   }
 }
+
 
 // Error Container
 .error-container {
@@ -135,6 +157,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(239, 83, 80, 0.15);
 
+
   mat-icon {
     font-size: 32px;
     width: 32px;
@@ -143,8 +166,10 @@ $hover-bg: rgba(73, 118, 181, 0.04);
     flex-shrink: 0;
   }
 
+
   .error-content {
     flex: 1;
+
 
     .error-title {
       margin: 0 0 8px 0;
@@ -153,15 +178,18 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       color: #c62828;
     }
 
+
     .error-message {
       margin: 0 0 16px 0;
       color: #d32f2f;
       line-height: 1.5;
     }
 
+
     button {
       border-color: #c62828;
       color: #c62828;
+
 
       mat-icon {
         margin-right: 8px;
@@ -169,6 +197,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
     }
   }
 }
+
 
 // Table Card
 .table-card {
@@ -178,8 +207,10 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   box-shadow: 0 2px 8px rgba(73, 118, 181, 0.08);
   border: 1px solid $border-color;
 
+
   .orders-table {
     width: 100%;
+
 
     th {
       background: linear-gradient(135deg, $primary-lighter 0%, #f5f9fd 100%);
@@ -188,10 +219,12 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       color: $primary-dark;
       padding: 20px 16px;
 
+
       .header-cell {
         display: flex;
         align-items: center;
         gap: 8px;
+
 
         .header-icon {
           font-size: 20px;
@@ -202,11 +235,13 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       }
     }
 
+
     td {
       padding: 16px;
       border-bottom: 1px solid $border-color;
       color: $text-primary;
     }
+
 
     // Column-specific styles
     .order-ref {
@@ -215,15 +250,18 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       font-size: 15px;
     }
 
+
     .customer-info {
       display: flex;
       flex-direction: column;
       gap: 4px;
 
+
       .customer-name {
         font-weight: 500;
         color: $text-primary;
       }
+
 
       .customer-address {
         font-size: 13px;
@@ -231,15 +269,18 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       }
     }
 
+
     .date-info {
       display: flex;
       flex-direction: column;
       gap: 4px;
 
+
       .date {
         font-weight: 500;
         color: $text-primary;
       }
+
 
       .time {
         font-size: 13px;
@@ -247,45 +288,70 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       }
     }
 
+
     .amount {
       font-weight: 600;
       font-size: 16px;
       color: $success-color;
     }
 
+
     .action-buttons {
       display: flex;
       gap: 8px;
+
 
       .action-btn {
         width: 40px;
         height: 40px;
         border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
         transition: all 0.2s ease;
+
 
         &.view-btn {
           color: $primary-color;
           background: rgba(73, 118, 181, 0.08);
 
+
           &:hover:not(:disabled) {
             background: $primary-lighter;
+            border-color: $primary-color;
             transform: scale(1.1);
           }
         }
 
+
         &.status-btn {
           background: rgba(156, 39, 176, 0.08);
 
+
           &:hover:not(:disabled) {
             background: rgba(156, 39, 176, 0.15);
+            border-color: rgba(156, 39, 176, 0.5);
             transform: scale(1.1);
           }
+
 
           &:disabled {
             opacity: 0.4;
             cursor: not-allowed;
           }
         }
+
+
+        &.pdf-btn {
+          color: $pdf-color;
+          background: rgba(220, 20, 60, 0.08);
+
+
+          &:hover:not(:disabled) {
+            background: rgba(220, 20, 60, 0.15);
+            border-color: $pdf-color;
+            transform: scale(1.1);
+          }
+        }
+
 
         mat-icon {
           font-size: 20px;
@@ -295,15 +361,18 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       }
     }
 
+
     // Row hover
     .data-row {
       cursor: pointer;
       transition: background-color 0.2s ease;
 
+
       &:hover {
         background-color: $hover-bg;
       }
     }
+
 
     // No data
     .no-data-row {
@@ -311,11 +380,13 @@ $hover-bg: rgba(73, 118, 181, 0.04);
         border-bottom: none;
         padding: 80px 20px;
 
+
         .no-data-content {
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 16px;
+
 
           mat-icon {
             font-size: 72px;
@@ -323,6 +394,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
             height: 72px;
             color: rgba(73, 118, 181, 0.3);
           }
+
 
           p {
             color: $text-secondary;
@@ -334,12 +406,14 @@ $hover-bg: rgba(73, 118, 181, 0.04);
     }
   }
 
+
   .paginator-wrapper {
     padding: 16px;
     background: $primary-lighter;
     border-top: 1px solid $border-color;
   }
 }
+
 
 // Responsive
 @media (max-width: 1200px) {
@@ -348,13 +422,16 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       flex-direction: column;
       align-items: stretch;
 
+
       .title-section {
         justify-content: center;
       }
 
+
       .actions-container {
         flex-direction: column;
         width: 100%;
+
 
         .filter-field,
         .search-field,
@@ -365,10 +442,12 @@ $hover-bg: rgba(73, 118, 181, 0.04);
     }
   }
 
+
   .table-card {
     .orders-table {
       display: block;
       overflow-x: auto;
+
 
       th, td {
         white-space: nowrap;
@@ -377,13 +456,16 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   }
 }
 
+
 @media (max-width: 768px) {
   .container {
     padding: 16px;
   }
 
+
   .header-card {
     padding: 20px;
+
 
     .header-card-content {
       .title-section {
@@ -391,9 +473,11 @@ $hover-bg: rgba(73, 118, 181, 0.04);
           font-size: 24px;
         }
 
+
         .title-icon {
           width: 40px;
           height: 40px;
+
 
           mat-icon {
             font-size: 24px;
