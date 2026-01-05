@@ -10,6 +10,8 @@ import {ToasterService} from '../../../core/services/toaster.service';
 import {OrderStatusHelper} from '../../../api-services/orders/order-status.helper';
 import {ChangeStatusDialogComponent} from './change-status-dialog/change-status-dialog.component';
 import {OrderDetailsDialogComponent} from './admin-orders-details-dialog/order-details-dialog.component';
+import { HttpClient } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-admin-orders',
@@ -25,6 +27,7 @@ export class AdminOrdersComponent
   private dialog = inject(MatDialog);
   private toaster = inject(ToasterService);
   private destroy$ = new Subject<void>();
+  private http = inject(HttpClient);
 
   // Table columns
   displayedColumns: string[] = [
@@ -277,4 +280,34 @@ getStatusIcon(statusId: number): string {
 
     return null;
   }
+
+
+  /**
+ * Download PDF report for completed order
+ */
+downloadPdf(orderId: number, event: Event): void {
+  event.stopPropagation();
+  
+  const url = `https://localhost:7260/Orders/${orderId}/pdf`;
+  
+  // Koristi HttpClient da automatski šalje JWT token
+  this.http.get(url, { responseType: 'blob' }).subscribe({
+    next: (blob) => {
+      // Kreiraj download link
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `Narudzba_${orderId}.pdf`;
+      link.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(link.href);
+    },
+    error: (err) => {
+      console.error('PDF download error:', err);
+      this.toaster.error('Greška pri preuzimanju PDF-a');
+    }
+  });
+}
+
+
 }

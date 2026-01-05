@@ -162,8 +162,8 @@ public partial class Program
                     ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=600");
                 }
             });
-            app.UseHttpsRedirection();
             app.UseCors("AllowAngularDev");
+            app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseRateLimiter();
