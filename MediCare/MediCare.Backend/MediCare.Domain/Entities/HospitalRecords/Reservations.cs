@@ -14,6 +14,9 @@ namespace MediCare.Domain.Entities.HospitalRecords
         public int TreatmentId { get; set; }
         public Treatments Treatment {  get; set; }
         public DateTime ReservationDate { get; set; }
-        public string Status { get; set; }
+        public TimeSpan ReservationTime { get; set; }
+        public int OrderStatusId { get; set; }
+        public OrderStatus OrderStatus { get; set; }
+        public decimal Price { get; set; }
     }
 }

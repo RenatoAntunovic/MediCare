@@ -1,0 +1,74 @@
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.dialog-content {
+  padding: 24px;
+}
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.datetime-row {
+  display: flex;
+  gap: 16px;
+}
+
+.half-width {
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .half-width {
+    width: calc(50% - 8px);
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.dialog-actions {
+  padding: 20px 24px 24px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+}
+
+.total-text {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.flex-spacer {
+  flex: 1 1 auto;
+}
+
+::ng-deep {
+  .workday-calendar {
+    .mat-calendar-body-cell {
+      &.available-date {
+        background-color: #dcfce7 !important;
+        color: #166534 !important;
+        &.mat-calendar-body-selected {
+          background-color: #10b981 !important;
+          color: white !important;
+        }
+      }
+      &.mat-calendar-body-weekend {
+        pointer-events: none !important;
+        opacity: 0.3 !important;
+        background-color: #fee2e2 !important;
+      }
+    }
+  }
+}

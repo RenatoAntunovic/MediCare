@@ -97,27 +97,20 @@
 
 
       <!-- Akcije -->
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.ACTIONS' | translate }}</th>
-        <td mat-cell *matCellDef="let treatment">
-          <button
-            mat-icon-button
-            color="primary"
-            (click)="onEdit(treatment)"
-            [matTooltip]="'TREATMENTS.ACTIONS.EDIT_TOOLTIP' | translate"
-          >
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            color="warn"
-            (click)="onDelete(treatment)"
-            [matTooltip]="'TREATMENTS.ACTIONS.DELETE_TOOLTIP' | translate"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+      <!-- Akcije - SAMO REZERVIRAJ za klijenta -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.ACTIONS' | translate }}</th>
+          <td mat-cell *matCellDef="let treatment">
+            <button mat-raised-button 
+                    color="accent" 
+                    (click)="openBooking(treatment)"
+                    matTooltip="Rezerviraj {{treatment.serviceName}}">
+              <mat-icon>schedule</mat-icon>
+              Rezerviši
+            </button>
+          </td>
+        </ng-container>
+
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>

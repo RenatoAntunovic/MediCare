@@ -37,7 +37,7 @@ public static class DynamicDataSeeder
         await SeedFavouritesAsync(context);
         await SeedMedicineReviewsAsync(context);
         await SeedReservationAsync(context);
-        await SeedReservationReviewsAsync(context);
+        //await SeedReservationReviewsAsync(context);
     }
 
     private static async Task SeedReservationReviewsAsync(DatabaseContext context)
@@ -69,28 +69,34 @@ public static class DynamicDataSeeder
     }
     private static async Task SeedReservationAsync(DatabaseContext context)
     {
-        if (!await context.Reservations.AnyAsync()) {
+        if (!await context.Reservations.AnyAsync())
+        {
             context.Reservations.AddRange(
                new Reservations
                {
-                   UserId=1,
-                   TreatmentId=1,
-                   ReservationDate=new DateTime(2025,11,11),
-                   Status="Reserved"
+                   UserId = 1,
+                   TreatmentId = 1,
+                   ReservationDate = new DateTime(2025, 11, 11),
+                   ReservationTime = new TimeSpan(14, 0, 0), // 14:00
+                   OrderStatusId = 2, // CONFIRMED
+                   Price = 50.00m
                },
                new Reservations
                {
                    UserId = 2,
                    TreatmentId = 1,
                    ReservationDate = new DateTime(2025, 10, 10),
-                   Status = "Done"
+                   ReservationTime = new TimeSpan(10, 30, 0), // 10:30
+                   OrderStatusId = 4, // COMPLETED (Done)
+                   Price = 50.00m
                }
             );
 
             await context.SaveChangesAsync();
-            Console.WriteLine("✅ Dynamic seed: Cart items added.");
+            Console.WriteLine("✅ Dynamic seed: Reservations added.");
         }
     }
+
     private static async Task SeedCartItemsAsync(DatabaseContext context)
     {
         if (!await context.CartItems.AnyAsync())
@@ -321,17 +327,18 @@ public static class DynamicDataSeeder
         if (!await context.OrderStatus.AnyAsync())
         {
             context.OrderStatus.AddRange(
-                new OrderStatus { StatusName = "Paid" },
-                new OrderStatus { StatusName = "Processing" },
-                new OrderStatus { StatusName = "Pending" },
-                new OrderStatus { StatusName = "Failed" }
-
+                new OrderStatus { StatusName = "DRAFT" },      // Id 1
+                new OrderStatus { StatusName = "CONFIRMED" },  // Id 2
+                new OrderStatus { StatusName = "PAID" },       // Id 3
+                new OrderStatus { StatusName = "COMPLETED" },  // Id 4
+                new OrderStatus { StatusName = "CANCELLED" }   // Id 5
             );
 
             await context.SaveChangesAsync();
             Console.WriteLine("✅ Dynamic seed: order status added.");
         }
     }
+
     public static async Task SeedOrderAndItemsAsync(DatabaseContext context)
     {
         if (await context.Orders.AnyAsync())

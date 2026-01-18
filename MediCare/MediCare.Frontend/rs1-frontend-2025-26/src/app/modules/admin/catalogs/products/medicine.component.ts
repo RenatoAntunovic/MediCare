@@ -220,7 +220,7 @@ loadCategories(): void {
     this.isLoading = true;
     const formValue = this.editForm.value;
 
-    // Kreiraj FormData za backend
+    
     const formData = new FormData();
     formData.append('id', medicine.id.toString());
     formData.append('name', formValue.name);
@@ -229,18 +229,17 @@ loadCategories(): void {
     formData.append('MedicineCategoryId', formValue.medicineCategoryId);
     formData.append('weight', formValue.weight);
     formData.append('isEnabled', medicine.isEnabled.toString());
-    formData.append('ImageFile', ''); // Bez promjene slike
+    formData.append('ImageFile', ''); //Bez promjene slike zbog komplikacije putanja fajlova
 
     this.api.updateFormData(medicine.id, formData).subscribe({
       next: () => {
-        // Updejtaj lokalne podatke
+        
         medicine.name = formValue.name;
         medicine.price = formValue.price;
         medicine.weight = formValue.weight;
         medicine.medicineCategoryId = formValue.medicineCategoryId;
         
-        // Pronađi naziv kategorije
-        // Pronađi naziv kategorije
+        
         const category = this.categories.find(c => c.id === formValue.medicineCategoryId);
         if (category) {
           medicine.medicineCategoryName = category.name;

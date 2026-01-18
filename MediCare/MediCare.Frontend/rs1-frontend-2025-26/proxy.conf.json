@@ -1,8 +1,6 @@
 {
-  "/api": {
-    "target": "https://localhost:7260",
-    "secure": false,
-    "changeOrigin": true,
-    "logLevel": "debug"
-  }
+  "/api/*": {"target": "https://localhost:7260", "secure": false, "changeOrigin": true, "logLevel": "debug"},
+  "/Auth/*": {"target": "https://localhost:7260", "secure": false, "changeOrigin": true},
+  "/Identity/*": {"target": "https://localhost:7260", "secure": false, "changeOrigin": true}
 }
+

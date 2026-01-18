@@ -1,0 +1,60 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>book_online</mat-icon>
+  Rezervacija: {{ data.treatment.serviceName }}
+</h2>
+
+<div mat-dialog-content class="dialog-content">
+  <form [formGroup]="bookingForm" class="booking-form">
+
+    <!-- DATUM + VRIJEME dropdown -->
+    <div class="datetime-row">
+      <!-- DATUM PICKER -->
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Datum</mat-label>
+        <input
+          matInput
+          [matDatepicker]="datePicker"
+          formControlName="date"
+          [matDatepickerFilter]="dateFilter"
+          >
+        <mat-datepicker-toggle matIconSuffix [for]="datePicker"></mat-datepicker-toggle>
+        <mat-datepicker
+          #datePicker
+          [dateClass]="dateClass"
+          panelClass="workday-calendar">
+        </mat-datepicker>
+      </mat-form-field>
+
+      <!-- TIME DROPDOWN -->
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Vrijeme</mat-label>
+        <mat-select formControlName="time">
+          <mat-option *ngFor="let slot of timeSlots" [value]="slot">
+            {{ slot }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- OPIS -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Opis problema</mat-label>
+      <textarea matInput formControlName="description" rows="4"></textarea>
+    </mat-form-field>
+  </form>
+</div>
+
+<div mat-dialog-actions align="end" class="dialog-actions">
+  <div class="total-text">
+    UKUPNO: {{ data.treatment.price }} KM
+  </div>
+  <span class="flex-spacer"></span>
+  <button mat-button mat-dialog-close>Otkaži</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="bookingForm.invalid"
+    (click)="saveBooking()">
+    Potvrdi rezervaciju
+  </button>
+</div>

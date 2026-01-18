@@ -29,5 +29,6 @@ public interface IAppDbContext
     DbSet<TreatmentCategories> TreatmentCategories { get; }
     DbSet<Treatments> Treatments { get; }
 
+
     Task<int> SaveChangesAsync(CancellationToken ct);
 }

@@ -640,12 +640,18 @@ namespace MediCare.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("OrderStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("ReservationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<TimeSpan>("ReservationTime")
+                        .HasColumnType("time");
 
                     b.Property<int>("TreatmentId")
                         .HasColumnType("int");
@@ -654,6 +660,8 @@ namespace MediCare.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderStatusId");
 
                     b.HasIndex("TreatmentId");
 
@@ -1198,6 +1206,12 @@ namespace MediCare.Infrastructure.Migrations
 
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Reservations", b =>
                 {
+                    b.HasOne("MediCare.Domain.Entities.HospitalRecords.OrderStatus", "OrderStatus")
+                        .WithMany()
+                        .HasForeignKey("OrderStatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("MediCare.Domain.Entities.HospitalRecords.Treatments", "Treatment")
                         .WithMany()
                         .HasForeignKey("TreatmentId")
@@ -1209,6 +1223,8 @@ namespace MediCare.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("OrderStatus");
 
                     b.Navigation("Treatment");
 

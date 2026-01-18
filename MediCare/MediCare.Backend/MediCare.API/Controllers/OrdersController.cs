@@ -76,6 +76,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPut("{id:int}/change-status")]
+    [Authorize(Roles = "Admin")]//Dodao sam autorizaciju samo za admina
     public async Task ChangeStatus(int id, [FromBody] ChangeOrderStatusCommand command, CancellationToken ct)
     {
         command.Id = id;

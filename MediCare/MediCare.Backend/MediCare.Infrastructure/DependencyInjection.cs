@@ -26,12 +26,12 @@ public static class DependencyInjection
         // DbContext: InMemory for test environments; SQL Server otherwise
         services.AddDbContext<DatabaseContext>((sp, options) =>
         {
-            if (env.IsTest())
-            {
-                options.UseInMemoryDatabase("IntegrationTestsDb");
+            //if (env.IsTest())
+            //{
+            //    options.UseInMemoryDatabase("IntegrationTestsDb");
 
-                return;
-            }
+            //    return;
+            //}
 
             var cs = sp.GetRequiredService<IOptions<ConnectionStringsOptions>>().Value.Main;
             options.UseSqlServer(cs);
