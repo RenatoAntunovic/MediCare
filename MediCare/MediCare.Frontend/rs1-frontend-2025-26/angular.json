@@ -115,7 +115,8 @@
               "buildTarget": "rs1-frontend-2025-26:build:production"
             },
             "development": {
-              "buildTarget": "rs1-frontend-2025-26:build:development"
+              "buildTarget": "rs1-frontend-2025-26:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

@@ -1,11 +1,17 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": []
+    "types": [],
+    "baseUrl": "./src/app",
+    "paths": {
+      "@shared/*": ["modules/shared/*"],
+      "@shared/models/*": ["modules/shared/models/*"],
+      "@api/*": ["api-services/*"]
+    }
+    // Uklonjen moduleResolution - nasljeđuje iz tsconfig.json (node)
   },
+  "files": [],
   "include": [
     "src/**/*.ts"
   ],

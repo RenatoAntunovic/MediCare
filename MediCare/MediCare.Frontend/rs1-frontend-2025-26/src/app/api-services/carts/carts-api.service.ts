@@ -38,12 +38,12 @@ export class CartsApiService {
   }
 
   addFromFavourites(dto: AddFromFavouritesDto): Observable<any> {
-    return this.http.post('/api/cart/add-from-favourites', dto);
-  }
+  return this.http.post(`${this.baseUrl}/add-from-favourites`, dto);
+}
 
     addFromForLater(dto: AddFromForLaterDto): Observable<any> {
-    return this.http.post('/api/cart/add-from-for-later', dto);
-  }
+  return this.http.post(`${this.baseUrl}/add-from-for-later`, dto);
+}
 
   /**
    * DELETE /Cart/{id}
@@ -55,6 +55,7 @@ export class CartsApiService {
 
 checkout() {
   return this.http.post<CheckoutOrderResponseDto>(
-    'api/Cart/checkout',{});
+    `${this.baseUrl}/checkout`, {}); // ← Koristi baseUrl kao ostale metode
 }
+
 }
