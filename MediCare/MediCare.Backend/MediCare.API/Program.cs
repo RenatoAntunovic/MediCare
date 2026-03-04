@@ -118,20 +118,20 @@ public partial class Program
 
             // Registracija FcmService
 
-            // ===== ELASTICSEARCH CONFIGURATION =====
-            var esUri = builder.Configuration["Elasticsearch:Uri"];
-            var esUsername = builder.Configuration["Elasticsearch:Username"];
-            var esPassword = builder.Configuration["Elasticsearch:Password"];
+            //// ===== ELASTICSEARCH CONFIGURATION =====
+            //var esUri = builder.Configuration["Elasticsearch:Uri"];
+            //var esUsername = builder.Configuration["Elasticsearch:Username"];
+            //var esPassword = builder.Configuration["Elasticsearch:Password"];
 
-            var settings = new ElasticsearchClientSettings(new Uri(esUri))
-                .Authentication(new BasicAuthentication(esUsername, esPassword))
-                .ServerCertificateValidationCallback((o, certificate, chain, errors) => true);
+            //var settings = new ElasticsearchClientSettings(new Uri(esUri))
+            //    .Authentication(new BasicAuthentication(esUsername, esPassword))
+            //    .ServerCertificateValidationCallback((o, certificate, chain, errors) => true);
 
-            var elasticClient = new ElasticsearchClient(settings);
-            builder.Services.AddSingleton(elasticClient);
+            //var elasticClient = new ElasticsearchClient(settings);
+            //builder.Services.AddSingleton(elasticClient);
 
-            // ===== REGISTER ELASTICSEARCH SERVICE =====
-            builder.Services.AddSingleton<ElasticsearchService>();
+            //// ===== REGISTER ELASTICSEARCH SERVICE =====
+            //builder.Services.AddSingleton<ElasticsearchService>();
 
 
             var app = builder.Build();
@@ -173,21 +173,21 @@ public partial class Program
             await app.Services.InitializeDatabaseAsync(app.Environment);
 
             // ===== ELASTICSEARCH INDEX INITIALIZATION =====
-            var elasticsearchService = app.Services.GetRequiredService<ElasticsearchService>();
+            //var elasticsearchService = app.Services.GetRequiredService<ElasticsearchService>();
 
-            // Obriši stari index
-            await elasticsearchService.DeleteProductIndexAsync();
+            //// Obriši stari index
+            //await elasticsearchService.DeleteProductIndexAsync();
 
-            // Kreiraj novi sa novim mappingom
-            await elasticsearchService.CreateProductIndexAsync();
+            //// Kreiraj novi sa novim mappingom
+            //await elasticsearchService.CreateProductIndexAsync();
 
-            // ===== SYNC MEDICINES FROM DATABASE TO ELASTICSEARCH =====
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
-                await elasticsearchService.SyncMedicinesFromDatabaseAsync(dbContext);
-                Log.Information("Medicines synced to Elasticsearch.");
-            }
+            //// ===== SYNC MEDICINES FROM DATABASE TO ELASTICSEARCH =====
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var dbContext = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
+            //    await elasticsearchService.SyncMedicinesFromDatabaseAsync(dbContext);
+            //    Log.Information("Medicines synced to Elasticsearch.");
+            //}
 
             Log.Information("MediCare API started successfully.");
             app.Run();
