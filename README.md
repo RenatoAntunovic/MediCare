@@ -5,7 +5,7 @@ MediCare is a **full-stack** healtcare managment project consisting of:
 - **Backend:** ASP.NET Core Web API (.NET 8)
 - **Frontend:** Angular application
 
-The goal of the project is to practice building a real-world style application (API + client) with layered architecture, authentication, CRUD modules and integrations (Swagger, logging, optional Elasticsearch, optional Firebase).
+The goal of the project is to practice building a real-world style application (API + client) with layered architecture, authentication, CRUD modules and integrations (Swagger, logging, optional Elasticsearch.
 
 > ⚠️ **Project status:** This project is still **in development**. Some modules are functional, while other parts are incomplete or planned.
 
