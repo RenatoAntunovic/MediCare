@@ -77,7 +77,7 @@ Download .NET: https://dotnet.microsoft.com/en-us/download
 
 ---
 
-## How to Run (Backend)
+## How to run (Backend)
 
 ### Option A — Visual Studio
 1. Open solution:
