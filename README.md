@@ -17,7 +17,7 @@ The goal of the project is to practice building a real-world style application (
 - Entity Framework Core
 - Swagger (OpenAPI)
 - Serilog (logging)
-- Elasticsearch (optional module)
+- Elasticsearch (optional module) (you can enable elasticsearch by removing comment lines on Program.cs that are related to it, you need to have running elasticsearch 8.9.3 version before starting the backend)
 
 ### Frontend
 - Angular
