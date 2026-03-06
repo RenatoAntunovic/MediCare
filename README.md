@@ -123,9 +123,7 @@ So the correct order is:
 
 1) Start backend  
 2) Start frontend
-cd MediCare/MediCare/MediCare.Backend/MediCare.API
-dotnet restore
-dotnet run
+
 
 ## Screenshots of the application
 ![Opis slike](MediCare/images//ss1.png)
