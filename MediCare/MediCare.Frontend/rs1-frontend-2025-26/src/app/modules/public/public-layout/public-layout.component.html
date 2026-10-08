@@ -1,150 +1,111 @@
-<!-- src/app/pages/landing/landing.component.html -->
-<div class="landing-page">
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="hero-content">
-      <div class="hero-text">
-        <div class="logo-container">
-          <mat-icon class="logo-icon">storefront</mat-icon>
-          <h1 class="brand-name">FIT Market</h1>
-        </div>
-        <h2 class="hero-title">Moderna platforma za upravljanje marketom</h2>
-        <p class="hero-description">
-          Pojednostavite vaše poslovanje sa našim intuitivnim sistemom za upravljanje proizvodima,
-          kategorijama i zalihama. Sve što vam treba na jednom mjestu.
-        </p>
-        <div class="hero-actions">
-          <button mat-raised-button color="primary" class="cta-button" routerLink="/auth/login">
-            <mat-icon>rocket_launch</mat-icon>
-            Započni sada
-          </button>
-          <button mat-stroked-button class="secondary-button">
-            <mat-icon>play_circle</mat-icon>
-            Pogledaj demo
-          </button>
-        </div>
-      </div>
-      <div class="hero-image">
-        <div class="floating-card card-1">
-          <mat-icon>inventory_2</mat-icon>
-          <span>1,250+ Proizvoda</span>
-        </div>
-        <div class="floating-card card-2">
-          <mat-icon>trending_up</mat-icon>
-          <span>95% Zadovoljstvo</span>
-        </div>
-        <div class="floating-card card-3">
-          <mat-icon>speed</mat-icon>
-          <span>Brzo & Efikasno</span>
-        </div>
-      </div>
-    </div>
-  </section>
+<div class="landing">
+  <!-- Top bar -->
+  <header class="landing-top">
+    <a routerLink="/" class="landing-brand" aria-label="MediCare – početna stranica">
+      <span class="mc-logo" aria-hidden="true"></span>
+      MediCare
+    </a>
 
-  <!-- Features Section -->
-  <section class="features-section">
-    <div class="section-header">
-      <h2 class="section-title">Zašto odabrati MediCare?</h2>
-      <p class="section-subtitle">
-        Sve funkcionalnosti koje su vam potrebne za uspješno vođenje biznisa
-      </p>
-    </div>
-
-    <div class="features-grid">
-      <div class="feature-card mat-elevation-z2">
-        <div class="feature-icon">
-          <mat-icon>category</mat-icon>
-        </div>
-        <h3>Upravljanje kategorijama</h3>
-        <p>
-          Organizujte proizvode u logične kategorije i podkategorije. Brza pretraga i filtriranje.
-        </p>
-      </div>
-
-      <div class="feature-card mat-elevation-z2">
-        <div class="feature-icon">
-          <mat-icon>inventory</mat-icon>
-        </div>
-        <h3>Kontrola zaliha</h3>
-        <p>Praćenje stanja zaliha u realnom vremenu. Automatska obavještenja za niske zalihe.</p>
-      </div>
-
-      <div class="feature-card mat-elevation-z2">
-        <div class="feature-icon">
-          <mat-icon>analytics</mat-icon>
-        </div>
-        <h3>Analitika i izvještaji</h3>
-        <p>
-          Detaljni izvještaji o prodaji, trendovima i performansama. Donosite informisane odluke.
-        </p>
-      </div>
-
-      <div class="feature-card mat-elevation-z2">
-        <div class="feature-icon">
-          <mat-icon>speed</mat-icon>
-        </div>
-        <h3>Brz i responsivan</h3>
-        <p>
-          Optimizovana platforma koja radi brzo na svim uređajima. Pristupite bilo gdje, bilo kada.
-        </p>
-      </div>
-
-      <div class="feature-card mat-elevation-z2">
-        <div class="feature-icon">
-          <mat-icon>security</mat-icon>
-        </div>
-        <h3>Sigurnost podataka</h3>
-        <p>Vaši podaci su zaštićeni najnovijim sigurnosnim protokolima. Redovne backup kopije.</p>
-      </div>
-
-      <div class="feature-card mat-elevation-z2">
-        <div class="feature-icon">
-          <mat-icon>support_agent</mat-icon>
-        </div>
-        <h3>24/7 podrška</h3>
-        <p>Naš tim je uvijek tu da vam pomogne. Brzi odgovori i profesionalna podrška.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats Section -->
-  <section class="stats-section">
-    <div class="stats-grid">
-      <div class="stat-card">
-        <mat-icon class="stat-icon">groups</mat-icon>
-        <div class="stat-number">500+</div>
-        <div class="stat-label">Aktivnih korisnika</div>
-      </div>
-
-      <div class="stat-card">
-        <mat-icon class="stat-icon">shopping_cart</mat-icon>
-        <div class="stat-number">10,000+</div>
-        <div class="stat-label">Proizvoda u sistemu</div>
-      </div>
-
-      <div class="stat-card">
-        <mat-icon class="stat-icon">schedule</mat-icon>
-        <div class="stat-number">99.9%</div>
-        <div class="stat-label">Uptime garancija</div>
-      </div>
-
-      <div class="stat-card">
-        <mat-icon class="stat-icon">star</mat-icon>
-        <div class="stat-number">4.9/5</div>
-        <div class="stat-label">Prosječna ocjena</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Section -->
-  <section class="cta-section">
-    <div class="cta-content">
-      <h2>Spremni da počnete?</h2>
-      <p>Pridružite se stotinama zadovoljnih korisnika koji su već unaprijedili svoje poslovanje</p>
-      <button mat-raised-button color="primary" class="cta-large-button" routerLink="/auth/login">
-        <mat-icon>login</mat-icon>
-        Prijavite se sada
+    <div class="landing-top__actions">
+      <button
+        type="button"
+        class="mc-iconbtn"
+        (click)="theme.toggle()"
+        [attr.aria-label]="theme.isDark() ? 'Uključi svijetli način' : 'Uključi tamni način'"
+      >
+        <mat-icon>{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
       </button>
+      <a mat-stroked-button routerLink="/auth/login" class="landing-login">Prijava</a>
+      <a mat-flat-button color="primary" routerLink="/auth/register">Registracija</a>
     </div>
-  </section>
+  </header>
+
+  <main>
+    <!-- Hero: headline + pharmacy search (the search component is the routed child) -->
+    <section class="landing-hero">
+      <div class="landing-hero__copy">
+        <h1 class="landing-hero__title">Bolnica i apoteka na jednom mjestu</h1>
+        <p class="landing-hero__lead">
+          Rezervišite tretman u našoj bolnici i naručite lijekove iz naše apoteke, sve s jednim nalogom.
+        </p>
+      </div>
+
+      <div class="landing-search">
+        <router-outlet></router-outlet>
+      </div>
+    </section>
+
+    <!-- What you can do -->
+    <section class="landing-section" aria-labelledby="landing-what">
+      <h2 id="landing-what" class="landing-section__title">Šta možete uraditi</h2>
+
+      <div class="landing-cards">
+        <article class="landing-card">
+          <span class="landing-card__icon" aria-hidden="true"><mat-icon>medical_services</mat-icon></span>
+          <h3>Rezervišite tretman</h3>
+          <p>Pregledajte dostupne tretmane i odaberite dan i slobodan termin koji vam odgovara.</p>
+        </article>
+
+        <article class="landing-card">
+          <span class="landing-card__icon" aria-hidden="true"><mat-icon>local_pharmacy</mat-icon></span>
+          <h3>Naručite lijekove</h3>
+          <p>Pretražujte apoteku po nazivu ili kategoriji, dodajte u korpu i završite narudžbu.</p>
+        </article>
+
+        <article class="landing-card">
+          <span class="landing-card__icon" aria-hidden="true"><mat-icon>receipt_long</mat-icon></span>
+          <h3>Pratite narudžbe</h3>
+          <p>Status svake narudžbe vidite na jednom mjestu, a omiljene lijekove sačuvajte za kasnije.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="landing-section landing-section--tint" aria-labelledby="landing-how">
+      <h2 id="landing-how" class="landing-section__title">Kako to funkcioniše</h2>
+
+      <ol class="landing-steps">
+        <li>
+          <span class="landing-steps__num" aria-hidden="true">1</span>
+          <div>
+            <h3>Napravite nalog</h3>
+            <p>Registracija traje nekoliko minuta.</p>
+          </div>
+        </li>
+        <li>
+          <span class="landing-steps__num" aria-hidden="true">2</span>
+          <div>
+            <h3>Odaberite tretman ili lijek</h3>
+            <p>Sve što nudimo je na jednom mjestu.</p>
+          </div>
+        </li>
+        <li>
+          <span class="landing-steps__num" aria-hidden="true">3</span>
+          <div>
+            <h3>Rezervišite ili naručite</h3>
+            <p>Potvrdu i status pratite u svom nalogu.</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="landing-cta">
+        <a mat-flat-button color="primary" routerLink="/auth/register" class="landing-cta__btn">
+          <mat-icon>person_add</mat-icon>
+          Registrujte se
+        </a>
+        <a mat-stroked-button routerLink="/auth/login" class="landing-cta__btn">
+          <mat-icon>login</mat-icon>
+          Već imam nalog
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="landing-footer">
+    <span class="landing-brand landing-brand--small">
+      <span class="mc-logo mc-logo--sm" aria-hidden="true"></span>
+      MediCare
+    </span>
+    <span>© {{ currentYear }} MediCare. Privatna bolnica i apoteka.</span>
+  </footer>
 </div>

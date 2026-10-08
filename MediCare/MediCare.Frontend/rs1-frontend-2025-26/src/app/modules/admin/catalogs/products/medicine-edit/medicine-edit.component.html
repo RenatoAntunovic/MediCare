@@ -1,14 +1,14 @@
-<div class="container">
+<div class="mc-page">
   <!-- Header -->
-  <div class="header-card mat-elevation-z2">
-    <h1>{{ 'MEDICINE.EDIT.TITLE' | translate }}</h1>
-  </div>
+  <header class="mc-page-header">
+    <h1 class="mc-page-header__title">{{ 'MEDICINE.EDIT.TITLE' | translate }}</h1>
+  </header>
 
   <!-- Form Card -->
-  <div class="form-card mat-elevation-z2">
+  <div class="mc-form-card">
     <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!isLoading || form">
       <!-- Error Message -->
-      <div *ngIf="errorMessage" class="error-banner">
+      <div *ngIf="errorMessage" class="error-banner" role="alert">
         <mat-icon>error</mat-icon>
         <span>{{ errorMessage }}</span>
       </div>
@@ -52,7 +52,7 @@
           [placeholder]="'MEDICINE.FORM.WEIGHT' | translate"
         />
         <mat-icon matSuffix>inventory_2</mat-icon>
-        <mat-error *ngIf="hasError('name')">
+        <mat-error *ngIf="hasError('weight')">
           {{ getErrorMessage('weight') }}
         </mat-error>
       </mat-form-field>
@@ -138,7 +138,7 @@
 
         <button
           type="submit"
-          mat-raised-button
+          mat-flat-button
           color="primary"
           [disabled]="form.invalid || isLoading"
         >

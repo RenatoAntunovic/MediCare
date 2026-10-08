@@ -1,128 +1,107 @@
-<div class="container">
-  <!-- Header Card -->
-  <div class="header-card">
-    <div class="header-card-content">
-      <!-- Left: Title with Icon -->
-      <div class="title-section">
-        <div class="title-icon">
-          <mat-icon>category</mat-icon>
-        </div>
-        <h1>{{ 'MEDICINE_CATEGORIES.TITLE' | translate }}</h1>
-      </div>
+<div class="mc-page">
+  <header class="mc-page-header">
+    <h1 class="mc-page-header__title">{{ 'MEDICINE_CATEGORIES.TITLE' | translate }}</h1>
 
-      <!-- Right: Search, Filter, Button -->
-      <div class="actions-container">
-        <!-- Only Enabled Toggle -->
-        <mat-slide-toggle
-          [(ngModel)]="showOnlyEnabled"
-          (change)="onToggleEnabledFilter($event.checked)"
-          color="primary"
-          class="enabled-toggle"
-        >
-          {{ 'MEDICINE_CATEGORIES.ONLY_ENABLED' | translate }}
-        </mat-slide-toggle>
+    <button mat-flat-button color="primary" type="button" (click)="onCreate()">
+      <mat-icon>add</mat-icon>
+      {{ 'MEDICINE_CATEGORIES.NEW_CATEGORY' | translate }}
+    </button>
+  </header>
 
-        <!-- Search -->
-        <mat-form-field class="search-field" appearance="fill">
-          <mat-label>{{ 'MEDICINE_CATEGORIES.SEARCH_PLACEHOLDER' | translate }}</mat-label>
-          <input
-            matInput
-            [(ngModel)]="request.search"
-            (keyup.enter)="onSearchChange(request.search || '')"
-            [placeholder]="'MEDICINE_CATEGORIES.SEARCH_INPUT_PLACEHOLDER' | translate"
-          />
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
+  <!-- Search + filter -->
+  <div class="mc-toolbar" role="search">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'MEDICINE_CATEGORIES.SEARCH_PLACEHOLDER' | translate }}</mat-label>
+      <input
+        matInput
+        [(ngModel)]="request.search"
+        (keyup.enter)="onSearchChange(request.search || '')"
+        [placeholder]="'MEDICINE_CATEGORIES.SEARCH_INPUT_PLACEHOLDER' | translate"
+      />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="onSearchChange(request.search || '')"
+        aria-label="Pretraži"
+      >
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
 
-        <!-- New Category Button -->
-        <button mat-raised-button color="primary" (click)="onCreate()" class="add-button">
-          <mat-icon>add</mat-icon>
-          <span>{{ 'MEDICINE_CATEGORIES.NEW_CATEGORY' | translate }}</span>
-        </button>
-      </div>
-    </div>
+    <mat-slide-toggle
+      [(ngModel)]="showOnlyEnabled"
+      (change)="onToggleEnabledFilter($event.checked)"
+      color="primary"
+    >
+      {{ 'MEDICINE_CATEGORIES.ONLY_ENABLED' | translate }}
+    </mat-slide-toggle>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="isLoading" class="loading-container">
-    <mat-spinner diameter="48" color="primary"></mat-spinner>
-    <p>{{ 'MEDICINE_CATEGORIES.LOADING' | translate }}</p>
+  <!-- Loading / error -->
+  <div *ngIf="isLoading" class="mc-state" role="status">
+    <mat-progress-spinner mode="indeterminate" diameter="40" strokeWidth="4"></mat-progress-spinner>
+    <span>{{ 'MEDICINE_CATEGORIES.LOADING' | translate }}</span>
   </div>
 
-  <!-- Error -->
-  <div *ngIf="!isLoading && errorMessage" class="error-container">
-    <mat-icon>error_outline</mat-icon>
-    <p>{{ errorMessage }}</p>
+  <div *ngIf="!isLoading && errorMessage" class="mc-state mc-state--danger" role="alert">
+    <span class="mc-state__icon" aria-hidden="true"><mat-icon>error_outline</mat-icon></span>
+    <span>{{ errorMessage }}</span>
   </div>
 
-  <!-- Table Card -->
-  <div class="table-card" *ngIf="!isLoading && !errorMessage">
+  <!-- Table -->
+  <div class="mc-table-wrap" *ngIf="!isLoading && !errorMessage">
     <table mat-table [dataSource]="items">
-      <!-- Name Column -->
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>
-          <div class="header-cell">
-            <mat-icon class="header-icon">label</mat-icon>
-            {{ 'MEDICINE_CATEGORIES.TABLE.NAME' | translate }}
-          </div>
-        </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'MEDICINE_CATEGORIES.TABLE.NAME' | translate }}</th>
         <td mat-cell *matCellDef="let category">
-          <span class="category-name">{{ category.name }}</span>
+          <span class="mc-cell-title">{{ category.name }}</span>
         </td>
       </ng-container>
 
-      <!-- Is Enabled Column -->
       <ng-container matColumnDef="isEnabled">
-        <th mat-header-cell *matHeaderCellDef>
-          <div class="header-cell">
-            <mat-icon class="header-icon">toggle_on</mat-icon>
-            {{ 'MEDICINE_CATEGORIES.TABLE.STATUS' | translate }}
-          </div>
-        </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'MEDICINE_CATEGORIES.TABLE.STATUS' | translate }}</th>
         <td mat-cell *matCellDef="let category">
-          <mat-slide-toggle
-            [checked]="category.isEnabled"
-            (change)="onToggleStatus(category)"
-            color="primary"
-            [disabled]="isLoading"
-            class="status-toggle"
-          >
-            <span class="status-label" [class.enabled]="category.isEnabled">
+          <span class="mc-toggle">
+            <mat-slide-toggle
+              [checked]="category.isEnabled"
+              (change)="onToggleStatus(category)"
+              color="primary"
+              [disabled]="isLoading"
+              [aria-label]="'MEDICINE_CATEGORIES.TABLE.STATUS' | translate"
+            ></mat-slide-toggle>
+            <span class="mc-toggle__label" [ngClass]="category.isEnabled ? 'mc-toggle__label--on' : 'mc-toggle__label--off'">
               {{
                 category.isEnabled
                   ? ('MEDICINE_CATEGORIES.TABLE.ENABLED' | translate)
                   : ('MEDICINE_CATEGORIES.TABLE.DISABLED' | translate)
               }}
             </span>
-          </mat-slide-toggle>
+          </span>
         </td>
       </ng-container>
 
-      <!-- Actions Column -->
       <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>
-          <div class="header-cell">
-            <mat-icon class="header-icon">settings</mat-icon>
-            {{ 'MEDICINE_CATEGORIES.TABLE.ACTIONS' | translate }}
-          </div>
-        </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'MEDICINE_CATEGORIES.TABLE.ACTIONS' | translate }}</th>
         <td mat-cell *matCellDef="let category">
-          <div class="action-buttons">
+          <div class="mc-cell-actions">
             <button
               mat-icon-button
+              type="button"
               color="primary"
               (click)="onEdit(category)"
               [matTooltip]="'PRODUCT_CATEGORIES.ACTIONS.EDIT_TOOLTIP' | translate"
-              class="action-btn edit-btn"
+              [attr.aria-label]="'PRODUCT_CATEGORIES.ACTIONS.EDIT_TOOLTIP' | translate"
             >
               <mat-icon>edit</mat-icon>
             </button>
             <button
               mat-icon-button
+              type="button"
               color="warn"
               (click)="onDelete(category)"
               [matTooltip]="'PRODUCT_CATEGORIES.ACTIONS.DELETE_TOOLTIP' | translate"
-              class="action-btn delete-btn"
+              [attr.aria-label]="'PRODUCT_CATEGORIES.ACTIONS.DELETE_TOOLTIP' | translate"
             >
               <mat-icon>delete</mat-icon>
             </button>
@@ -130,33 +109,19 @@
         </td>
       </ng-container>
 
-      <!-- Header Row -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
-      <!-- Data Rows -->
-      <tr mat-row *matRowDef="let row; columns: displayedColumns" class="data-row"></tr>
-
-      <!-- No Data Row -->
-      <tr class="mat-row no-data-row" *matNoDataRow>
-        <td class="mat-cell" [attr.colspan]="displayedColumns.length">
-          <div class="no-data-content">
-            <mat-icon>inbox</mat-icon>
-            <p>
-              <ng-container *ngIf="request.search; else noDataDefault">
-                {{ 'PRODUCT_CATEGORIES.NO_DATA_FILTER' | translate }}
-              </ng-container>
-              <ng-template #noDataDefault>
-                {{ 'PRODUCT_CATEGORIES.NO_DATA' | translate }}
-              </ng-template>
-            </p>
-          </div>
+      <tr class="mat-mdc-no-data-row" *matNoDataRow>
+        <td class="mat-mdc-cell" [attr.colspan]="displayedColumns.length">
+          <ng-container *ngIf="request.search; else noDataDefault">
+            {{ 'PRODUCT_CATEGORIES.NO_DATA_FILTER' | translate }}
+          </ng-container>
+          <ng-template #noDataDefault>{{ 'PRODUCT_CATEGORIES.NO_DATA' | translate }}</ng-template>
         </td>
       </tr>
     </table>
-
-    <!-- Paginator -->
-    <div class="paginator-wrapper">
-      <app-fit-paginator-bar [vm]="this"></app-fit-paginator-bar>
-    </div>
   </div>
+
+  <app-fit-paginator-bar [vm]="this"></app-fit-paginator-bar>
 </div>

@@ -1,8 +1,8 @@
 <div class="paginator-bar" *ngIf="vm.totalItems > 0">
   <div class="paginator-container">
     <!-- Info Section -->
-    <div class="paginator-info">
-      <mat-icon class="info-icon">info_outline</mat-icon>
+    <div class="paginator-info" aria-live="polite">
+      <mat-icon class="info-icon">info</mat-icon>
       <span class="info-text">
         Stranica <strong>{{ vm.request.paging.page }}</strong> od
         <strong>{{ vm.totalPages || 1 }}</strong>
@@ -18,12 +18,18 @@
       <!-- Page Size Selector -->
       <div class="page-size-selector">
         <span class="selector-label">Po stranici:</span>
-        <mat-form-field appearance="fill" class="page-size-field">
+        <mat-form-field appearance="outline" class="page-size-field" subscriptSizing="dynamic">
           <mat-select
+            aria-label="Broj zapisa po stranici"
             [value]="vm.request.paging.pageSize"
             (selectionChange)="vm.changePageSize($event.value)"
             [disabled]="vm.isLoading"
           >
+            <!-- the default page size is 1000: show the current value when it is not one of the presets -->
+            <mat-option
+              *ngIf="vm.request.paging.pageSize !== 5 && vm.request.paging.pageSize !== 10 && vm.request.paging.pageSize !== 20 && vm.request.paging.pageSize !== 50"
+              [value]="vm.request.paging.pageSize"
+            >{{ vm.request.paging.pageSize }}</mat-option>
             <mat-option [value]="5">5</mat-option>
             <mat-option [value]="10">10</mat-option>
             <mat-option [value]="20">20</mat-option>

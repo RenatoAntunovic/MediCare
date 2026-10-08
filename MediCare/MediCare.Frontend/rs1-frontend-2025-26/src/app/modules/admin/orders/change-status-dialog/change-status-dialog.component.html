@@ -1,82 +1,94 @@
-<div class="dialog-container">
-  <!-- Header -->
-  <div class="dialog-header">
-    <div class="header-left">
-      <mat-icon class="header-icon">swap_horiz</mat-icon>
-      <h2 mat-dialog-title>{{ 'ORDERS.CHANGE_STATUS.TITLE' | translate }}</h2>
-    </div>
+<div class="cs">
+  <div class="cs__head">
+    <h2 mat-dialog-title class="cs__title">{{ 'ORDERS.CHANGE_STATUS.TITLE' | translate }}</h2>
   </div>
 
-  <!-- Content -->
-  <div mat-dialog-content class="dialog-content">
-    <!-- Order Info -->
-    <div class="order-info">
-      <div class="order-ref">
-        <mat-icon>confirmation_number</mat-icon>
-        <span>{{ data.order.id }}</span>
-      </div>
-      <div class="customer-name">
-        <mat-icon>person</mat-icon>
-        <span>{{ data.order.user.userFirstname }} {{ data.order.user.userLastname }}</span>
-      </div>
+  <div mat-dialog-content class="cs__content">
+    <div class="cs__order">
+      <span>
+        <mat-icon aria-hidden="true">confirmation_number</mat-icon>
+        #{{ data.order.id }}
+      </span>
+      <span>
+        <mat-icon aria-hidden="true">person</mat-icon>
+        {{ data.order.user.userFirstname }} {{ data.order.user.userLastname }}
+      </span>
     </div>
 
-    <!-- Current Status -->
-    <div class="current-status-section">
-      <span class="section-label">{{ 'ORDERS.CHANGE_STATUS.CURRENT_STATUS' | translate }}</span>
-      <div class="status-badge" [ngClass]="getCurrentStatusClass()">
-        <mat-icon>{{ getCurrentStatusIcon() }}</mat-icon>
-        <span>{{ getCurrentStatusLabel() | translate }}</span>
-      </div>
+    <div>
+      <span class="cs__label">{{ 'ORDERS.CHANGE_STATUS.CURRENT_STATUS' | translate }}</span>
+      <span
+        class="mc-badge"
+        [ngClass]="{
+          'mc-badge--warning': data.order.statusId === 1,
+          'mc-badge--info': data.order.statusId === 2,
+          'mc-badge--teal': data.order.statusId === 3,
+          'mc-badge--success': data.order.statusId === 4,
+          'mc-badge--danger': data.order.statusId === 5
+        }"
+      >
+        <mat-icon aria-hidden="true">{{
+          data.order.statusId === 1 ? 'edit_note'
+          : data.order.statusId === 2 ? 'check_circle'
+          : data.order.statusId === 3 ? 'payment'
+          : data.order.statusId === 4 ? 'done_all'
+          : data.order.statusId === 5 ? 'cancel'
+          : 'help_outline'
+        }}</mat-icon>
+        {{ getCurrentStatusLabel() | translate }}
+      </span>
     </div>
 
-    <!-- Arrow -->
-    <div class="arrow-container">
-      <mat-icon>arrow_downward</mat-icon>
-    </div>
+    <div class="cs__arrow" aria-hidden="true"><mat-icon>arrow_downward</mat-icon></div>
 
-    <!-- New Status Selection -->
-    <div class="new-status-section">
-      <span class="section-label">{{ 'ORDERS.CHANGE_STATUS.NEW_STATUS' | translate }}</span>
+    <div>
+      <span class="cs__label" id="cs-new-status">{{ 'ORDERS.CHANGE_STATUS.NEW_STATUS' | translate }}</span>
 
-      <div *ngIf="availableStatuses.length === 0" class="no-transitions">
-        <mat-icon>block</mat-icon>
-        <p>{{ 'ORDERS.CHANGE_STATUS.NO_TRANSITIONS' | translate }}</p>
-      </div>
+      <p *ngIf="availableStatuses.length === 0" class="cs__none">
+        <mat-icon aria-hidden="true">block</mat-icon>
+        {{ 'ORDERS.CHANGE_STATUS.NO_TRANSITIONS' | translate }}
+      </p>
 
       <mat-radio-group
+        *ngIf="availableStatuses.length > 0"
         [(ngModel)]="selectedStatusId"
-        class="status-radio-group"
-        *ngIf="availableStatuses.length > 0">
-        <mat-radio-button
-          *ngFor="let status of availableStatuses"
-          [value]="status.id"
-          class="status-radio-option">
-          <div class="status-badge" [ngClass]="getStatusClass(status.id)">
-            <mat-icon>{{ getStatusIcon(status.id) }}</mat-icon>
-            <span>{{ getStatusLabel(status) | translate }}</span>
-          </div>
+        class="cs__options"
+        aria-labelledby="cs-new-status"
+      >
+        <mat-radio-button *ngFor="let status of availableStatuses" [value]="status.id">
+          <span
+            class="mc-badge"
+            [ngClass]="{
+              'mc-badge--warning': status.id === 1,
+              'mc-badge--info': status.id === 2,
+              'mc-badge--teal': status.id === 3,
+              'mc-badge--success': status.id === 4,
+              'mc-badge--danger': status.id === 5
+            }"
+          >
+            <mat-icon aria-hidden="true">{{
+              status.id === 1 ? 'edit_note'
+              : status.id === 2 ? 'check_circle'
+              : status.id === 3 ? 'payment'
+              : status.id === 4 ? 'done_all'
+              : status.id === 5 ? 'cancel'
+              : 'help_outline'
+            }}</mat-icon>
+            {{ getStatusLabel(status) | translate }}
+          </span>
         </mat-radio-button>
       </mat-radio-group>
     </div>
 
-    <!-- Warning Message -->
-    <div class="warning-message" *ngIf="selectedStatusId === 5">
-      <mat-icon>warning</mat-icon>
+    <div class="cs__warning" *ngIf="selectedStatusId === 5" role="alert">
+      <mat-icon aria-hidden="true">warning</mat-icon>
       <p>{{ 'ORDERS.CHANGE_STATUS.CANCEL_WARNING' | translate }}</p>
     </div>
   </div>
 
-  <!-- Actions -->
-  <div mat-dialog-actions class="dialog-actions">
-    <button mat-button (click)="onCancel()">
-      {{ 'COMMON.CANCEL' | translate }}
-    </button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onConfirm()"
-      [disabled]="!canConfirm()">
+  <div mat-dialog-actions class="cs__actions">
+    <button mat-button type="button" (click)="onCancel()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button mat-flat-button color="primary" type="button" (click)="onConfirm()" [disabled]="!canConfirm()">
       {{ 'COMMON.CONFIRM' | translate }}
     </button>
   </div>

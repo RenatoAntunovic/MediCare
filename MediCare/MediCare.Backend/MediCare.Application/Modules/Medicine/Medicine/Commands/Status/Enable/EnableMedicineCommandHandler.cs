@@ -1,6 +1,8 @@
-﻿namespace MediCare.Application.Modules.Medicine.Medicine.Commands.Status.Enable;
+using MediCare.Application.Modules.MedicineSearch;
 
-public sealed class EnableMedicineCommandHandler(IAppDbContext ctx)
+namespace MediCare.Application.Modules.Medicine.Medicine.Commands.Status.Enable;
+
+public sealed class EnableMedicineCommandHandler(IAppDbContext ctx, IMedicineSearchIndex searchIndex)
     : IRequestHandler<EnableMedicineCommand, Unit>
 {
     public async Task<Unit> Handle(EnableMedicineCommand request, CancellationToken ct)
@@ -9,7 +11,7 @@ public sealed class EnableMedicineCommandHandler(IAppDbContext ctx)
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
         if (entity is null)
-            throw new MediCareNotFoundException($"Medicina (ID={request.Id}) nije pronađena.");
+            throw new MediCareNotFoundException($"Lijek (ID={request.Id}) nije pronađen.");
 
         if (!entity.isEnabled)
         {
@@ -17,7 +19,8 @@ public sealed class EnableMedicineCommandHandler(IAppDbContext ctx)
             await ctx.SaveChangesAsync(ct);
         }
 
-        // If already enabled — nothing changes, idempotent
+        await searchIndex.SyncMedicineAsync(ctx, entity.Id, ct);
+
         return Unit.Value;
     }
 }

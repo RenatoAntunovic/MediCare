@@ -33,9 +33,9 @@
       "HOSPITAL": "Hospital",
       "TREATMENT_CATEGORIES":"Treatment categories",
       "TREATMENT":"Treatment",
-      "ORDERS_SECTION": "ORDERS",
-      "ORDERS": "Orders Overview",
-      "SYSTEM": "SYSTEM",
+      "ORDERS_SECTION": "Orders",
+      "ORDERS": "Orders overview",
+      "SYSTEM": "System",
       "SETTINGS": "Settings",
       "LOGOUT": "Logout"
     }
@@ -56,9 +56,9 @@
       "HOSPITAL": "Hospital",
       "TREATMENT_CATEGORIES":"Treatment categories",
       "TREATMENT":"Treatment",
-      "ORDERS_SECTION": "ORDERS",
-      "ORDERS": "Orders Overview",
-      "SYSTEM": "SYSTEM",
+      "ORDERS_SECTION": "Orders",
+      "ORDERS": "Orders overview",
+      "SYSTEM": "System",
       "SETTINGS": "Settings",
       "LOGOUT": "Logout"
     }

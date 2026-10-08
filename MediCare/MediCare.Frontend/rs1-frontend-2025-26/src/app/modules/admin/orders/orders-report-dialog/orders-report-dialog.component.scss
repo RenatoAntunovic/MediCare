@@ -1,0 +1,64 @@
+// PDF report dialog – tokens only (light + dark).
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mc-text);
+  font-weight: 700;
+}
+
+.content { min-width: min(440px, 80vw); }
+
+.section-label {
+  margin: 4px 0 8px;
+  font-size: 1rem;
+  color: var(--mc-text-muted);
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.preset {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--mc-border-strong);
+  border-radius: 999px;
+  background: var(--mc-surface);
+  color: var(--mc-text);
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+
+  &:hover { border-color: var(--mc-primary); }
+  &:focus-visible { outline: 3px solid var(--mc-focus); outline-offset: 2px; }
+
+  &.active {
+    background: var(--mc-primary);
+    border-color: var(--mc-primary);
+    color: var(--mc-on-primary);
+    font-weight: 700;
+  }
+}
+
+.full-width { width: 100%; margin-bottom: 6px; }
+
+.summary {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  color: var(--mc-text-muted);
+  line-height: 1.5;
+}
+
+.error {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border-left: 4px solid var(--mc-danger);
+  border-radius: var(--mc-radius-sm);
+  background: var(--mc-danger-tint);
+  color: var(--mc-text);
+  font-size: 1rem;
+}

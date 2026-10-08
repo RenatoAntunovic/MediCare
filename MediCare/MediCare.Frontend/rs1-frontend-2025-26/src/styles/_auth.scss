@@ -1,0 +1,328 @@
+// =====================================================================
+// Auth pages (login, register, logout): brand panel on the left, form card on the right.
+// Below 900px the brand panel collapses to a slim header so the form is the first thing you see.
+// =====================================================================
+
+.auth-page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--mc-bg);
+  color: var(--mc-text);
+}
+
+// ---------- Colour band (brand + headline) ----------
+.auth-hero {
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 20px clamp(20px, 5vw, 64px) 210px;
+  color: #ffffff;
+  background: linear-gradient(158deg, #0a3556 0%, #0b5278 58%, #0a6f76 120%);
+
+  // Very quiet medical pattern: a field of small crosses that fades out towards the bottom
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M36 28v16M28 36h16' stroke='%23fff' stroke-width='2' stroke-linecap='round' opacity='.17'/%3E%3C/svg%3E");
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+  }
+
+  &__copy {
+    max-width: 40rem;
+    margin: clamp(20px, 4vw, 44px) auto 0;
+    text-align: center;
+  }
+
+  &__title {
+    margin: 0 0 14px;
+    color: #ffffff;
+    font-size: clamp(1.875rem, 3.6vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+  }
+
+  &__lead {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 1.1875rem;
+    line-height: 1.55;
+  }
+}
+
+.auth-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  text-decoration: none;
+
+  .mc-logo { --mc-logo-size: 44px; }
+}
+
+// What the account gives you (sits under the card)
+.auth-points {
+  box-sizing: border-box;
+  list-style: none;
+  width: 100%;
+  max-width: 62rem;
+  margin: 8px auto 0;
+  padding: 32px 20px 56px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    color: var(--mc-text-muted);
+    font-size: 1.0625rem;
+    line-height: 1.4;
+  }
+
+  strong {
+    display: block;
+    color: var(--mc-text);
+    font-weight: 700;
+  }
+
+  mat-icon,
+  .mat-icon {
+    flex: 0 0 auto;
+    box-sizing: content-box;
+    width: 24px;
+    height: 24px;
+    padding: 10px;
+    border-radius: 14px;
+    background: var(--mc-teal-tint);
+    color: var(--mc-teal);
+  }
+}
+
+// ---------- Form side ----------
+.auth-main {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-top: -170px;
+  padding: 0 16px;
+}
+
+.auth-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 30rem;
+  padding: clamp(24px, 4vw, 40px);
+  border-radius: var(--mc-radius-lg);
+  border: 1px solid var(--mc-border);
+  background: var(--mc-surface);
+  box-shadow: var(--mc-shadow);
+
+  // The register form is longer: give it more room
+  &--wide { max-width: 38rem; }
+
+  // Keep Material's card padding out of the way (we control spacing)
+  .mat-mdc-card-header { padding: 0; }
+  .mat-mdc-card-content { padding: 0; }
+
+  &__title {
+    margin: 0 0 6px;
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    color: var(--mc-text);
+  }
+
+  &__subtitle {
+    margin: 0 0 24px;
+    color: var(--mc-text-muted);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mat-mdc-form-field { width: 100%; }
+
+  .auth-alert { margin-bottom: 20px; }
+
+  .auth-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+  }
+
+  .auth-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: -4px 0 12px;
+  }
+
+  .auth-submit {
+    width: 100%;
+    height: 52px;
+    margin-top: 8px;
+    font-size: 1.125rem;
+
+    // icon + label on one centred line
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    .mdc-button__label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .mat-icon { margin: 0; flex: 0 0 auto; }
+    .mat-mdc-progress-spinner { flex: 0 0 auto; }
+  }
+
+  .auth-switch {
+    margin: 24px 0 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--mc-border);
+    text-align: center;
+    color: var(--mc-text-muted);
+    font-size: 1.0625rem;
+
+    a {
+      margin-left: 6px;
+      color: var(--mc-primary);
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      border-radius: 4px;
+
+      &:hover { color: var(--mc-primary-hover); }
+    }
+  }
+}
+
+.auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--mc-touch);
+  padding: 0 14px;
+  border-radius: var(--mc-radius);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1.0625rem;
+  text-decoration: none;
+
+  &:hover { color: #ffffff; background: rgba(255, 255, 255, 0.14); }
+  &:focus-visible { outline-color: #ffffff; }
+}
+
+// ---------- Logout confirmation ----------
+.auth-logout {
+  text-align: center;
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    background: var(--mc-success-tint);
+    color: var(--mc-success);
+
+    mat-icon,
+    .mat-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 40px;
+      line-height: 40px;
+    }
+  }
+
+  &__progress { margin-top: 28px; }
+
+  &__countdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    color: var(--mc-text-muted);
+    font-size: 1rem;
+  }
+}
+
+// ---------- Responsive ----------
+@media (max-width: 899.98px) {
+  .auth-hero { padding-bottom: 140px; }
+  .auth-hero__lead { display: none; }
+  .auth-main { margin-top: -100px; }
+  .auth-points { grid-template-columns: 1fr; gap: 18px; }
+}
+
+@media (max-width: 520px) {
+  .auth-card .auth-row { grid-template-columns: 1fr; }
+  .auth-back { padding: 0 8px; }
+}
+
+// Routed page components (<app-login>, <app-register>, <app-logout>) sit directly inside .auth-main
+.auth-main > *:not(router-outlet) {
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+// Register: form sections
+.auth-group {
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+
+  legend {
+    padding: 0;
+    margin: 4px 0 14px;
+    color: var(--mc-text);
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+}

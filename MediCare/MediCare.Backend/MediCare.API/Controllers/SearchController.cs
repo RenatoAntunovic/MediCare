@@ -1,51 +1,38 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MediCare.Infrastructure.Services;
-using MediCare.Infrastructure.Models;
+using MediCare.Application.Modules.MedicineSearch;
 
-namespace MediCare.API.Controllers
+namespace MediCare.API.Controllers;
+
+/// <summary>
+/// Public full-text medicine search (Elasticsearch or SQL fallback, depending on configuration).
+/// </summary>
+[ApiController]
+[Route("api/[controller]")]
+[AllowAnonymous]
+public class SearchController(ISender sender) : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class SearchController : ControllerBase
+    // GET /api/search?query=bru&page=1&pageSize=10
+    [HttpGet]
+    public async Task<IActionResult> Search(
+        [FromQuery] string query,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        CancellationToken ct = default)
     {
-        private readonly ElasticsearchService _elasticService;
-        private readonly ILogger<SearchController> _logger;
-
-        public SearchController(ElasticsearchService elasticService, ILogger<SearchController> logger)
+        var result = await sender.Send(new SearchMedicinesQuery
         {
-            _elasticService = elasticService;
-            _logger = logger;
-        }
+            Query = query,
+            Page = page,
+            PageSize = pageSize
+        }, ct);
 
-        [HttpGet]
-        public async Task<IActionResult> Search(
-            [FromQuery] string query,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+        return Ok(new
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(query))
-                    return BadRequest(new { Message = "Query is required" });
-
-                _logger.LogInformation($"Searching for: {query}");
-
-                var results = await _elasticService.SearchMedicinesAsync(query, page, pageSize);
-
-                return Ok(new
-                {
-                    Query = query,
-                    Page = page,
-                    PageSize = pageSize,
-                    Results = results,
-                    Count = results.Count
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Search error");
-                return StatusCode(500, new { Error = ex.Message });
-            }
-        }
+            query,
+            page,
+            pageSize,
+            total = result.Total,
+            count = result.Items.Count,
+            results = result.Items
+        });
     }
 }

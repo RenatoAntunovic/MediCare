@@ -32,7 +32,7 @@
       <!-- Raised buttons (OK, Yes, Delete, Save) -->
       <button
         *ngIf="button.type !== 'cancel' && button.type !== 'no' && button.type !== 'close'"
-        mat-raised-button
+        mat-flat-button
         [color]="button.color || (button.type === 'delete' ? 'warn' : 'primary')"
         (click)="onButtonClick(button.type, button.result)"
         class="dialog-button"

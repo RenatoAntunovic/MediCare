@@ -1,90 +1,82 @@
-<!-- Glavni sadržaj: slika lijevo, detalji desno -->
-<div class="container">
-  <!-- Header -->
-  <div class="header-card mat-elevation-z2">
-    <div class="header-card-content">
-      <h1>{{ 'MEDICINE.TITLE' | translate }}</h1>
-      
-      <button mat-icon-button color="primary" (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
+<div class="mc-page">
+  <header class="mc-page-header">
+    <button mat-button type="button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Nazad
+    </button>
+  </header>
 
+  <div class="mc-detail">
+    <!-- Left: photo (click to magnify, drag to move) -->
+    <div
+      class="mc-zoom"
+      [class.zoomed]="zoomLevel > 1"
+      (pointerdown)="onPointerDown($event)"
+      (pointermove)="onPointerMove($event)"
+      (pointerup)="onPointerUp($event)"
+      (pointercancel)="onPointerUp($event)"
+      (click)="onImageClick($event)"
+    >
+      <img
+        #zoomImage
+        *ngIf="imageUrl"
+        [src]="imageUrl"
+        [alt]="medicine.name"
+        draggable="false"
+        tabindex="0"
+        role="button"
+        [attr.aria-label]="zoomLevel > 1 ? 'Smanji sliku' : 'Uvećaj sliku'"
+        [style.transform]="imageTransform"
+        [style.transition]="isDragging ? 'none' : 'transform 0.2s ease'"
+        [style.cursor]="imageCursor"
+        (keydown)="onImageKeydown($event)"
+      />
+      <span class="mc-zoom__hint" *ngIf="imageUrl">
+        {{ zoomLevel > 1 ? 'Povucite za pomjeranje · klik ili Esc za povratak' : 'Kliknite na sliku za uvećanje' }}
+      </span>
     </div>
-  </div>
 
-  <!-- Content -->
-  <div class="detail-content">
-    <!-- Lijevo: slika -->
-<div class="left" 
-     (mousedown)="startDrag($event)" 
-     (mousemove)="drag($event)" 
-     (mouseup)="stopDrag()" 
-     (mouseleave)="stopDrag()"
-     (click)="toggleZoom($event)">
-  <img
-    [src]="'https://localhost:7260/' + medicine.imagePath"
-    alt="{{ medicine.name }}"
-    [style.transform]="'scale(' + zoomLevel + ') translate(' + offsetX + 'px, ' + offsetY + 'px)'"
-    style="transition: transform 0.2s ease; user-select: none;"
-    [style.cursor]="isDragging ? 'grabbing' : (zoomLevel > 1 ? 'grab' : 'pointer')"
-  >
-</div>
+    <!-- Right: details -->
+    <section class="mc-detail__info" *ngIf="medicine">
+      <span class="mc-badge mc-badge--teal">{{ medicine.medicineCategoryName }}</span>
+      <h1 class="mc-detail__name">{{ medicine.name }}</h1>
+      <p class="mc-detail__desc">{{ medicine.description }}</p>
 
+      <dl class="mc-detail__facts">
+        <div>
+          <dt>Težina</dt>
+          <dd>{{ medicine.weight }} Mg</dd>
+        </div>
+        <div>
+          <dt>Cijena</dt>
+          <dd class="mc-price">{{ medicine.price | number : '1.2-2' }} KM</dd>
+        </div>
+      </dl>
 
+      <div class="mc-detail__buy">
+        <!-- Quantity -->
+        <mat-form-field appearance="outline" class="quantity-field" subscriptSizing="dynamic">
+          <mat-label>Količina</mat-label>
+          <input matInput type="number" min="1" [(ngModel)]="quantity" />
+        </mat-form-field>
 
-
-
-    <!-- Desno: detalji -->
-    <div class="right" *ngIf="medicine">
-      <p class="medicine-categoryname"><strong>{{medicine.medicineCategoryName}}</strong></p>
-      <h1 class="medicine-name">{{ medicine.name }}</h1>
-      <hr>
-      <p><strong>Opis:</strong></p>
-      <p class="desc">{{ medicine.description }}</p>
-      <div class="mini-flex">
-      <p><strong>Težina:</strong> {{ medicine.weight }} Mg</p>
-      <p><strong>Cijena:</strong> {{ medicine.price }} KM</p>
+        <!-- Add to cart -->
+        <button mat-flat-button color="primary" type="button" class="mc-detail__cta" (click)="addToCart()">
+          <mat-icon>shopping_cart</mat-icon>
+          Dodaj u korpu
+        </button>
       </div>
-      <div class="add-to-cart-wrapper">
 
-  <!-- Količina -->
-  <mat-form-field appearance="outline" class="quantity-field">
-    <mat-label>Količina</mat-label>
-    <input
-      matInput
-      type="number"
-      min="1"
-      [(ngModel)]="quantity"
-    />
-  </mat-form-field>
-
-  <!-- Add to cart dugme -->
-  <button
-    mat-raised-button
-    class="add-to-cart-btn"
-    (click)="addToCart()">
-    <mat-icon>shopping_cart</mat-icon>
-    Dodaj u korpu
-  </button>
-
-    <button
-    mat-icon-button
-    class="add-to-favourites-btn"
-    (click)="addToFavourites()">
-    <mat-icon>favorite_border</mat-icon>
-  </button>
-
-      <button
-    mat-icon-button
-    class="add-to-for-later-btn"
-    (click)="addToForLater()">
-    <mat-icon>bookmark_border</mat-icon>
-  </button>
-
-</div>
-
-
-    </div>
+      <div class="mc-detail__secondary">
+        <button mat-stroked-button type="button" (click)="addToFavourites()">
+          <mat-icon>favorite_border</mat-icon>
+          Dodaj u favorite
+        </button>
+        <button mat-stroked-button type="button" (click)="addToForLater()">
+          <mat-icon>bookmark_border</mat-icon>
+          Sačuvaj za kasnije
+        </button>
+      </div>
+    </section>
   </div>
 </div>
-

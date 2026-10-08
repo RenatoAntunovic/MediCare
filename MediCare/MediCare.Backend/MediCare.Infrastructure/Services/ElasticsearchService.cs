@@ -1,24 +1,116 @@
-﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using MediCare.Application.Abstractions;
-using MediCare.Domain.Entities;
 using MediCare.Infrastructure.Models;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace MediCare.Infrastructure.Services
 {
-    public class ElasticsearchService
+    /// <summary>
+    /// Elasticsearch implementation of search and index maintenance.
+    /// The index contains only active medicines, so public search cannot return a disabled medicine.
+    /// </summary>
+    public class ElasticsearchService : IMedicineSearchService, IMedicineSearchIndex
     {
         private readonly ElasticsearchClient _client;
+        private readonly ILogger<ElasticsearchService> _logger;
         private const string ProductIndexName = "products";
-        private const string MedicineIndexName = "medicines";
 
-        public ElasticsearchService(ElasticsearchClient client)
+        public ElasticsearchService(ElasticsearchClient client, ILogger<ElasticsearchService> logger)
         {
             _client = client;
+            _logger = logger;
         }
 
-        // Kreiraj index
+        // =========================================================
+        // SEARCH
+        // =========================================================
+
+        public async Task<MedicineSearchResultDto> SearchAsync(string query, int page, int pageSize, CancellationToken ct)
+        {
+            var response = await _client.SearchAsync<MedicineDocument>(s => s
+                .Indices(ProductIndexName)
+                .From((page - 1) * pageSize)
+                .Size(pageSize)
+                .Query(q => q
+                    .MultiMatch(mm => mm
+                        .Fields(new[] { "name", "description", "category" })
+                        .Query(query)
+                        .Type(TextQueryType.BoolPrefix)
+                        .Fuzziness(new Fuzziness("AUTO"))
+                        .Operator(Operator.Or)
+                    )
+                )
+            );
+
+            if (!response.IsValidResponse)
+            {
+                _logger.LogError("Elasticsearch search failed: {Debug}", response.DebugInformation);
+                throw new InvalidOperationException("Pretraga trenutno nije dostupna.");
+            }
+
+            return new MedicineSearchResultDto
+            {
+                Total = response.Total,
+                Items = response.Documents.Select(ToDto).ToList()
+            };
+        }
+
+        // =========================================================
+        // INDEX MAINTENANCE
+        // =========================================================
+
+        public async Task UpsertAsync(MedicineSearchItemDto item, CancellationToken ct)
+        {
+            try
+            {
+                var response = await _client.IndexAsync(ToDocument(item), ProductIndexName);
+                if (!response.IsValidResponse)
+                    _logger.LogWarning("Elasticsearch upsert za lijek {Id} nije uspio: {Debug}", item.Id, response.DebugInformation);
+            }
+            catch (Exception ex)
+            {
+                // The index must never break saving to the database.
+                _logger.LogWarning(ex, "Elasticsearch upsert za lijek {Id} nije uspio.", item.Id);
+            }
+        }
+
+        public async Task RemoveAsync(int medicineId, CancellationToken ct)
+        {
+            try
+            {
+                // 404 (document does not exist) is not an error – just ignore it.
+                await _client.DeleteAsync<MedicineDocument>(medicineId, d => d.Index(ProductIndexName));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Elasticsearch brisanje lijeka {Id} nije uspjelo.", medicineId);
+            }
+        }
+
+        public async Task RebuildAsync(IReadOnlyList<MedicineSearchItemDto> items, CancellationToken ct)
+        {
+            await DeleteProductIndexAsync();
+            await CreateProductIndexAsync();
+
+            if (items.Count == 0)
+                return;
+
+            var documents = items.Select(ToDocument).ToList();
+
+            var bulkResponse = await _client.BulkAsync(b => b
+                .Index(ProductIndexName)
+                .IndexMany(documents)
+            );
+
+            if (!bulkResponse.IsValidResponse)
+                throw new InvalidOperationException($"Bulk index failed: {bulkResponse.DebugInformation}");
+        }
+
+        // =========================================================
+        // INDEX (create / delete)
+        // =========================================================
+
         public async Task CreateProductIndexAsync()
         {
             var existsResponse = await _client.Indices.ExistsAsync(ProductIndexName);
@@ -43,64 +135,6 @@ namespace MediCare.Infrastructure.Services
             }
         }
 
-        // Indexiraj proizvod
-        public async Task IndexMedicineAsync(MedicineDocument medicine)
-        {
-            await _client.IndexAsync(medicine, ProductIndexName);
-        }
-
-        // Bulk indexiranje
-        public async Task IndexMedicinesBulkAsync(List<MedicineDocument> medicines)
-        {
-            var bulkResponse = await _client.BulkAsync(b => b
-                .Index(ProductIndexName)
-                .IndexMany(medicines)
-            );
-
-            if (!bulkResponse.IsValidResponse)
-            {
-                throw new Exception($"Bulk index failed: {bulkResponse.DebugInformation}");
-            }
-        }
-
-        // Full-Text Search
-        public async Task<List<MedicineDocument>> SearchMedicinesAsync(string query, int page = 1, int pageSize = 10)
-        {
-            var response = await _client.SearchAsync<MedicineDocument>(s => s
-                .Indices(ProductIndexName)
-                .From((page - 1) * pageSize)
-                .Size(pageSize)
-                .Query(q => q
-                    .MultiMatch(mm => mm
-                        .Fields(new[] { "name", "description", "category" })
-                        .Query(query)
-                        .Type(TextQueryType.BoolPrefix)
-                        .Fuzziness(new Fuzziness("AUTO"))
-                        .Operator(Operator.Or)
-                    )
-                )
-            );
-
-            return response.Documents.ToList();
-        }
-
-        // Obriši proizvod
-        public async Task DeleteMedicineAsync(int medicineId)
-        {
-            await _client.DeleteAsync<MedicineDocument>(medicineId, d => d.Index(ProductIndexName));
-        }
-
-        // Update proizvod
-        public async Task UpdateMedicineAsync(MedicineDocument medicine)
-        {
-            await _client.UpdateAsync<MedicineDocument, MedicineDocument>(
-                ProductIndexName,
-                medicine.Id,
-                u => u.Doc(medicine)
-            );
-        }
-
-        // Obriši index
         public async Task DeleteProductIndexAsync()
         {
             var existsResponse = await _client.Indices.ExistsAsync(ProductIndexName);
@@ -111,36 +145,32 @@ namespace MediCare.Infrastructure.Services
             }
         }
 
-        // Sinhroniziraj ljekove iz baze u Elasticsearch
-        public async Task SyncMedicinesFromDatabaseAsync(IAppDbContext dbContext)
+        // =========================================================
+        // MAPPING
+        // =========================================================
+
+        private static MedicineDocument ToDocument(MedicineSearchItemDto item) => new()
         {
-            // Učitaj sve ljekove iz baze
-            var medicines = await dbContext.Medicine
-                .Include(m => m.MedicineCategory)
-                .AsNoTracking()
-                .ToListAsync();
+            Id = item.Id,
+            Name = item.Name,
+            Description = item.Description,
+            Price = item.Price,
+            Category = item.Category,
+            ImagePath = item.ImagePath,
+            Weight = item.Weight,
+            IsEnabled = true,
+            CreatedAt = DateTime.UtcNow
+        };
 
-            if (!medicines.Any())
-            {
-                return;
-            }
-
-            // Mapiraj u MedicineDocument
-            var documents = medicines.Select(m => new MedicineDocument
-            {
-                Id = m.Id,
-                Name = m.Name,
-                Description = m.Description,
-                Price = m.Price,
-                Category = m.MedicineCategory.Name,
-                ImagePath = m.ImagePath,
-                Weight = m.Weight,
-                IsEnabled = m.isEnabled,
-                CreatedAt = m.CreatedAtUtc
-            }).ToList();
-
-            // Bulk index u Elasticsearch
-            await IndexMedicinesBulkAsync(documents);
-        }
+        private static MedicineSearchItemDto ToDto(MedicineDocument d) => new()
+        {
+            Id = d.Id,
+            Name = d.Name ?? string.Empty,
+            Description = d.Description ?? string.Empty,
+            Price = d.Price,
+            Category = d.Category ?? string.Empty,
+            ImagePath = d.ImagePath ?? string.Empty,
+            Weight = d.Weight
+        };
     }
 }

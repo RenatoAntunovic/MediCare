@@ -14,15 +14,15 @@
   width: 100%;
   background: linear-gradient(
       90deg,
-      #4976b5 0%,
-      #6b96d1 25%,
-      #7ba7db 50%,
-      #6b96d1 75%,
-      #4976b5 100%
+      var(--mc-primary) 0%,
+      color-mix(in srgb, var(--mc-primary) 70%, #ffffff) 25%,
+      color-mix(in srgb, var(--mc-primary) 55%, #ffffff) 50%,
+      color-mix(in srgb, var(--mc-primary) 70%, #ffffff) 75%,
+      var(--mc-primary) 100%
   );
   background-size: 200% 100%;
   animation: loading-wave 1.5s ease-in-out infinite;
-  box-shadow: 0 2px 8px rgba(73, 118, 181, 0.4);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--mc-primary) 40%, transparent);
 }
 
 @keyframes loading-wave {

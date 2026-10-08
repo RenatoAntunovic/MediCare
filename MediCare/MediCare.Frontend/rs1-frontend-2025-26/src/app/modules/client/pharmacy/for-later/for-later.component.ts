@@ -37,12 +37,6 @@ export class ForLaterComponent extends BaseListPagedComponent<ForLaterDto, any> 
 
   ngOnInit(): void {
     this.loadPagedData();
-
-    // Dark mode
-    const darkMode = localStorage.getItem('darkMode');
-    if (darkMode === 'true') {
-      document.body.classList.add('dark-mode');
-    }
   }
 
   protected loadPagedData(): void {

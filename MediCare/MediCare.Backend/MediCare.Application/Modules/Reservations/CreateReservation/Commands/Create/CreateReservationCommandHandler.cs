@@ -1,57 +1,57 @@
-﻿using MediatR;
-using MediCare.Application.Abstractions;
-using MediCare.Domain.Entities.HospitalRecords;
-using Microsoft.EntityFrameworkCore;
+using MediCare.Application.Modules.Reservations.Common;
+using ReservationEntity = MediCare.Domain.Entities.HospitalRecords.Reservations;
 
-namespace MediCare.Application.Modules.Reservations.CreateReservation.Commands.Create
+namespace MediCare.Application.Modules.Reservations.CreateReservation.Commands.Create;
+
+public sealed class CreateReservationCommandHandler(IAppDbContext ctx)
+    : IRequestHandler<CreateReservationCommand, int>
 {
-    public class CreateReservationCommandHandler : IRequestHandler<CreateReservationCommand, int>
+    public async Task<int> Handle(CreateReservationCommand request, CancellationToken ct)
     {
-        private readonly IAppDbContext _context;
+        var date = request.ReservationDate.Date;
 
-        public CreateReservationCommandHandler(IAppDbContext context)
+        var treatment = await ctx.Treatments
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == request.TreatmentId, ct)
+            ?? throw new MediCareNotFoundException("Tretman ne postoji.");
+
+        if (!treatment.isEnabled)
+            throw new MediCareBusinessRuleException(
+                "reservation.treatment.disabled",
+                "Ovaj tretman trenutno nije dostupan za rezervaciju.");
+
+        var isTaken = await ctx.Reservations.AnyAsync(r =>
+                r.TreatmentId == request.TreatmentId &&
+                r.ReservationDate.Date == date &&
+                r.ReservationTime == request.ReservationTime &&
+                r.OrderStatus.StatusName != ReservationRules.CancelledStatus,
+            ct);
+
+        if (isTaken)
+            throw new MediCareConflictException("Ovaj termin je upravo zauzet. Odaberite drugi termin.");
+
+        var draftStatusId = await ctx.OrderStatus
+            .Where(s => s.StatusName == ReservationRules.DraftStatus)
+            .Select(s => (int?)s.Id)
+            .FirstOrDefaultAsync(ct)
+            ?? throw new MediCareBusinessRuleException(
+                "reservation.status.missing",
+                "Status DRAFT ne postoji u bazi. Pokrenite seed podataka.");
+
+        var reservation = new ReservationEntity
         {
-            _context = context;
-        }
+            UserId = request.UserId,
+            TreatmentId = request.TreatmentId,
+            ReservationDate = date,                 // store the date ONLY
+            ReservationTime = request.ReservationTime,
+            OrderStatusId = draftStatusId,
+            Price = treatment.Price,
+            Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim()
+        };
 
-        public async Task<int> Handle(CreateReservationCommand request, CancellationToken cancellationToken)
-        {
-            // 1. Tretman isti
-            var treatment = await _context.Treatments.FirstOrDefaultAsync(t => t.Id == request.TreatmentId, cancellationToken);
-            if (treatment == null) throw new Exception("Tretman ne postoji.");
+        ctx.Reservations.Add(reservation);
+        await ctx.SaveChangesAsync(ct);
 
-            // 2. FIX: DateTime + string → query
-            var dateToCheck = request.ReservationDate.Date;
-            var cancelledStatusId = await _context.OrderStatus
-                .Where(os => os.StatusName == "Cancelled").Select(os => os.Id).FirstOrDefaultAsync(cancellationToken);
-
-            var existingReservation = await _context.Reservations
-                .AnyAsync(r => r.TreatmentId == request.TreatmentId
-                            && r.ReservationDate.Date == dateToCheck  // ✅ SAMO OVO!
-                            && r.ReservationTime == request.ReservationTime
-                            && r.OrderStatusId != cancelledStatusId,
-                        cancellationToken);
-
-            if (existingReservation) throw new Exception("Ovaj termin je već zauzet.");
-
-            // 3-4. OSTALO IDENTIČNO
-            var draftStatus = await _context.OrderStatus.FirstOrDefaultAsync(os => os.StatusName == "Draft", cancellationToken);
-            if (draftStatus == null) throw new Exception("OrderStatus 'Draft' ne postoji u bazi.");
-
-            var reservation = new Domain.Entities.HospitalRecords.Reservations
-            {
-                UserId = request.UserId,
-                TreatmentId = request.TreatmentId,
-                ReservationDate = request.ReservationDate,
-                ReservationTime = request.ReservationTime,
-                OrderStatusId = draftStatus.Id,
-                Price = treatment.Price
-            };
-
-            _context.Reservations.Add(reservation);
-            await _context.SaveChangesAsync(cancellationToken);
-            return reservation.Id;
-        }
-
+        return reservation.Id;
     }
 }

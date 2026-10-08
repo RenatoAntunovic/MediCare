@@ -39,12 +39,6 @@ export class CartComponent extends BaseListPagedComponent<CartItemDto, any> impl
 
   ngOnInit(): void {
     this.loadPagedData();
-
-    // Dark mode
-    const darkMode = localStorage.getItem('darkMode');
-    if (darkMode === 'true') {
-      document.body.classList.add('dark-mode');
-    }
   }
 
   protected loadPagedData(): void {

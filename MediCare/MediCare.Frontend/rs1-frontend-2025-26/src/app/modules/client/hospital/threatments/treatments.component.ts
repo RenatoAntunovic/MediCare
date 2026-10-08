@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import {
   ListTreatmentsRequest,
   ListTreatmentsQueryDto
@@ -7,14 +7,10 @@ import {
 import { TreatmentsApiService } from '../../../../api-services/treatments/treatments-api.service';
 import { BaseListPagedComponent } from '../../../../core/components/base-classes/base-list-paged-component';
 import { ToasterService } from '../../../../core/services/toaster.service';
-import { DialogHelperService } from '../../../shared/services/dialog-helper.service';
-import { DialogButton } from '../../../shared/models/dialog-config.model';
-import { MatDialog } from '@angular/material/dialog';  // ✅ NOVO
-import { BookTreatmentComponent } from '../../../client/book-treatment/book-treatment.component';  // ✅ NOVO
-import { MatDialogModule } from '@angular/material/dialog'
-import { HttpClient } from '@angular/common/http';  // ✅ za API
-import { MatSnackBar } from '@angular/material/snack-bar';  // ✅ poruke
-import { ReservationsService } from '../../../../api-services/reservations/reservations.service';
+import {
+  BookTreatmentComponent,
+  BookTreatmentResult
+} from '../../../client/book-treatment/book-treatment.component';
 
 @Component({
   selector: 'app-treatments',
@@ -27,10 +23,8 @@ export class TreatmentComponent
   implements OnInit {
 
   private api = inject(TreatmentsApiService);
-  private router = inject(Router);
   private toaster = inject(ToasterService);
-  private dialogHelper = inject(DialogHelperService);
-  private dialog = inject(MatDialog);  // ✅ NOVO
+  private dialog = inject(MatDialog);
 
   displayedColumns: string[] = [
     'imageFile',
@@ -41,16 +35,14 @@ export class TreatmentComponent
     'actions'
   ];
 
+  // Client-side "cooldown" (Namik's rate-limit task) – left as it was
   private lastRequestTime = 0;
   private requestCooldown = 2000;
 
-  constructor(
-     private reservationsService: ReservationsService
-  ) {
-  super();
-  this.request = new ListTreatmentsRequest();
-  console.log('CLIENT TREATMENT COMPONENT');
-}
+  constructor() {
+    super();
+    this.request = new ListTreatmentsRequest();
+  }
 
   ngOnInit(): void {
     this.initList();
@@ -68,7 +60,6 @@ export class TreatmentComponent
 
     this.api.list(this.request).subscribe({
       next: (response) => {
-        console.log('Treatments:', response.items);
         this.items = response.items;
         this.stopLoading();
       },
@@ -79,36 +70,37 @@ export class TreatmentComponent
     });
   }
 
-  // ✅ NOVA METODA - REZERVACIJA
-  openBooking(treatment: ListTreatmentsQueryDto) {
-  const dialogRef = this.dialog.open(BookTreatmentComponent, {
-    width: '450px',
-    data: { treatment }
-  });
+  /**
+   * Opens the booking calendar.
+   * The dialog CREATES the reservation – here we only show a confirmation
+   * (previously a second POST here would have created a duplicate reservation).
+   */
+  openBooking(treatment: ListTreatmentsQueryDto): void {
+    if (!treatment.isEnabled) {
+      this.toaster.error('Ovaj tretman trenutno nije dostupan za rezervaciju.');
+      return;
+    }
 
-  dialogRef.afterClosed().subscribe((bookingData: any) => {
-    if (!bookingData) return;
+    this.dialog
+      .open<BookTreatmentComponent, { treatment: ListTreatmentsQueryDto }, BookTreatmentResult>(
+        BookTreatmentComponent,
+        {
+          width: '560px',
+          maxWidth: '95vw',
+          autoFocus: false,
+          data: { treatment }
+        }
+      )
+      .afterClosed()
+      .subscribe(result => {
+        if (!result) return;
 
-    const requestData = {
-    treatmentId: bookingData.treatmentId,
-    reservationDate: bookingData.reservationDate,
-    reservationTime: bookingData.reservationTime + ':00'  // "08:00" → "08:00:00"
-  };
-
-
-    this.reservationsService.createReservation(requestData).subscribe({
-      next: () => this.toaster.success('Rezervacija kreirana!'),
-      error: () => this.toaster.error('Greška!')
-    });
-  });
-}
-
-
-  // === UI Actions ===
-  onCreate() {}
-  onEdit(medicine: any) {}
-  onDelete(medicine: any) {}
-  onToggleStatus(medicine: any) {}
+        const [y, m, d] = result.date.split('-');
+        this.toaster.success(
+          `Rezervacija #${result.reservationId} kreirana: ${d}.${m}.${y}. u ${result.time}.`
+        );
+      });
+  }
 
   onSearch(): void {
     this.request.paging.page = 1;

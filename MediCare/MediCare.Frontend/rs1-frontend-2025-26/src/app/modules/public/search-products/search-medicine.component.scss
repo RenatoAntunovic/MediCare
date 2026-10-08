@@ -1,148 +1,177 @@
+// Pharmacy search (public landing hero). All colours come from the design tokens.
+:host { display: block; }
+
 .search-container {
-  padding: 20px;
+  box-sizing: border-box;
+  padding: clamp(20px, 3vw, 28px);
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius-lg);
+  box-shadow: var(--mc-shadow-lg);
+  color: var(--mc-text);
 }
 
-.search-box {
+.search-label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.search-box { position: relative; }
+
+.search-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 56px;
+  padding: 0 52px 0 18px;
+  font: inherit;
+  font-size: 1.0625rem;
+  color: var(--mc-text);
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-border-strong);
+  border-radius: var(--mc-radius);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder { color: var(--mc-text-muted); }
+  &::-webkit-search-cancel-button { appearance: none; -webkit-appearance: none; display: none; }
+
+  &:focus {
+    outline: none;
+    border-color: var(--mc-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--mc-primary) 28%, transparent);
+  }
+}
+
+.clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--mc-text-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover { background: var(--mc-surface-muted); color: var(--mc-text); }
+}
+
+.hint,
+.status { margin: 12px 2px 0; color: var(--mc-text-muted); font-size: 1rem; }
+
+.error {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--mc-radius);
+  background: var(--mc-danger-tint);
+  border-left: 4px solid var(--mc-danger);
+  color: var(--mc-text);
+}
+
+.results-count { margin: 18px 2px 8px; color: var(--mc-text-muted); font-size: 1rem; }
+
+.results-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius);
+  background: var(--mc-surface);
+
+  li + li { border-top: 1px solid var(--mc-border); }
+}
+
+// Results are informational (not links), so no hover / pointer styling
+.medicine-item {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-
-  .search-input {
-    flex: 1;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-
-    &:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
-    }
-  }
-
-  .search-btn,
-  .clear-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  .search-btn {
-    background: #3b82f6;
-    color: white;
-
-    &:hover {
-      background: #2563eb;
-    }
-  }
-
-  .clear-btn {
-    background: #ef4444;
-    color: white;
-
-    &:hover {
-      background: #dc2626;
-    }
-  }
+  gap: 14px;
+  padding: 12px 14px;
+  color: inherit;
 }
 
-.loading {
-  text-align: center;
-  padding: 20px;
-  color: #666;
-}
-
-.error-message {
-  background: #fee;
-  border: 1px solid #f87171;
-  color: #dc2626;
-  padding: 15px;
+.thumb {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
   border-radius: 8px;
-  margin-bottom: 20px;
+  background: #ffffff;
+  border: 1px solid var(--mc-border);
 }
 
-.results {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
+.info { min-width: 0; flex: 1; }
+.title-row { display: flex; justify-content: space-between; gap: 12px; }
+.name { font-size: 1.0625rem; }
+.price { color: var(--mc-primary); font-weight: 700; white-space: nowrap; }
+.category { color: var(--mc-teal); font-size: 0.9375rem; font-weight: 600; }
 
-  .result-item {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.description {
+  margin: 4px 0 0;
+  color: var(--mc-text-muted);
+  font-size: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
-    &:hover {
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      transform: translateY(-5px);
-    }
+.no-results { margin: 18px 2px 0; color: var(--mc-text-muted); font-size: 1.0625rem; }
 
-    .medicine-image {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      background: #f3f4f6;
-    }
+@media (max-width: 480px) {
+  .title-row { flex-direction: column; gap: 2px; }
+}
 
-    .medicine-info {
-      padding: 15px;
+// Prompt shown under the results: details and ordering need an account
+.search-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: var(--mc-radius);
+  background: var(--mc-primary-tint);
+  color: var(--mc-on-primary-tint);
 
-      h3 {
-        margin: 0 0 8px;
-        font-size: 16px;
-        color: #1f2937;
-      }
+  &__text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
 
-      .description {
-        margin: 0 0 8px;
-        font-size: 13px;
-        color: #666;
-        line-height: 1.4;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
+  &__actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
-      .category {
-        margin: 0;
-        font-size: 12px;
-        color: #3b82f6;
-        font-weight: 600;
-      }
-    }
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--mc-primary);
+    border-radius: var(--mc-radius);
+    color: var(--mc-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    background: transparent;
 
-    .medicine-price {
-      padding: 0 15px 15px;
+    &:hover { background: color-mix(in srgb, var(--mc-primary) 10%, transparent); }
 
-      .price {
-        font-size: 18px;
-        font-weight: 700;
-        color: #059669;
-      }
+    &--primary {
+      background: var(--mc-primary);
+      color: var(--mc-on-primary);
+      &:hover { background: var(--mc-primary-hover); }
     }
   }
-}
-
-.no-results,
-.no-data {
-  text-align: center;
-  padding: 40px 20px;
-  color: #666;
-  font-size: 16px;
-}
-
-.no-results {
-  color: #f87171;
 }
