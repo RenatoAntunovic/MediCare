@@ -1,100 +1,63 @@
-<div class="container">
-  <!-- Header kartica -->
-  <div class="header-card mat-elevation-z2">
-    <div class="header-card-content">
-      <!-- Lijevo: naslov -->
-      <h1>{{ 'FOR_LATER.TITLE' | translate }}</h1>
-</div>
+<div class="mc-page">
+  <header class="mc-page-header">
+    <h1 class="mc-page-header__title">{{ 'FOR_LATER.TITLE' | translate }}</h1>
+  </header>
 
   <!-- Loading / error -->
-  <div *ngIf="isLoading" class="loading">
-    {{ 'MEDICINE.LOADING' | translate }}
+  <div *ngIf="isLoading" class="mc-state" role="status">
+    <mat-progress-spinner mode="indeterminate" diameter="40" strokeWidth="4"></mat-progress-spinner>
+    <span>{{ 'MEDICINE.LOADING' | translate }}</span>
   </div>
 
-  <div *ngIf="!isLoading && errorMessage" class="error">
-    {{ errorMessage }}
+  <div *ngIf="!isLoading && errorMessage" class="mc-state mc-state--danger" role="alert">
+    <span class="mc-state__icon" aria-hidden="true"><mat-icon>error_outline</mat-icon></span>
+    <span>{{ errorMessage }}</span>
   </div>
-    </div>
 
-  <!-- Tabela -->
-  <div class="mat-elevation-z8" *ngIf="!isLoading && !errorMessage">
-    <table mat-table [dataSource]="items">
-
-<ng-container matColumnDef="imageFile">
-  <th mat-header-cell *matHeaderCellDef>{{'MEDICINE.TABLE.PICTURE' | translate}}</th>
-  <td mat-cell *matCellDef="let medicine">
-    <img
-      [src]="'https://localhost:7260/' + medicine.imagePath"
-      alt="{{ medicine.name }}"
-      style="width:100px; height:100px; object-fit:contain;"
-    />
-
-    </td>
-      </ng-container>
-
-      <!-- Naziv -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>{{ 'MEDICINE.TABLE.NAME' | translate }}</th>
-        <td mat-cell *matCellDef="let medicine">
-           <a 
-      [routerLink]="['/client/medicine', medicine.id]" 
-      style="font-weight: 500; text-decoration: none; color: inherit; cursor: pointer;">
-      {{ medicine.medicineName }}
+  <!-- Items -->
+  <ul class="mc-list" *ngIf="!isLoading && !errorMessage && items.length > 0">
+    <li class="mc-list__item" *ngFor="let item of items">
+      <a class="mc-list__thumb" [routerLink]="['/client/medicine', item.medicineId]" tabindex="-1" aria-hidden="true">
+        <img [src]="'https://localhost:7260/' + item.imagePath" [alt]="item.medicineName" loading="lazy" />
       </a>
-        </td>
-      </ng-container>
 
+      <div>
+        <a class="mc-list__name" [routerLink]="['/client/medicine', item.medicineId]">{{ item.medicineName }}</a>
 
-    <!-- Cijena -->
-    <ng-container matColumnDef="price">
-      <th mat-header-cell *matHeaderCellDef>{{ 'MEDICINE.TABLE.PRICE' | translate }}</th>
-      <td mat-cell *matCellDef="let item">
-        <span style="font-weight: 600; color: #4976b5">
-          {{ item.price}} KM
-        </span>
-      </td>
-    </ng-container>
+      </div>
 
-    <!-- Akcije -->
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>{{ 'FOR_LATER.TABLE.ACTIONS' | translate }}</th>
-      <td mat-cell *matCellDef="let item">
-         <button
+      <span class="mc-price">{{ item.price | number : '1.2-2' }} KM</span>
+
+      <div class="mc-list__actions">
+        <button
           mat-icon-button
-          color="warn"
+          type="button"
           (click)="addToCart(item)"
-          [matTooltip]="'FOR_LATER.ACTIONS.REMOVE_TOOLTIP' | translate"
+          matTooltip="Dodaj u korpu"
+          aria-label="Dodaj u korpu"
         >
-          <mat-icon>shopping_cart</mat-icon>
+          <mat-icon>add_shopping_cart</mat-icon>
         </button>
         <button
           mat-icon-button
-          color="warn"
+          type="button"
           (click)="removeItem(item)"
           [matTooltip]="'FOR_LATER.ACTIONS.REMOVE_TOOLTIP' | translate"
+          [attr.aria-label]="'FOR_LATER.ACTIONS.REMOVE_TOOLTIP' | translate"
         >
           <mat-icon>delete</mat-icon>
         </button>
-      </td>
+      </div>
+    </li>
+  </ul>
+
+  <!-- No data -->
+  <div class="mc-state" *ngIf="!isLoading && !errorMessage && items.length === 0">
+    <span class="mc-state__icon" aria-hidden="true"><mat-icon>bookmark_border</mat-icon></span>
+    <ng-container *ngIf="request.search; else noDataDefault">
+      {{ 'FOR_LATER.NO_DATA_FILTER' | translate }}
     </ng-container>
+    <ng-template #noDataDefault>{{ 'FOR_LATER.NO_DATA' | translate }}</ng-template>
+  </div>
 
-    <!-- Header i Row definicije -->
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
-    <!-- No data -->
-    <tr class="mat-row" *matNoDataRow>
-      <td class="mat-cell" colspan="5">
-        <ng-container *ngIf="request.search; else noDataDefault">
-          {{ 'FOR_LATER.NO_DATA_FILTER' | translate }}
-        </ng-container>
-        <ng-template #noDataDefault>
-          {{ 'FOR_LATER.NO_DATA' | translate }}
-        </ng-template>
-      </td>
-    </tr>
-  </table>
-
-</div>  
-
-
+</div>

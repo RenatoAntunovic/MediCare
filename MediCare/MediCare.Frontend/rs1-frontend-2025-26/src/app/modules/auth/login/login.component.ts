@@ -45,7 +45,7 @@ export class LoginComponent extends BaseComponent {
   this.loginAttempts++;
 
   if (this.loginAttempts > this.maxAttempts) {
-    this.stopLoading('Too many login attempts. Please wait a while.');
+    this.stopLoading('Previše pokušaja prijave. Pričekajte malo pa pokušajte ponovo.');
     return;
   }
 
@@ -72,7 +72,7 @@ export class LoginComponent extends BaseComponent {
         this.router.navigate([target]);
       },
       error: (err) => {
-        this.stopLoading('Invalid credentials. Please try again.');
+        this.stopLoading('Pogrešan email ili lozinka. Pokušajte ponovo.');
         console.error('Login error:', err);
       },
     });

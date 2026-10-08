@@ -1,0 +1,41 @@
+// =====================================================================
+// TRANSITIONAL – dark mode for pages that have not been redesigned yet.
+// Those pages use hard-coded light colours and all start with <div class="container">.
+// Redesigned pages use .mc-page instead and are themed by tokens, so they never match this block.
+// Delete this file (and its @use in styles.scss) once every page has been migrated.
+// =====================================================================
+body.dark-mode .container {
+  background: var(--mc-bg) !important;
+  color: #ffffff;
+
+  .header-card,
+  .mat-elevation-z8,
+  .loading {
+    background-color: #1e1e1e !important;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .mat-mdc-row { background-color: #111827; }
+  .mat-mdc-row:hover { background-color: #1e293b; }
+
+  table { background-color: #1e1e1e !important; }
+  th { background-color: #1a1a1a !important; color: #ffffff !important; }
+  td { background-color: #1e1e1e !important; color: #ffffff !important; }
+  tr:hover { background-color: rgba(255, 255, 255, 0.05) !important; }
+
+  .mdc-text-field--filled { background-color: #2a2a2a !important; }
+  .mdc-text-field__input { color: #ffffff !important; }
+  .mdc-floating-label { color: #b0bec5 !important; }
+
+  h1, h2, h3 { color: #ffffff; }
+  .mat-mdc-header-row,
+  .mat-mdc-header-cell,
+  .mdc-data-table__header-row,
+  .mdc-data-table__header-cell { background: #1a1a1a !important; color: #ffffff !important; }
+  .paginator-bar,
+  .paginator-container { background: #1a1a1a !important; color: #ffffff !important; }
+
+  mat-icon { color: #ffffff; }
+  app-fit-paginator-bar { background-color: #1a1a1a; color: #ffffff; }
+}

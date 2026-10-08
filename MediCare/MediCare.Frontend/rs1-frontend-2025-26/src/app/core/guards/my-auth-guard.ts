@@ -7,10 +7,13 @@ export const myAuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const currentUser = inject(CurrentUserService);
   const router = inject(Router);
 
-  const requireAuth = route.data['requireAuth'] === true;
-  const requireAdmin = route.data['requireAdmin'] === true;
-  const requireManager = route.data['requireManager'] === true;
-  const requireEmployee = route.data['requireEmployee'] === true;
+  // Routes declare their rules with myAuthData(...), which stores them under data['auth'].
+  // (Reading data['requireAuth'] directly always gave undefined, so the guard let everybody in.)
+  const rules = (route.data['auth'] ?? route.data) as MyAuthRouteData;
+  const requireAuth = rules.requireAuth === true;
+  const requireAdmin = rules.requireAdmin === true;
+  const requireManager = rules.requireManager === true;
+  const requireEmployee = rules.requireEmployee === true;
 
   const isAuth = currentUser.isAuthenticated();
 

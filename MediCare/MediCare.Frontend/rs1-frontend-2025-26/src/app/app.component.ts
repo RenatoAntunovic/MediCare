@@ -1,4 +1,5 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { ThemeService } from './core/services/theme.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -12,6 +13,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class AppComponent implements OnInit {
   protected readonly title = signal('rs1-frontend-2025-26');
   currentLang: string = 'bs';
+  /** created here so the saved light/dark choice is applied on every page from the first render */
+  protected readonly theme = inject(ThemeService);
 
   constructor(
     private translate: TranslateService, 

@@ -210,6 +210,12 @@ export class MedicineComponent
       weight: [medicine.weight, [Validators.required, Validators.min(1)]],
       medicineCategoryId: [medicine.medicineCategoryId, [Validators.required]]
     });
+
+    // Move the keyboard focus into the first field once it is rendered, so Enter (save) and
+    // Esc (cancel) work right after the double click without having to click into the field first.
+    setTimeout(() => {
+      (document.querySelector('.mc-editing-row .inline-edit-field input') as HTMLElement | null)?.focus();
+    });
   }
 
   saveRow(medicine: ListMedicineQueryDto): void {

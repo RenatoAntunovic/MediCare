@@ -49,7 +49,7 @@
 
 <div mat-dialog-actions align="end">
   <button mat-button type="button" mat-dialog-close [disabled]="isGenerating">Odustani</button>
-  <button mat-raised-button color="primary" type="button" (click)="generate()" [disabled]="isGenerating">
+  <button mat-flat-button color="primary" type="button" (click)="generate()" [disabled]="isGenerating">
     <mat-icon>download</mat-icon>
     {{ isGenerating ? 'Generišem…' : 'Preuzmi PDF' }}
   </button>

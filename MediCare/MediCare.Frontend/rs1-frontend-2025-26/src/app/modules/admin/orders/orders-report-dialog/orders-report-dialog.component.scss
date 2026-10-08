@@ -1,23 +1,18 @@
-$primary: #4976b5;
-$text: #1e293b;
-$muted: #64748b;
-$border: #e2e8f0;
-
+// PDF report dialog – tokens only (light + dark).
 .title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: $text;
+  gap: 10px;
+  color: var(--mc-text);
+  font-weight: 700;
 }
 
-.content {
-  min-width: min(440px, 80vw);
-}
+.content { min-width: min(440px, 80vw); }
 
 .section-label {
   margin: 4px 0 8px;
-  font-size: 13px;
-  color: $muted;
+  font-size: 1rem;
+  color: var(--mc-text-muted);
 }
 
 .presets {
@@ -28,49 +23,42 @@ $border: #e2e8f0;
 }
 
 .preset {
-  padding: 6px 12px;
-  border: 1px solid $border;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--mc-border-strong);
   border-radius: 999px;
-  background: #fff;
-  color: $text;
+  background: var(--mc-surface);
+  color: var(--mc-text);
   font: inherit;
-  font-size: 13px;
+  font-size: 1rem;
   cursor: pointer;
 
-  &:hover {
-    border-color: $primary;
-  }
-
-  &:focus-visible {
-    outline: 3px solid rgba(73, 118, 181, 0.45);
-    outline-offset: 1px;
-  }
+  &:hover { border-color: var(--mc-primary); }
+  &:focus-visible { outline: 3px solid var(--mc-focus); outline-offset: 2px; }
 
   &.active {
-    background: $primary;
-    border-color: $primary;
-    color: #fff;
+    background: var(--mc-primary);
+    border-color: var(--mc-primary);
+    color: var(--mc-on-primary);
+    font-weight: 700;
   }
 }
 
-.full-width {
-  width: 100%;
-  margin-bottom: 6px;
-}
+.full-width { width: 100%; margin-bottom: 6px; }
 
 .summary {
   margin: 8px 0 0;
-  font-size: 13px;
-  color: $muted;
+  font-size: 1rem;
+  color: var(--mc-text-muted);
   line-height: 1.5;
 }
 
 .error {
   margin: 12px 0 0;
-  padding: 10px 12px;
-  border-left: 4px solid #dc2626;
-  border-radius: 6px;
-  background: #fef2f2;
-  color: #991b1b;
-  font-size: 14px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--mc-danger);
+  border-radius: var(--mc-radius-sm);
+  background: var(--mc-danger-tint);
+  color: var(--mc-text);
+  font-size: 1rem;
 }

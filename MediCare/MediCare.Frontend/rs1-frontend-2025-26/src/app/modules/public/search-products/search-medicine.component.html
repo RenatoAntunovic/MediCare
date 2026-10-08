@@ -36,7 +36,7 @@
 
     <ul class="results-list">
       <li *ngFor="let medicine of medicines; trackBy: trackById">
-        <a class="medicine-item" [routerLink]="['/client/medicine', medicine.id]">
+        <div class="medicine-item">
           <img
             *ngIf="medicine.imagePath"
             class="thumb"
@@ -52,9 +52,21 @@
             <span class="category">{{ medicine.category }}</span>
             <p class="description">{{ medicine.description }}</p>
           </div>
-        </a>
+        </div>
       </li>
     </ul>
+
+    <!-- Visitors are not signed in: details and ordering are available after login -->
+    <div class="search-cta">
+      <p class="search-cta__text">
+        <mat-icon aria-hidden="true">lock</mat-icon>
+        Za detalje o lijeku i narudžbu potrebna je prijava.
+      </p>
+      <div class="search-cta__actions">
+        <a routerLink="/auth/login" class="search-cta__btn search-cta__btn--primary">Prijavite se</a>
+        <a routerLink="/auth/register" class="search-cta__btn">Registrujte se</a>
+      </div>
+    </div>
   </div>
 
   <p class="no-results" *ngIf="showNoResults">

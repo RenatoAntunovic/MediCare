@@ -1,134 +1,84 @@
-<div class="container">
-  <!-- Header card -->
-  <div class="header-card mat-elevation-z2">
-    <div class="header-card-content">
-      <!-- Left: title -->
-      <h1>{{ 'TREATMENTS.TITLE' | translate }}</h1>
+<div class="mc-page">
+  <header class="mc-page-header">
+    <h1 class="mc-page-header__title">{{ 'TREATMENTS.TITLE' | translate }}</h1>
+  </header>
 
-      <!-- Right: search + new product -->
-      <div class="actions-container">
-        <mat-form-field class="search-field" appearance="fill">
-          <mat-label>{{ 'TREATMENTS.SEARCH_PLACEHOLDER' | translate }}</mat-label>
-          <input
-            matInput
-            [placeholder]="'TREATMENTS.SEARCH_INPUT_PLACEHOLDER' | translate"
-            (keyup.enter)="request.paging.page = 1; loadPagedData()"
-            [(ngModel)]="request.search"
-          />
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
-          </div>
-    </div>
+  <!-- Search -->
+  <div class="mc-toolbar" role="search">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'TREATMENTS.SEARCH_PLACEHOLDER' | translate }}</mat-label>
+      <input
+        matInput
+        [placeholder]="'TREATMENTS.SEARCH_INPUT_PLACEHOLDER' | translate"
+        (keyup.enter)="onSearch()"
+        [(ngModel)]="request.search"
+      />
+      <button mat-icon-button matSuffix type="button" (click)="onSearch()" aria-label="Pretraži">
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
   </div>
 
   <!-- Loading / error -->
-  <div *ngIf="isLoading" class="loading">
-    {{ 'TREATMENTS.LOADING' | translate }}
+  <div *ngIf="isLoading" class="mc-state" role="status">
+    <mat-progress-spinner mode="indeterminate" diameter="40" strokeWidth="4"></mat-progress-spinner>
+    <span>{{ 'TREATMENTS.LOADING' | translate }}</span>
   </div>
 
-  <div *ngIf="!isLoading && errorMessage" class="error">
-    {{ errorMessage }}
+  <div *ngIf="!isLoading && errorMessage" class="mc-state mc-state--danger" role="alert">
+    <span class="mc-state__icon" aria-hidden="true"><mat-icon>error_outline</mat-icon></span>
+    <span>{{ errorMessage }}</span>
   </div>
 
-  <!-- Table -->
-  <div class="mat-elevation-z8" *ngIf="!isLoading && !errorMessage">
-    <table mat-table [dataSource]="items">
+  <!-- Treatments -->
+  <ul class="mc-grid mc-grid--wide" *ngIf="!isLoading && !errorMessage && items.length > 0">
+    <li class="mc-product" *ngFor="let treatment of items">
+      <div class="mc-product__media">
+        <img [src]="'https://localhost:7260/' + treatment.imagePath" [alt]="treatment.serviceName" loading="lazy" />
+      </div>
 
-<ng-container matColumnDef="imageFile">
-  <th mat-header-cell *matHeaderCellDef>{{'TREATMENTS.TABLE.PICTURE' | translate}}</th>
-  <td mat-cell *matCellDef="let treatment">
-    <img
-      [src]="'https://localhost:7260/' + treatment.imagePath"
-      alt="{{ treatment.serviceName }}"
-      style="width:100px; height:100px; object-fit:contain;"
-    />
+      <div class="mc-product__body">
+        <span class="mc-product__category">{{ treatment.treatmentsCategoryName }}</span>
+        <h2 class="mc-product__name">{{ treatment.serviceName }}</h2>
+        <p class="mc-product__desc">{{ treatment.description }}</p>
 
-    </td>
-      </ng-container>
+        <div class="mc-product__foot">
+          <span class="mc-price">{{ treatment.price | number : '1.2-2' }} KM</span>
+          <span class="mc-badge" [ngClass]="treatment.isEnabled ? 'mc-badge--success' : 'mc-badge--danger'">
+            <mat-icon aria-hidden="true">{{ treatment.isEnabled ? 'check_circle' : 'block' }}</mat-icon>
+            {{
+              treatment.isEnabled
+                ? ('TREATMENTS.TABLE.ENABLED' | translate)
+                : ('TREATMENTS.TABLE.DISABLED' | translate)
+            }}
+          </span>
+        </div>
 
-      <!-- Name -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>{{ 'TEST' | translate }}</th>
-        <td mat-cell *matCellDef="let treatment">
-          <span style="font-weight: 500">{{ treatment.serviceName }}</span>
-        </td>
-      </ng-container>
+        <!-- Only action for the client: book -->
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          class="mc-product__cta"
+          (click)="openBooking(treatment)"
+          [disabled]="!treatment.isEnabled"
+          [attr.aria-label]="'Rezerviši ' + treatment.serviceName"
+        >
+          <mat-icon>event_available</mat-icon>
+          Rezerviši
+        </button>
+      </div>
+    </li>
+  </ul>
 
-      <!-- Category -->
-      <ng-container matColumnDef="treatmentsCategoryName">
-        <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.CATEGORY' | translate }}</th>
-        <td mat-cell *matCellDef="let treatment">
-          {{ treatment.treatmentsCategoryName }}
-        </td>
-      </ng-container>
-
-      <!-- Price -->
-      <ng-container matColumnDef="price">
-        <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.PRICE' | translate }}</th>
-        <td mat-cell *matCellDef="let treatment">
-          <span style="font-weight: 600; color: #4976b5"
-            >{{ treatment.price | number : '1.2-2' }} KM</span
-          >
-        </td>
-      </ng-container>
-
-      <!-- Active -->
-<ng-container matColumnDef="isEnabled">
-  <th mat-header-cell *matHeaderCellDef>
-    {{ 'TREATMENTS.TABLE.STATUS' | translate }}
-  </th>
-
-  <td mat-cell *matCellDef="let threatment">
-    <span
-      class="status-label"
-      [ngClass]="{
-        'enabled': threatment.isEnabled,
-        'disabled': !threatment.isEnabled
-      }"
-    >
-      {{
-        threatment.isEnabled
-          ? ('TREATMENTS.TABLE.ENABLED' | translate)
-          : ('TREATMENTS.TABLE.DISABLED' | translate)
-      }}
-    </span>
-  </td>
-</ng-container>
-
-
-      <!-- Actions -->
-      <!-- Actions - ONLY BOOK for the client -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.ACTIONS' | translate }}</th>
-          <td mat-cell *matCellDef="let treatment">
-            <button mat-raised-button 
-                    color="accent" 
-                    (click)="openBooking(treatment)"
-                    [disabled]="!treatment.isEnabled"
-                    matTooltip="Rezerviraj {{treatment.serviceName}}">
-              <mat-icon>schedule</mat-icon>
-              Rezerviši
-            </button>
-          </td>
-        </ng-container>
-
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
-      <!-- No data -->
-      <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="7">
-          <ng-container *ngIf="request.search; else noDataDefault">
-            {{ 'TREATMENTS.NO_DATA_FILTER' | translate }}
-          </ng-container>
-          <ng-template #noDataDefault>
-            {{ 'TREATMENTS.NO_DATA' | translate }}
-          </ng-template>
-        </td>
-      </tr>
-    </table>
-
-    <app-fit-paginator-bar [vm]="this" />
+  <!-- No data -->
+  <div class="mc-state" *ngIf="!isLoading && !errorMessage && items.length === 0">
+    <span class="mc-state__icon" aria-hidden="true"><mat-icon>medical_services</mat-icon></span>
+    <ng-container *ngIf="request.search; else noDataDefault">
+      {{ 'TREATMENTS.NO_DATA_FILTER' | translate }}
+    </ng-container>
+    <ng-template #noDataDefault>{{ 'TREATMENTS.NO_DATA' | translate }}</ng-template>
   </div>
+
+  <app-fit-paginator-bar [vm]="this" />
 </div>

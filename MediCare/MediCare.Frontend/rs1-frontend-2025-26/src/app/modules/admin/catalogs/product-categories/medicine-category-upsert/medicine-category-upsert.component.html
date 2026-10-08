@@ -1,8 +1,6 @@
 <h2 mat-dialog-title>{{ title }}</h2>
-
 <mat-dialog-content>
   <form [formGroup]="form" *ngIf="!isLoading && form">
-    <!-- Category Name -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>{{ 'MEDICINE_CATEGORIES.FORM.NAME' | translate }}</mat-label>
       <input
@@ -12,7 +10,6 @@
         maxlength="100"
         autocomplete="off"
       />
-      <mat-icon matSuffix>label</mat-icon>
       <mat-error *ngIf="form.get('name')?.invalid">
         {{ getErrorMessage('name') }}
       </mat-error>
@@ -20,21 +17,17 @@
     </mat-form-field>
   </form>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading && !form" class="loading-container">
-    <mat-spinner diameter="40"></mat-spinner>
-    <p>{{ 'MEDICINE_CATEGORIES.FORM.LOADING' | translate }}</p>
+  <div *ngIf="isLoading && !form" class="mc-state" role="status">
+    <mat-progress-spinner mode="indeterminate" diameter="36" strokeWidth="4"></mat-progress-spinner>
+    <span>{{ 'MEDICINE_CATEGORIES.FORM.LOADING' | translate }}</span>
   </div>
 </mat-dialog-content>
-
 <mat-dialog-actions align="end">
   <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">
-    <mat-icon>close</mat-icon>
     {{ 'MEDICINE_CATEGORIES.FORM.CANCEL' | translate }}
   </button>
-
   <button
-    mat-raised-button
+    mat-flat-button
     color="primary"
     type="button"
     (click)="onSubmit()"

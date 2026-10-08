@@ -54,7 +54,8 @@ constructor(
 
   getTotalAmount(): number {
   if (!this.order?.items) return 0;
-  return this.order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // item.price is already the TOTAL of the line (price x quantity), so the order total is the plain sum
+  return this.order.items.reduce((sum, item) => sum + item.price, 0);
 }
   // === Status Helpers ===
 

@@ -1,125 +1,139 @@
-<mat-sidenav-container class="sidenav-container">
+<mat-sidenav-container class="mc-shell">
   <!-- SIDEBAR -->
-  <mat-sidenav mode="side" opened class="sidenav">
-    <!-- SIDEBAR HEADER WITH USER INFO -->
-    <div class="sidebar-header">
-      <!-- User Info -->
-      <div class="user-info">
-        <div class="user-avatar">
-          <mat-icon>account_circle</mat-icon>
-        </div>
-        <div class="user-details">
-          <div class="user-email">{{ auth.currentUser()?.email }}</div>
-          <div class="user-role">
-            @if (auth.isAdmin()) {
-            <mat-chip class="role-chip admin">
-              <mat-icon>admin_panel_settings</mat-icon>
-              {{ 'ADMIN_PANEL.ROLES.ADMIN' | translate }}
-            </mat-chip>
-            } @else if (auth.isManager()) {
-            <mat-chip class="role-chip manager">
-              <mat-icon>manage_accounts</mat-icon>
-              {{ 'ADMIN_PANEL.ROLES.MANAGER' | translate }}
-            </mat-chip>
-            } @else if (auth.isEmployee()) {
-            <mat-chip class="role-chip user">
-              <mat-icon>badge</mat-icon>
-              {{ 'ADMIN_PANEL.ROLES.USER' | translate }}
-            </mat-chip>
-            }
-          </div>
-        </div>
-      </div>
-
-      <!-- Language Selector -->
-      <div class="language-selector">
-        <button mat-icon-button [matMenuTriggerFor]="langMenu" class="lang-button">
-          <span class="flag-icon">{{ getCurrentLanguage()?.flag }}</span>
-          <mat-icon>arrow_drop_down</mat-icon>
-        </button>
-
-        <mat-menu #langMenu="matMenu">
-          <button
-            mat-menu-item
-            *ngFor="let lang of languages"
-            (click)="switchLanguage(lang.code)"
-            [class.active-lang]="currentLang === lang.code"
-          >
-            <span class="flag-icon">{{ lang.flag }}</span>
-            <span>{{ lang.name }}</span>
-            <mat-icon *ngIf="currentLang === lang.code" class="check-icon">check</mat-icon>
-          </button>
-        </mat-menu>
-      </div>
+  <mat-sidenav
+    #sidenav
+    class="mc-nav"
+    role="complementary"
+    [mode]="isMobile() ? 'over' : 'side'"
+    [opened]="!isMobile()"
+    [fixedInViewport]="isMobile()"
+  >
+    <div class="mc-nav__brand">
+      <span class="mc-logo" aria-hidden="true"></span>
+      <span>MediCare</span>
     </div>
 
-    <!-- NAVIGATION MENU -->
-    <mat-nav-list>
-      <!-- CATALOG SECTION -->
-      <div class="nav-section-title">
-        {{ 'ADMIN_PANEL.MENU.PHARMACY' | translate }}
+    <!-- NAVIGATION -->
+    <nav class="mc-nav__links">
+      <p class="mc-nav__section">{{ 'ADMIN_PANEL.MENU.PHARMACY' | translate }}</p>
+
+      <a class="mc-nav-link" routerLink="/admin/products" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
+        <mat-icon aria-hidden="true">medication</mat-icon>
+        <span>{{ 'ADMIN_PANEL.MENU.MEDICINE' | translate }}</span>
+      </a>
+
+      <a class="mc-nav-link" routerLink="/admin/product-categories" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
+        <mat-icon aria-hidden="true">category</mat-icon>
+        <span>{{ 'ADMIN_PANEL.MENU.CATEGORIES' | translate }}</span>
+      </a>
+
+      <a class="mc-nav-link" routerLink="/admin/orders" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
+        <mat-icon aria-hidden="true">receipt_long</mat-icon>
+        <span>{{ 'ADMIN_PANEL.MENU.ORDERS' | translate }}</span>
+      </a>
+
+      <p class="mc-nav__section">{{ 'ADMIN_PANEL.MENU.HOSPITAL' | translate }}</p>
+
+      <a class="mc-nav-link" routerLink="/admin/treatments" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
+        <mat-icon aria-hidden="true">medical_services</mat-icon>
+        <span>{{ 'ADMIN_PANEL.MENU.TREATMENT' | translate }}</span>
+      </a>
+
+      <a class="mc-nav-link" routerLink="/admin/treatment-categories" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
+        <mat-icon aria-hidden="true">category</mat-icon>
+        <span>{{ 'ADMIN_PANEL.MENU.TREATMENT_CATEGORIES' | translate }}</span>
+      </a>
+
+      <p class="mc-nav__section">{{ 'ADMIN_PANEL.MENU.SYSTEM' | translate }}</p>
+
+      <a class="mc-nav-link" routerLink="/admin/settings" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
+        <mat-icon aria-hidden="true">settings</mat-icon>
+        <span>{{ 'ADMIN_PANEL.MENU.SETTINGS' | translate }}</span>
+      </a>
+    </nav>
+
+    <!-- SIGNED-IN USER, LANGUAGE, LOGOUT -->
+    <div class="mc-nav__footer">
+      <div class="mc-user">
+        <span class="mc-user__avatar" aria-hidden="true">
+          <mat-icon>person</mat-icon>
+        </span>
+        <div class="mc-user__meta">
+          <span class="mc-user__email" [attr.title]="auth.currentUser()?.email">{{ auth.currentUser()?.email }}</span>
+          @if (auth.isAdmin()) {
+          <span class="mc-role">
+            <mat-icon aria-hidden="true">admin_panel_settings</mat-icon>
+            {{ 'ADMIN_PANEL.ROLES.ADMIN' | translate }}
+          </span>
+          } @else if (auth.isManager()) {
+          <span class="mc-role">
+            <mat-icon aria-hidden="true">manage_accounts</mat-icon>
+            {{ 'ADMIN_PANEL.ROLES.MANAGER' | translate }}
+          </span>
+          } @else if (auth.isEmployee()) {
+          <span class="mc-role">
+            <mat-icon aria-hidden="true">badge</mat-icon>
+            {{ 'ADMIN_PANEL.ROLES.USER' | translate }}
+          </span>
+          }
+        </div>
       </div>
 
-      <a mat-list-item routerLink="/admin/product-categories" routerLinkActive="active">
-        <mat-icon matListItemIcon>local_pharmacy</mat-icon>
-        <span matListItemTitle>{{ 'ADMIN_PANEL.MENU.CATEGORIES' | translate }}</span>
+      <!-- Language selector -->
+      <button type="button" class="mc-lang" [matMenuTriggerFor]="langMenu" aria-label="Jezik / Language">
+        <span class="mc-lang__flag" aria-hidden="true">{{ getCurrentLanguage()?.flag }}</span>
+        <span class="mc-lang__name">{{ getCurrentLanguage()?.name }}</span>
+        <mat-icon aria-hidden="true">arrow_drop_down</mat-icon>
+      </button>
+
+      <mat-menu #langMenu="matMenu">
+        <button
+          mat-menu-item
+          *ngFor="let lang of languages"
+          (click)="switchLanguage(lang.code)"
+          [class.active-lang]="currentLang === lang.code"
+        >
+          <span class="flag-icon">{{ lang.flag }}</span>
+          <span>{{ lang.name }}</span>
+          <mat-icon *ngIf="currentLang === lang.code" class="check-icon">check</mat-icon>
+        </button>
+      </mat-menu>
+
+      <!-- Dark / light theme (one shared setting for client and admin) -->
+      <button
+        type="button"
+        class="mc-lang mc-theme"
+        role="switch"
+        [attr.aria-checked]="theme.isDark()"
+        (click)="theme.toggle()"
+      >
+        <mat-icon aria-hidden="true">{{ theme.isDark() ? 'dark_mode' : 'light_mode' }}</mat-icon>
+        <span class="mc-lang__name">Tamni način</span>
+        <span class="mc-switch" aria-hidden="true"></span>
+      </button>
+
+      <!-- Logout -->
+      <a class="mc-nav-link" routerLink="/auth/logout" routerLinkActive="active">
+        <mat-icon aria-hidden="true">logout</mat-icon>
+        <span>{{ 'ADMIN_PANEL.MENU.LOGOUT' | translate }}</span>
       </a>
-
-      <a mat-list-item routerLink="/admin/products" routerLinkActive="active">
-        <mat-icon matListItemIcon>local_pharmacy</mat-icon>
-        <span matListItemTitle>{{ 'ADMIN_PANEL.MENU.MEDICINE' | translate }}</span>
-      </a>
-
-      <mat-divider></mat-divider>
-
-       <div class="nav-section-title">
-        {{ 'ADMIN_PANEL.MENU.HOSPITAL' | translate }}
-      </div>
-
-      <a mat-list-item routerLink="/admin/treatment-categories" routerLinkActive="active">
-        <mat-icon matListItemIcon>local_hospital</mat-icon>
-        <span matListItemTitle>{{ 'ADMIN_PANEL.MENU.TREATMENT_CATEGORIES' | translate }}</span>
-      </a>
-
-      <a mat-list-item routerLink="/admin/treatments" routerLinkActive="active">
-        <mat-icon matListItemIcon>local_hospital</mat-icon>
-        <span matListItemTitle>{{ 'ADMIN_PANEL.MENU.TREATMENT' | translate }}</span>
-      </a>
-
-      <mat-divider></mat-divider>
-
-      <!-- ORDERS SECTION -->
-      <div class="nav-section-title">
-        {{ 'ADMIN_PANEL.MENU.ORDERS_SECTION' | translate }}
-      </div>
-
-      <a mat-list-item routerLink="/admin/orders" routerLinkActive="active">
-        <mat-icon matListItemIcon>shopping_cart</mat-icon>
-        <span matListItemTitle>{{ 'ADMIN_PANEL.MENU.ORDERS' | translate }}</span>
-      </a>
-
-      <mat-divider></mat-divider>
-
-      <!-- SYSTEM SECTION -->
-      <div class="nav-section-title">
-        {{ 'ADMIN_PANEL.MENU.SYSTEM' | translate }}
-      </div>
-
-      <a mat-list-item routerLink="/admin/settings" routerLinkActive="active">
-        <mat-icon matListItemIcon>settings</mat-icon>
-        <span matListItemTitle>{{ 'ADMIN_PANEL.MENU.SETTINGS' | translate }}</span>
-      </a>
-
-      <!-- LOGOUT -->
-      <a mat-list-item routerLink="/auth/logout" routerLinkActive="active" class="logout-item">
-        <mat-icon matListItemIcon>logout</mat-icon>
-        <span matListItemTitle>{{ 'ADMIN_PANEL.MENU.LOGOUT' | translate }}</span>
-      </a>
-    </mat-nav-list>
+    </div>
   </mat-sidenav>
 
   <!-- MAIN CONTENT -->
-  <mat-sidenav-content class="main-content">
-    <router-outlet></router-outlet>
+  <mat-sidenav-content class="mc-content">
+    <header class="mc-topbar">
+      <button mat-icon-button type="button" (click)="sidenav.toggle()" aria-label="Otvori meni">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="mc-topbar__brand">
+        <span class="mc-logo mc-logo--sm" aria-hidden="true"></span>
+        MediCare
+      </span>
+    </header>
+
+    <main class="mc-main" id="main">
+      <router-outlet></router-outlet>
+    </main>
   </mat-sidenav-content>
 </mat-sidenav-container>

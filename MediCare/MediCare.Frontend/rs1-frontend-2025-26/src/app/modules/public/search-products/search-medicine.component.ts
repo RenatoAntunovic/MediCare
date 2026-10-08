@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { Subject, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -36,7 +37,7 @@ const MIN_QUERY_LENGTH = 2;
   selector: 'app-search-medicine',
   templateUrl: './search-medicine.component.html',
   styleUrls: ['./search-medicine.component.scss'],
-  imports: [CommonModule, FormsModule, RouterLink]
+  imports: [CommonModule, FormsModule, RouterLink, MatIconModule]
 })
 export class SearchMedicineComponent implements OnInit {
   private medicineApi = inject(MedicineApiService);

@@ -1,0 +1,283 @@
+// =====================================================================
+// App shell: sidebar + mobile top bar (shared by the client and admin layouts)
+// Desktop (>= 960px): sidebar always visible.  Below: sidebar is an overlay opened from the top bar.
+// =====================================================================
+
+.mc-shell {
+  height: 100vh;
+  background: var(--mc-bg);
+
+  .mc-content {
+    background: var(--mc-bg);
+    min-height: 100%;
+  }
+}
+
+// ---------- Sidebar ----------
+.mc-nav {
+  box-sizing: border-box;
+  width: var(--mc-nav-width);
+  max-width: 86vw;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--mc-nav-bg);
+  color: var(--mc-nav-text);
+  border: 0;
+  border-radius: 0;
+
+  .mat-drawer-inner-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 24px 12px;
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+
+  &__links {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 8px 14px 16px;
+  }
+
+  &__section {
+    margin: 22px 14px 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--mc-nav-text-muted);
+  }
+
+  &__footer {
+    flex: 0 0 auto;
+    padding: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+}
+
+.mc-nav-link {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: var(--mc-touch);
+  padding: 0 14px;
+  margin-bottom: 2px;
+  border-radius: var(--mc-radius);
+  color: rgba(232, 240, 247, 0.9);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--mc-dur) var(--mc-ease), color var(--mc-dur) var(--mc-ease);
+
+  mat-icon,
+  .mat-icon {
+    flex: 0 0 auto;
+    color: rgba(232, 240, 247, 0.72);
+    transition: color var(--mc-dur) var(--mc-ease);
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: #ffffff;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #9bcbf3;
+    outline-offset: 2px;
+  }
+
+  // Current page: filled background + bold text + a teal marker (not colour alone)
+  &.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-weight: 700;
+
+    mat-icon,
+    .mat-icon {
+      color: #7fe0e2;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -14px;
+      top: 10px;
+      bottom: 10px;
+      width: 4px;
+      border-radius: 0 4px 4px 0;
+      background: #5fd0d2;
+    }
+  }
+}
+
+// ---------- Signed-in user block ----------
+.mc-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 6px 14px;
+
+  &__avatar {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+  }
+
+  &__meta {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+.mc-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 2px 10px 2px 8px;
+  border-radius: 999px;
+  background: rgba(95, 208, 210, 0.2);
+  color: #bff1f2;
+  font-size: 0.875rem;
+  font-weight: 600;
+
+  mat-icon,
+  .mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    line-height: 16px;
+    color: inherit;
+  }
+}
+
+.mc-lang {
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 2px;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: var(--mc-touch);
+  padding: 0 12px;
+  border-radius: var(--mc-radius);
+  border: 0;
+  background: transparent;
+  color: rgba(232, 240, 247, 0.9);
+  font: inherit;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  &:hover { background: rgba(255, 255, 255, 0.09); color: #fff; }
+  &:focus-visible { outline: 3px solid #9bcbf3; outline-offset: 2px; }
+
+  &__flag { font-size: 1.25rem; line-height: 1; }
+  &__name { flex: 1 1 auto; text-align: left; }
+}
+
+.mc-nav__footer .mc-nav-link { margin-bottom: 0; }
+
+// ---------- Mobile top bar ----------
+.mc-topbar {
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  height: 64px;
+  padding: 0 12px;
+  background: var(--mc-surface);
+  border-bottom: 1px solid var(--mc-border);
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--mc-text);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+}
+
+@media (max-width: 959.98px) {
+  .mc-topbar { display: flex; }
+}
+
+// ---------- Theme switch (sidebar) ----------
+.mc-theme .mc-switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  transition: background-color var(--mc-dur) var(--mc-ease);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform var(--mc-dur) var(--mc-ease);
+  }
+}
+.mc-theme[aria-checked='true'] .mc-switch {
+  background: #5fd0d2;
+  &::after { transform: translateX(18px); }
+}
+
+// Small round icon button used on public / auth headers (theme toggle)
+.mc-iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--mc-touch);
+  height: var(--mc-touch);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color var(--mc-dur) var(--mc-ease);
+
+  &:hover { background: rgba(127, 127, 127, 0.16); }
+}

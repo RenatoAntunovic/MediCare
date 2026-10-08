@@ -1,151 +1,142 @@
-<div class="container">
-  <!-- Header kartica -->
-  <div class="header-card mat-elevation-z2">
-    <div class="header-card-content">
-      <!-- Lijevo: naslov -->
-      <h1>{{ 'TREATMENTS.TITLE' | translate }}</h1>
+<div class="mc-page">
+  <header class="mc-page-header">
+    <h1 class="mc-page-header__title">{{ 'TREATMENTS.TITLE' | translate }}</h1>
 
-      <!-- Desno: search + novi proizvod -->
-      <div class="actions-container">
-        <mat-form-field class="search-field" appearance="fill">
-          <mat-label>{{ 'TREATMENTS.SEARCH_PLACEHOLDER' | translate }}</mat-label>
-          <input
-            matInput
-            [placeholder]="'TREATMENTS.SEARCH_INPUT_PLACEHOLDER' | translate"
-            (keyup.enter)="request.paging.page = 1; loadPagedData()"
-            [(ngModel)]="request.search"
-          />
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
+    <button mat-flat-button color="primary" type="button" (click)="onCreate()">
+      <mat-icon>add</mat-icon>
+      {{ 'TREATMENTS.NEW_TREATMENT' | translate }}
+    </button>
+  </header>
 
-        <button mat-raised-button color="primary" (click)="onCreate()">
-          <mat-icon>add</mat-icon>
-          {{ 'TREATMENTS.NEW_TREATMENT' | translate }}
-        </button>
-      </div>
-    </div>
+  <!-- Search -->
+  <div class="mc-toolbar" role="search">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'TREATMENTS.SEARCH_PLACEHOLDER' | translate }}</mat-label>
+      <input
+        matInput
+        [placeholder]="'TREATMENTS.SEARCH_INPUT_PLACEHOLDER' | translate"
+        (keyup.enter)="request.paging.page = 1; loadPagedData()"
+        [(ngModel)]="request.search"
+      />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="request.paging.page = 1; loadPagedData()"
+        aria-label="Pretraži"
+      >
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
   </div>
 
   <!-- Loading / error -->
-  <div *ngIf="isLoading" class="loading">
-    {{ 'TREATMENTS.LOADING' | translate }}
+  <div *ngIf="isLoading" class="mc-state" role="status">
+    <mat-progress-spinner mode="indeterminate" diameter="40" strokeWidth="4"></mat-progress-spinner>
+    <span>{{ 'TREATMENTS.LOADING' | translate }}</span>
   </div>
 
-  <div *ngIf="!isLoading && errorMessage" class="error">
-    {{ errorMessage }}
+  <div *ngIf="!isLoading && errorMessage" class="mc-state mc-state--danger" role="alert">
+    <span class="mc-state__icon" aria-hidden="true"><mat-icon>error_outline</mat-icon></span>
+    <span>{{ errorMessage }}</span>
   </div>
 
-  <!-- Tabela -->
-  <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" matSort [hidden]="isLoading || errorMessage">
-
-<ng-container matColumnDef="imageFile">
-  <th mat-header-cell *matHeaderCellDef>{{'TREATMENTS.TABLE.PICTURE' | translate}}</th>
-  <td mat-cell *matCellDef="let treatment">
-    <img
-      [src]="'https://localhost:7260/' + treatment.imagePath"
-      alt="{{ treatment.serviceName }}"
-      style="width:100px; height:100px; object-fit:contain;"
-    />
-
-    </td>
+  <!-- Table -->
+  <div class="mc-table-wrap" [hidden]="isLoading || errorMessage">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <ng-container matColumnDef="imageFile">
+        <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.PICTURE' | translate }}</th>
+        <td mat-cell *matCellDef="let treatment">
+          <span class="mc-cell-thumb">
+            <img [src]="'https://localhost:7260/' + treatment.imagePath" [alt]="treatment.serviceName" />
+          </span>
+        </td>
       </ng-container>
 
-      <!-- Naziv -->
       <ng-container matColumnDef="serviceName">
         <th mat-header-cell *matHeaderCellDef mat-sort-header="serviceName">{{ 'TREATMENTS.TABLE.NAME' | translate }}</th>
         <td mat-cell *matCellDef="let treatment">
-          <span style="font-weight: 500">{{ treatment.serviceName }}</span>
+          <span class="mc-cell-title">{{ treatment.serviceName }}</span>
         </td>
       </ng-container>
 
-      <!-- Kategorija -->
       <ng-container matColumnDef="treatmentsCategoryName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header="treatmentsCategoryName">{{ 'TREATMENTS.TABLE.CATEGORY' | translate }}</th>
-        <td mat-cell *matCellDef="let treatment">
-          {{ treatment.treatmentsCategoryName }}
-        </td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="treatmentsCategoryName">
+          {{ 'TREATMENTS.TABLE.CATEGORY' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let treatment">{{ treatment.treatmentsCategoryName }}</td>
       </ng-container>
 
-      <!-- Cijena -->
       <ng-container matColumnDef="price">
         <th mat-header-cell *matHeaderCellDef mat-sort-header="price">{{ 'TREATMENTS.TABLE.PRICE' | translate }}</th>
         <td mat-cell *matCellDef="let treatment">
-          <span style="font-weight: 600; color: #4976b5"
-            >{{ treatment.price | number : '1.2-2' }} KM</span
-          >
+          <span class="mc-cell-price">{{ treatment.price | number : '1.2-2' }} KM</span>
         </td>
       </ng-container>
 
-      <!-- Aktivno -->
-<ng-container matColumnDef="isEnabled">
-  <th mat-header-cell *matHeaderCellDef mat-sort-header="isEnabled">
-    {{ 'TREATMENTS.TABLE.STATUS' | translate }}
-  </th>
+      <ng-container matColumnDef="isEnabled">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="isEnabled">{{ 'TREATMENTS.TABLE.STATUS' | translate }}</th>
+        <td mat-cell *matCellDef="let treatment">
+          <span class="mc-toggle">
+            <mat-slide-toggle
+              [checked]="treatment.isEnabled"
+              (change)="onToggleStatus(treatment)"
+              color="primary"
+              [disabled]="isLoading"
+              [aria-label]="'TREATMENTS.TABLE.STATUS' | translate"
+            ></mat-slide-toggle>
+            <span class="mc-toggle__label" [ngClass]="treatment.isEnabled ? 'mc-toggle__label--on' : 'mc-toggle__label--off'">
+              {{
+                treatment.isEnabled
+                  ? ('TREATMENTS.TABLE.ENABLED' | translate)
+                  : ('TREATMENTS.TABLE.DISABLED' | translate)
+              }}
+            </span>
+          </span>
+        </td>
+      </ng-container>
 
-  <td mat-cell *matCellDef="let treatment">
-    <mat-slide-toggle
-      [checked]="treatment.isEnabled"
-      (change)="onToggleStatus(treatment)"
-      color="primary"
-      [disabled]="isLoading"
-      class="status-toggle"
-    >
-      <span
-        class="status-label"
-        [class.enabled]="treatment.isEnabled"
-        [class.disabled]="!treatment.isEnabled"
-      >
-        {{
-          treatment.isEnabled
-            ? ('TREATMENTS.TABLE.ENABLED' | translate)
-            : ('TREATMENTS.TABLE.DISABLED' | translate)
-        }}
-      </span>
-    </mat-slide-toggle>
-  </td>
-</ng-container>
-
-
-      <!-- Akcije -->
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.ACTIONS' | translate }}</th>
         <td mat-cell *matCellDef="let treatment">
-          <button
-            mat-icon-button
-            color="primary"
-            (click)="onEdit(treatment)"
-            [matTooltip]="'TREATMENTS.ACTIONS.EDIT_TOOLTIP' | translate"
-          >
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            color="warn"
-            (click)="onDelete(treatment)"
-            [matTooltip]="'TREATMENTS.ACTIONS.DELETE_TOOLTIP' | translate"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
+          <div class="mc-cell-actions">
+            <button
+              mat-icon-button
+              type="button"
+              color="primary"
+              (click)="onEdit(treatment)"
+              [matTooltip]="'TREATMENTS.ACTIONS.EDIT_TOOLTIP' | translate"
+              [attr.aria-label]="'TREATMENTS.ACTIONS.EDIT_TOOLTIP' | translate"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              type="button"
+              color="warn"
+              (click)="onDelete(treatment)"
+              [matTooltip]="'TREATMENTS.ACTIONS.DELETE_TOOLTIP' | translate"
+              [attr.aria-label]="'TREATMENTS.ACTIONS.DELETE_TOOLTIP' | translate"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
-      <!-- No data -->
-      <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="7">
+      <tr class="mat-mdc-no-data-row" *matNoDataRow>
+        <td class="mat-mdc-cell" colspan="6">
           <ng-container *ngIf="request.search; else noDataDefault">
             {{ 'TREATMENTS.NO_DATA_FILTER' | translate }}
           </ng-container>
-          <ng-template #noDataDefault>
-            {{ 'TREATMENTS.NO_DATA' | translate }}
-          </ng-template>
+          <ng-template #noDataDefault>{{ 'TREATMENTS.NO_DATA' | translate }}</ng-template>
         </td>
       </tr>
     </table>
-
-    <app-fit-paginator-bar [vm]="this" />
   </div>
+
+  <app-fit-paginator-bar [vm]="this" />
 </div>

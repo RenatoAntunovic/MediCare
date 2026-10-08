@@ -1,15 +1,10 @@
-$primary: #4976b5;
-$success: #10b981;
-$text: #1e293b;
-$muted: #64748b;
-$border: #e2e8f0;
-
+// Booking dialog (calendar + time slots) – all colours from the design tokens (light + dark).
 .dialog-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 500;
-  color: $text;
+  gap: 10px;
+  font-weight: 700;
+  color: var(--mc-text);
 }
 
 .dialog-content {
@@ -25,67 +20,64 @@ $border: #e2e8f0;
 
 .step-title {
   margin: 0 0 8px;
-  font-size: 15px;
-  font-weight: 600;
-  color: $text;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--mc-text);
 
-  &::first-letter {
-    text-transform: uppercase;
-  }
+  &::first-letter { text-transform: uppercase; }
 }
 
 .calendar-card {
-  border: 1px solid $border;
-  border-radius: 10px;
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius);
   overflow: hidden;
-  background: #fff;
+  background: var(--mc-surface);
 }
 
 .field-hint {
   margin: 6px 2px 0;
-  font-size: 12px;
-  color: $muted;
+  font-size: 0.9375rem;
+  color: var(--mc-text-muted);
 }
 
-// ==================== TIME SLOTS ====================
-
+// ---------- Time slots ----------
 .slots-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
   gap: 8px;
 }
 
 .slot {
-  padding: 8px 0;
-  border: 1px solid $border;
-  border-radius: 8px;
-  background: #fff;
-  color: $text;
+  min-height: 44px;
+  border: 1px solid var(--mc-border-strong);
+  border-radius: var(--mc-radius-sm);
+  background: var(--mc-surface);
+  color: var(--mc-text);
   font: inherit;
+  font-size: 1rem;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition: background-color 0.12s ease, border-color 0.12s ease;
 
   &:hover:not(:disabled) {
-    border-color: $primary;
-    background: rgba(73, 118, 181, 0.08);
+    border-color: var(--mc-primary);
+    background: var(--mc-primary-tint);
   }
 
-  &:focus-visible {
-    outline: 3px solid rgba(73, 118, 181, 0.45);
-    outline-offset: 1px;
-  }
+  &:focus-visible { outline: 3px solid var(--mc-focus); outline-offset: 2px; }
 
   &.slot-selected {
-    background: $primary;
-    border-color: $primary;
-    color: #fff;
-    font-weight: 600;
+    background: var(--mc-primary);
+    border-color: var(--mc-primary);
+    color: var(--mc-on-primary);
+    font-weight: 700;
   }
 
+  // Taken: struck through AND greyed (not colour alone)
   &.slot-taken {
-    background: #f1f5f9;
-    color: #94a3b8;
+    background: var(--mc-surface-muted);
+    border-color: var(--mc-border);
+    color: var(--mc-text-muted);
     text-decoration: line-through;
     cursor: not-allowed;
   }
@@ -96,99 +88,85 @@ $border: #e2e8f0;
   flex-wrap: wrap;
   gap: 14px;
   margin-top: 10px;
-  font-size: 12px;
-  color: $muted;
+  font-size: 0.9375rem;
+  color: var(--mc-text-muted);
 
-  span {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
+  span { display: inline-flex; align-items: center; gap: 6px; }
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 3px;
   display: inline-block;
-  border: 1px solid $border;
+  border: 1px solid var(--mc-border-strong);
 
-  &.dot-free { background: #fff; }
-  &.dot-taken { background: #f1f5f9; }
-  &.dot-selected { background: $primary; border-color: $primary; }
+  &.dot-free { background: var(--mc-surface); }
+  &.dot-taken { background: var(--mc-surface-muted); }
+  &.dot-selected { background: var(--mc-primary); border-color: var(--mc-primary); }
 }
 
 .slots-loading {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: $muted;
-  font-size: 14px;
+  color: var(--mc-text-muted);
+  font-size: 1rem;
 }
 
 .slots-warning {
   margin: 8px 0 0;
-  padding: 8px 12px;
-  border-radius: 6px;
-  background: #fffbeb;
-  color: #92400e;
-  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: var(--mc-radius-sm);
+  background: var(--mc-warning-tint);
+  color: var(--mc-text);
+  font-size: 1rem;
 }
 
 .form-error {
   margin: 0;
-  padding: 10px 12px;
-  border-left: 4px solid #dc2626;
-  border-radius: 6px;
-  background: #fef2f2;
-  color: #991b1b;
-  font-size: 14px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--mc-danger);
+  border-radius: var(--mc-radius-sm);
+  background: var(--mc-danger-tint);
+  color: var(--mc-text);
+  font-size: 1rem;
 }
 
-.full-width {
-  width: 100%;
-}
+.full-width { width: 100%; }
 
-// ==================== ACTIONS ====================
-
+// ---------- Actions ----------
 .dialog-actions {
   padding: 16px 24px 20px;
-  background: #f8fafc;
-  border-top: 1px solid $border;
+  background: var(--mc-surface-muted);
+  border-top: 1px solid var(--mc-border);
   display: flex;
   align-items: center;
 }
 
 .total-text {
-  font-weight: 600;
-  color: #0f172a;
-  font-size: 16px;
+  font-weight: 700;
+  color: var(--mc-text);
+  font-size: 1.125rem;
 }
 
-.flex-spacer {
-  flex: 1 1 auto;
-}
+.flex-spacer { flex: 1 1 auto; }
 
-// ==================== CALENDAR – day colors ====================
-
+// ---------- Calendar day colours ----------
 ::ng-deep .workday-calendar {
   .mat-calendar-body-cell.available-date .mat-calendar-body-cell-content {
-    background-color: #dcfce7;
-    color: #166534;
+    background-color: var(--mc-success-tint);
+    color: var(--mc-success);
   }
 
   .mat-calendar-body-cell.available-date .mat-calendar-body-selected {
-    background-color: $success;
-    color: #fff;
+    background-color: var(--mc-primary);
+    color: var(--mc-on-primary);
   }
 
-  .mat-calendar-body-disabled .mat-calendar-body-cell-content {
-    opacity: 0.35;
-  }
+  .mat-calendar-body-disabled .mat-calendar-body-cell-content { opacity: 0.4; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .slot {
-    transition: none;
-  }
+  .slot { transition: none; }
 }

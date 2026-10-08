@@ -1,1 +1,75 @@
-<p>client-settings works!</p>
+<div class="mc-page">
+  <header class="mc-page-header">
+    <h1 class="mc-page-header__title">{{ 'CLIENT_PANEL.MENU.SETTINGS' | translate }}</h1>
+  </header>
+
+  <div class="mc-settings">
+    <!-- Account -->
+    <section class="mc-card" aria-labelledby="settings-account">
+      <h2 class="mc-card__title" id="settings-account">Račun</h2>
+
+      <div class="mc-setting-row">
+        <span class="mc-setting-row__label">Email</span>
+        <span>{{ auth.currentUser()?.email }}</span>
+      </div>
+
+      <div class="mc-setting-row">
+        <span class="mc-setting-row__label">Uloga</span>
+        @if (auth.isAdmin()) {
+        <span class="mc-badge mc-badge--info">
+          <mat-icon aria-hidden="true">admin_panel_settings</mat-icon>
+          {{ 'CLIENT_PANEL.ROLES.ADMIN' | translate }}
+        </span>
+        } @else if (auth.isManager()) {
+        <span class="mc-badge mc-badge--info">
+          <mat-icon aria-hidden="true">manage_accounts</mat-icon>
+          {{ 'CLIENT_PANEL.ROLES.MANAGER' | translate }}
+        </span>
+        } @else if (auth.isEmployee()) {
+        <span class="mc-badge mc-badge--info">
+          <mat-icon aria-hidden="true">badge</mat-icon>
+          {{ 'CLIENT_PANEL.ROLES.USER' | translate }}
+        </span>
+        }
+      </div>
+    </section>
+
+    <!-- Appearance -->
+    <section class="mc-card" aria-labelledby="settings-appearance">
+      <h2 class="mc-card__title" id="settings-appearance">Izgled</h2>
+
+      <div class="mc-setting-row">
+        <span class="mc-setting-row__label" id="settings-dark-label">
+          Tamni način
+          <span class="mc-setting-row__hint">Mijenja izgled cijele aplikacije i pamti se na ovom uređaju.</span>
+        </span>
+        <mat-slide-toggle
+          color="primary"
+          [checked]="theme.isDark()"
+          (change)="theme.toggle()"
+          aria-labelledby="settings-dark-label"
+        ></mat-slide-toggle>
+      </div>
+    </section>
+
+    <!-- Language -->
+    <section class="mc-card" aria-labelledby="settings-language">
+      <h2 class="mc-card__title" id="settings-language">Jezik</h2>
+
+      <div class="mc-setting-row">
+        <span class="mc-setting-row__label" id="settings-lang-label">Jezik aplikacije</span>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-select
+            [value]="currentLang"
+            (selectionChange)="switchLanguage($event.value)"
+            aria-labelledby="settings-lang-label"
+          >
+            <mat-option *ngFor="let lang of languages" [value]="lang.code">
+              {{ lang.flag }} {{ lang.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </section>
+  </div>
+</div>

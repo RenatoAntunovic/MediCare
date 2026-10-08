@@ -1,41 +1,46 @@
-$primary: #4976b5;
-$text: #1e293b;
-$muted: #64748b;
-$border: #e2e8f0;
+// Pharmacy search (public landing hero). All colours come from the design tokens.
+:host { display: block; }
 
 .search-container {
-  max-width: 760px;
-  margin: 32px auto;
-  padding: 0 16px;
-  color: $text;
+  box-sizing: border-box;
+  padding: clamp(20px, 3vw, 28px);
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius-lg);
+  box-shadow: var(--mc-shadow-lg);
+  color: var(--mc-text);
 }
 
 .search-label {
   display: block;
-  font-size: 1.25rem;
-  font-weight: 600;
   margin-bottom: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.search-box {
-  position: relative;
-}
+.search-box { position: relative; }
 
 .search-input {
-  width: 100%;
   box-sizing: border-box;
-  padding: 14px 44px 14px 16px;
-  font-size: 1rem;
-  border: 1px solid $border;
-  border-radius: 10px;
-  background: #fff;
-  color: $text;
-  outline: none;
+  width: 100%;
+  height: 56px;
+  padding: 0 52px 0 18px;
+  font: inherit;
+  font-size: 1.0625rem;
+  color: var(--mc-text);
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-border-strong);
+  border-radius: var(--mc-radius);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
+  &::placeholder { color: var(--mc-text-muted); }
+  &::-webkit-search-cancel-button { appearance: none; -webkit-appearance: none; display: none; }
+
   &:focus {
-    border-color: $primary;
-    box-shadow: 0 0 0 3px rgba(73, 118, 181, 0.2);
+    outline: none;
+    border-color: var(--mc-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--mc-primary) 28%, transparent);
   }
 }
 
@@ -44,126 +49,129 @@ $border: #e2e8f0;
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  border: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
   border-radius: 50%;
   background: transparent;
-  color: $muted;
-  font-size: 1.4rem;
+  color: var(--mc-text-muted);
+  font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
 
-  &:hover,
-  &:focus-visible {
-    background: #f1f5f9;
-    color: $text;
-  }
+  &:hover { background: var(--mc-surface-muted); color: var(--mc-text); }
 }
 
 .hint,
-.status {
-  margin: 10px 2px 0;
-  color: $muted;
-  font-size: 0.9rem;
-}
+.status { margin: 12px 2px 0; color: var(--mc-text-muted); font-size: 1rem; }
 
 .error {
-  margin-top: 12px;
-  padding: 10px 14px;
-  border-left: 4px solid #dc2626;
-  background: #fef2f2;
-  color: #991b1b;
-  border-radius: 6px;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--mc-radius);
+  background: var(--mc-danger-tint);
+  border-left: 4px solid var(--mc-danger);
+  color: var(--mc-text);
 }
 
-.results-count {
-  margin: 18px 2px 8px;
-  color: $muted;
-  font-size: 0.9rem;
-}
+.results-count { margin: 18px 2px 8px; color: var(--mc-text-muted); font-size: 1rem; }
 
 .results-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  border: 1px solid $border;
-  border-radius: 10px;
   overflow: hidden;
-  background: #fff;
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius);
+  background: var(--mc-surface);
 
-  li + li {
-    border-top: 1px solid $border;
-  }
+  li + li { border-top: 1px solid var(--mc-border); }
 }
 
+// Results are informational (not links), so no hover / pointer styling
 .medicine-item {
   display: flex;
   gap: 14px;
   padding: 12px 14px;
   color: inherit;
-  text-decoration: none;
-
-  &:hover,
-  &:focus-visible {
-    background: #f8fafc;
-    outline: none;
-  }
 }
 
 .thumb {
+  flex: 0 0 auto;
   width: 64px;
   height: 64px;
-  flex-shrink: 0;
   object-fit: contain;
   border-radius: 8px;
-  background: #f5f5f5;
+  background: #ffffff;
+  border: 1px solid var(--mc-border);
 }
 
-.info {
-  min-width: 0;
-  flex: 1;
-}
-
-.title-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.name {
-  font-size: 1rem;
-}
-
-.price {
-  color: $primary;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.category {
-  font-size: 0.85rem;
-  color: $muted;
-}
+.info { min-width: 0; flex: 1; }
+.title-row { display: flex; justify-content: space-between; gap: 12px; }
+.name { font-size: 1.0625rem; }
+.price { color: var(--mc-primary); font-weight: 700; white-space: nowrap; }
+.category { color: var(--mc-teal); font-size: 0.9375rem; font-weight: 600; }
 
 .description {
   margin: 4px 0 0;
-  font-size: 0.9rem;
-  color: #475569;
+  color: var(--mc-text-muted);
+  font-size: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.no-results {
-  margin-top: 18px;
-  color: $muted;
-}
+.no-results { margin: 18px 2px 0; color: var(--mc-text-muted); font-size: 1.0625rem; }
 
 @media (max-width: 480px) {
-  .title-row {
-    flex-direction: column;
-    gap: 2px;
+  .title-row { flex-direction: column; gap: 2px; }
+}
+
+// Prompt shown under the results: details and ordering need an account
+.search-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: var(--mc-radius);
+  background: var(--mc-primary-tint);
+  color: var(--mc-on-primary-tint);
+
+  &__text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+
+  &__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--mc-primary);
+    border-radius: var(--mc-radius);
+    color: var(--mc-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    background: transparent;
+
+    &:hover { background: color-mix(in srgb, var(--mc-primary) 10%, transparent); }
+
+    &--primary {
+      background: var(--mc-primary);
+      color: var(--mc-on-primary);
+      &:hover { background: var(--mc-primary-hover); }
+    }
   }
 }

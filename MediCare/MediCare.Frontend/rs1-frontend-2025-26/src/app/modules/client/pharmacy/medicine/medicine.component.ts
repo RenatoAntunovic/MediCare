@@ -35,8 +35,6 @@ export class MedicineComponent
   private favoritesService = inject(FavouritesService);
   private snackbar = inject(MatSnackBar);
 
-  isDarkMode = false;
-
   displayedColumns: string[] = [
     'imageFile',
     'name',
@@ -55,12 +53,6 @@ export class MedicineComponent
     this.request = new ListMedicineRequest();
   }
 
-  toggleDarkMode(): void {
-    this.isDarkMode = !this.isDarkMode;
-    document.body.classList.toggle('dark-mode', this.isDarkMode);
-    localStorage.setItem('darkMode', this.isDarkMode ? 'true' : 'false');
-  }
-
   goToMedicineDetail(medicine: any) {
     this.router.navigate(['/client/medicine', medicine.id]);
   }
@@ -68,11 +60,6 @@ export class MedicineComponent
   ngOnInit(): void {
     this.initList();
     this.loadCategories();
-
-    const darkMode = localStorage.getItem('darkMode');
-    if (darkMode === 'true') {
-      document.body.classList.add('dark-mode');
-    }
   }
 
   onCategoryFilterChange(categoryId: number | null): void {
