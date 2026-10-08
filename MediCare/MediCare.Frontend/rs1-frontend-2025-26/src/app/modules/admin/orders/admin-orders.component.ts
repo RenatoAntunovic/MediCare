@@ -10,7 +10,8 @@ import {ToasterService} from '../../../core/services/toaster.service';
 import {OrderStatusHelper} from '../../../api-services/orders/order-status.helper';
 import {ChangeStatusDialogComponent} from './change-status-dialog/change-status-dialog.component';
 import {OrderDetailsDialogComponent} from './admin-orders-details-dialog/order-details-dialog.component';
-import { HttpClient } from '@angular/common/http';
+import {OrdersReportDialogComponent} from './orders-report-dialog/orders-report-dialog.component';
+import {downloadBlob, readBlobErrorMessage} from '../../../core/utils/download-file';
 
 
 @Component({
@@ -27,7 +28,6 @@ export class AdminOrdersComponent
   private dialog = inject(MatDialog);
   private toaster = inject(ToasterService);
   private destroy$ = new Subject<void>();
-  private http = inject(HttpClient);
 
   // Table columns
   displayedColumns: string[] = [
@@ -88,12 +88,12 @@ statusOptions: { id: number; name: string; icon:string }[] = [
   }
 
   private lastRequestTime = 0;
-private requestCooldown = 2000; // 2 sekunde cooldown
+private requestCooldown = 2000; // 2 second cooldown
 
 private canMakeRequest(): boolean {
   const now = Date.now();
   if (now - this.lastRequestTime < this.requestCooldown) {
-    return false; // još nije prošlo 2 sekunde
+    return false; // 2 seconds have not passed yet
   }
   this.lastRequestTime = now;
   return true;
@@ -144,7 +144,7 @@ onStatusFilterChange(status: number | null): void {
   // === Actions ===
 
   onViewDetails(order: ListOrdersQueryDto, event?: MouseEvent): void {
-    // spriječi da klik sa dugmeta ode na <tr> i ponovo otvori dialog
+    // prevent the button click from bubbling to the <tr> and reopening the dialog
     event?.stopPropagation();
 
     console.log('Order ID being sent to dialog:', order.id);
@@ -283,31 +283,28 @@ getStatusIcon(statusId: number): string {
 
 
   /**
- * Download PDF report for completed order
- */
-downloadPdf(orderId: number, event: Event): void {
-  event.stopPropagation();
-  
-  const url = `https://localhost:7260/Orders/${orderId}/pdf`;
-  
-  // Koristi HttpClient da automatski šalje JWT token
-  this.http.get(url, { responseType: 'blob' }).subscribe({
-    next: (blob) => {
-      // Kreiraj download link
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = `Narudzba_${orderId}.pdf`;
-      link.click();
-      
-      // Cleanup
-      window.URL.revokeObjectURL(link.href);
-    },
-    error: (err) => {
-      console.error('PDF download error:', err);
-      this.toaster.error('Greška pri preuzimanju PDF-a');
-    }
-  });
-}
+   * Single order PDF (button in the table row).
+   */
+  downloadPdf(orderId: number, event: Event): void {
+    event.stopPropagation();
 
+    this.ordersApi.downloadOrderPdf(orderId).subscribe({
+      next: (blob) => downloadBlob(blob, `Narudzba_${orderId}.pdf`),
+      error: async (err) => {
+        console.error('PDF download error:', err);
+        this.toaster.error(await readBlobErrorMessage(err, 'Greška pri preuzimanju PDF-a'));
+      }
+    });
+  }
 
+  /**
+   * Parameterized PDF report (period + status).
+   */
+  openReportDialog(): void {
+    this.dialog.open(OrdersReportDialogComponent, {
+      width: '520px',
+      maxWidth: '95vw',
+      autoFocus: false
+    });
+  }
 }

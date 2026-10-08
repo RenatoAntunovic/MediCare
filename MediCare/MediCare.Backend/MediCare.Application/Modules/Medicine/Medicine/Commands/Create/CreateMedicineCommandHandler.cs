@@ -1,27 +1,22 @@
-﻿using MediCare.Application.Modules.Medicine.Medicine.Commands.Create;
+using MediCare.Application.Modules.Medicine.Medicine.Commands.Create;
+using MediCare.Application.Modules.MedicineSearch;
 
-public class CreateMedicineCommandHandler(IAppDbContext context)
+public class CreateMedicineCommandHandler(IAppDbContext context, IMedicineSearchIndex searchIndex)
     : IRequestHandler<CreateMedicineCommand, int>
 {
     public async Task<int> Handle(CreateMedicineCommand request, CancellationToken cancellationToken)
     {
-        var normalized = request.Name?.Trim();
+        var normalized = request.Name.Trim();
 
-        //if (string.IsNullOrWhiteSpace(normalized))
-        //    throw new ValidationException("Name is required."); ovo sam zakomentarisao zato sto se sve vec testira u validatoru
-
-        // Check if a category with the same name already exists.
         bool exists = await context.Medicine
             .AnyAsync(x => x.Name == normalized, cancellationToken);
 
         if (exists)
-        {
-            throw new MediCareConflictException("Name already exists.");
-        }
+            throw new MediCareConflictException("Lijek s tim nazivom već postoji.");
 
         var medicine = new Medicine
         {
-            Name = request.Name!.Trim(),
+            Name = normalized,
             Description = request.Description,
             MedicineCategoryId = request.MedicineCategoryId,
             Weight = request.Weight,
@@ -31,11 +26,12 @@ public class CreateMedicineCommandHandler(IAppDbContext context)
 
         if (request.ImageFile != null && request.ImageFile.Length > 0)
         {
-            var uploadsFolder = Path.Combine("wwwroot", "images"); // folder za slike
+            var uploadsFolder = Path.Combine("wwwroot", "images");
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
-            var uniqueFileName = Guid.NewGuid().ToString() + "_" + request.ImageFile.FileName;
+            // Path.GetFileName strips any path segments from the file name sent by the client
+            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(request.ImageFile.FileName)}";
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -43,12 +39,14 @@ public class CreateMedicineCommandHandler(IAppDbContext context)
                 await request.ImageFile.CopyToAsync(fileStream, cancellationToken);
             }
 
-            // Spremi relativnu putanju u bazu
             medicine.ImagePath = "images/" + uniqueFileName;
         }
 
         context.Medicine.Add(medicine);
         await context.SaveChangesAsync(cancellationToken);
+
+        // Sync the search index (a no-op if ES is disabled)
+        await searchIndex.SyncMedicineAsync(context, medicine.Id, cancellationToken);
 
         return medicine.Id;
     }

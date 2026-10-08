@@ -1,56 +1,118 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';   // ← OVO
-import { FormsModule } from '@angular/forms'; 
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { Subject, of } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, finalize, map, switchMap, tap } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { MedicineApiService } from '../../../api-services/medicine/medicine-api.service';
-import { ListMedicineQueryDto } from '../../../api-services/medicine/medicine-api.models';
+import { environment } from '../../../../environments/environment';
+
+/** A single result from GET /api/search */
+export interface MedicineSearchItem {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  imagePath: string;
+  weight: number;
+}
+
+interface MedicineSearchResponse {
+  query: string;
+  page: number;
+  pageSize: number;
+  total: number;
+  results: MedicineSearchItem[];
+}
+
+const MIN_QUERY_LENGTH = 2;
 
 @Component({
   standalone: true,
   selector: 'app-search-medicine',
   templateUrl: './search-medicine.component.html',
   styleUrls: ['./search-medicine.component.scss'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, RouterLink]
 })
 export class SearchMedicineComponent implements OnInit {
+  private medicineApi = inject(MedicineApiService);
+  private destroyRef = inject(DestroyRef);
+
+  /** Every input goes through this stream – debounce + switchMap solve the race condition. */
+  private search$ = new Subject<string>();
 
   searchQuery = '';
-  medicines: ListMedicineQueryDto[] = [];
+  medicines: MedicineSearchItem[] = [];
+  total = 0;
   isLoading = false;
-  private searchTimeout: any = null;
+  errorMessage = '';
+  /** Query the current results belong to (for the "No results for ..." message). */
+  searchedFor = '';
 
-  // OPCIJA 1 – klasični DI
-  constructor(private medicineApiService: MedicineApiService) {}
-
-  // ili OPCIJA 2 – inject:
-  // private medicineApiService = inject(MedicineApiService);
+  readonly minQueryLength = MIN_QUERY_LENGTH;
 
   ngOnInit(): void {
-    // opcionalno: loadAllMedicines();
+    this.search$
+      .pipe(
+        map(q => q.trim()),
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(() => (this.errorMessage = '')),
+        switchMap(query => {
+          if (query.length < MIN_QUERY_LENGTH) {
+            this.isLoading = false;
+            return of({ query, results: [], total: 0 } as Partial<MedicineSearchResponse>);
+          }
+
+          this.isLoading = true;
+
+          // switchMap cancels the previous request automatically → stale results never overwrite new ones
+          return this.medicineApi.searchMedicines(query, 1, 20).pipe(
+            map(res => res as MedicineSearchResponse),
+            catchError((err: HttpErrorResponse) => {
+              this.errorMessage = err.status === 0
+                ? 'Server nije dostupan. Provjerite da li je backend pokrenut.'
+                : (err.error?.message || 'Pretraga trenutno nije dostupna. Pokušajte ponovo.');
+              return of({ query, results: [], total: 0 } as Partial<MedicineSearchResponse>);
+            }),
+            finalize(() => (this.isLoading = false))
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(res => {
+        this.medicines = res.results ?? [];
+        this.total = res.total ?? 0;
+        this.searchedFor = res.query ?? '';
+      });
   }
 
-  onSearchChange(query: string) {
-    console.log('onSearchChange fired', query);
-    if (!query || query.trim().length < 2) {
-      this.medicines = [];
-      return;
-    }
+  onSearchChange(query: string): void {
+    this.search$.next(query ?? '');
+  }
 
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-    }
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.search$.next('');
+  }
 
-    this.searchTimeout = setTimeout(() => {
-      this.isLoading = true;
-      this.medicineApiService.searchMedicines(query).subscribe({
-        next: (response) => {
-          // ako API vraća { results: [...] }
-          this.medicines = response.results ?? response;
-          this.isLoading = false;
-        },
-        error: () => {
-          this.isLoading = false;
-        }
-      });
-    }, 300);
+  imageUrl(path: string | null | undefined): string {
+    if (!path) return '';
+    return `${environment.apiUrl}/${path.replace(/^\/+/, '')}`;
+  }
+
+  trackById(_: number, item: MedicineSearchItem): number {
+    return item.id;
+  }
+
+  get showNoResults(): boolean {
+    return !this.isLoading
+      && !this.errorMessage
+      && this.searchedFor.length >= MIN_QUERY_LENGTH
+      && this.medicines.length === 0;
   }
 }

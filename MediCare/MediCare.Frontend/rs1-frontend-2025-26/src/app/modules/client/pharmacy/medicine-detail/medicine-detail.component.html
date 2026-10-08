@@ -1,4 +1,4 @@
-<!-- Glavni sadržaj: slika lijevo, detalji desno -->
+<!-- Main content: image on the left, details on the right -->
 <div class="container">
   <!-- Header -->
   <div class="header-card mat-elevation-z2">
@@ -14,27 +14,39 @@
 
   <!-- Content -->
   <div class="detail-content">
-    <!-- Lijevo: slika -->
-<div class="left" 
-     (mousedown)="startDrag($event)" 
-     (mousemove)="drag($event)" 
-     (mouseup)="stopDrag()" 
-     (mouseleave)="stopDrag()"
-     (click)="toggleZoom($event)">
+    <!-- Left: image -->
+<div class="left zoom-frame"
+     [class.zoomed]="zoomLevel > 1"
+     (pointerdown)="onPointerDown($event)"
+     (pointermove)="onPointerMove($event)"
+     (pointerup)="onPointerUp($event)"
+     (pointercancel)="onPointerUp($event)"
+     (click)="onImageClick($event)">
   <img
-    [src]="'https://localhost:7260/' + medicine.imagePath"
-    alt="{{ medicine.name }}"
-    [style.transform]="'scale(' + zoomLevel + ') translate(' + offsetX + 'px, ' + offsetY + 'px)'"
-    style="transition: transform 0.2s ease; user-select: none;"
-    [style.cursor]="isDragging ? 'grabbing' : (zoomLevel > 1 ? 'grab' : 'pointer')"
+    #zoomImage
+    *ngIf="imageUrl"
+    [src]="imageUrl"
+    [alt]="medicine.name"
+    draggable="false"
+    tabindex="0"
+    role="button"
+    [attr.aria-label]="zoomLevel > 1 ? 'Smanji sliku' : 'Uvećaj sliku'"
+    [style.transform]="imageTransform"
+    [style.transition]="isDragging ? 'none' : 'transform 0.2s ease'"
+    [style.cursor]="imageCursor"
+    style="user-select: none;"
+    (keydown)="onImageKeydown($event)"
   >
+  <span class="zoom-hint" *ngIf="imageUrl">
+    {{ zoomLevel > 1 ? 'Povucite za pomjeranje · klik ili Esc za povratak' : 'Kliknite na sliku za uvećanje' }}
+  </span>
 </div>
 
 
 
 
 
-    <!-- Desno: detalji -->
+    <!-- Right: details -->
     <div class="right" *ngIf="medicine">
       <p class="medicine-categoryname"><strong>{{medicine.medicineCategoryName}}</strong></p>
       <h1 class="medicine-name">{{ medicine.name }}</h1>
@@ -47,7 +59,7 @@
       </div>
       <div class="add-to-cart-wrapper">
 
-  <!-- Količina -->
+  <!-- Quantity -->
   <mat-form-field appearance="outline" class="quantity-field">
     <mat-label>Količina</mat-label>
     <input
@@ -58,7 +70,7 @@
     />
   </mat-form-field>
 
-  <!-- Add to cart dugme -->
+  <!-- Add to cart button -->
   <button
     mat-raised-button
     class="add-to-cart-btn"

@@ -1,0 +1,56 @@
+<h2 mat-dialog-title class="title">
+  <mat-icon>picture_as_pdf</mat-icon>
+  Izvještaj o narudžbama
+</h2>
+
+<div mat-dialog-content class="content">
+  <form [formGroup]="form" (ngSubmit)="generate()">
+
+    <p class="section-label">Brzi izbor perioda</p>
+    <div class="presets" role="group" aria-label="Brzi izbor perioda">
+      <button
+        *ngFor="let p of presets"
+        type="button"
+        class="preset"
+        [class.active]="activePreset === p.key"
+        [attr.aria-pressed]="activePreset === p.key"
+        (click)="applyPreset(p.key)">
+        {{ p.label }}
+      </button>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Period</mat-label>
+      <mat-date-range-input [formGroup]="form.controls.range" [rangePicker]="picker">
+        <input matStartDate formControlName="start" placeholder="Od">
+        <input matEndDate formControlName="end" placeholder="Do">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+      <mat-hint>Ostavite prazno za sve narudžbe. Datum „do” je uključen.</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="statusId">
+        <mat-option [value]="null">Svi statusi</mat-option>
+        <mat-option *ngFor="let s of statuses" [value]="s.id">{{ s.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <p class="summary">
+      Izvještaj će sadržati narudžbe za period <strong>{{ periodSummary }}</strong>,
+      sa sažetkom prometa i podjelom po statusu.
+    </p>
+
+    <p *ngIf="errorMessage" class="error" role="alert">{{ errorMessage }}</p>
+  </form>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close [disabled]="isGenerating">Odustani</button>
+  <button mat-raised-button color="primary" type="button" (click)="generate()" [disabled]="isGenerating">
+    <mat-icon>download</mat-icon>
+    {{ isGenerating ? 'Generišem…' : 'Preuzmi PDF' }}
+  </button>
+</div>

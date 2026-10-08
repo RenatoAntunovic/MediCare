@@ -1,11 +1,11 @@
 <div class="container">
-  <!-- Header kartica -->
+  <!-- Header card -->
   <div class="header-card mat-elevation-z2">
     <div class="header-card-content">
-      <!-- Lijevo: naslov -->
+      <!-- Left: title -->
       <h1>{{ 'TREATMENTS.TITLE' | translate }}</h1>
 
-      <!-- Desno: search + novi proizvod -->
+      <!-- Right: search + new product -->
       <div class="actions-container">
         <mat-form-field class="search-field" appearance="fill">
           <mat-label>{{ 'TREATMENTS.SEARCH_PLACEHOLDER' | translate }}</mat-label>
@@ -30,7 +30,7 @@
     {{ errorMessage }}
   </div>
 
-  <!-- Tabela -->
+  <!-- Table -->
   <div class="mat-elevation-z8" *ngIf="!isLoading && !errorMessage">
     <table mat-table [dataSource]="items">
 
@@ -46,7 +46,7 @@
     </td>
       </ng-container>
 
-      <!-- Naziv -->
+      <!-- Name -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>{{ 'TEST' | translate }}</th>
         <td mat-cell *matCellDef="let treatment">
@@ -54,7 +54,7 @@
         </td>
       </ng-container>
 
-      <!-- Kategorija -->
+      <!-- Category -->
       <ng-container matColumnDef="treatmentsCategoryName">
         <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.CATEGORY' | translate }}</th>
         <td mat-cell *matCellDef="let treatment">
@@ -62,7 +62,7 @@
         </td>
       </ng-container>
 
-      <!-- Cijena -->
+      <!-- Price -->
       <ng-container matColumnDef="price">
         <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.PRICE' | translate }}</th>
         <td mat-cell *matCellDef="let treatment">
@@ -72,7 +72,7 @@
         </td>
       </ng-container>
 
-      <!-- Aktivno -->
+      <!-- Active -->
 <ng-container matColumnDef="isEnabled">
   <th mat-header-cell *matHeaderCellDef>
     {{ 'TREATMENTS.TABLE.STATUS' | translate }}
@@ -96,14 +96,15 @@
 </ng-container>
 
 
-      <!-- Akcije -->
-      <!-- Akcije - SAMO REZERVIRAJ za klijenta -->
+      <!-- Actions -->
+      <!-- Actions - ONLY BOOK for the client -->
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>{{ 'TREATMENTS.TABLE.ACTIONS' | translate }}</th>
           <td mat-cell *matCellDef="let treatment">
             <button mat-raised-button 
                     color="accent" 
                     (click)="openBooking(treatment)"
+                    [disabled]="!treatment.isEnabled"
                     matTooltip="Rezerviraj {{treatment.serviceName}}">
               <mat-icon>schedule</mat-icon>
               Rezerviši

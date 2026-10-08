@@ -713,3 +713,48 @@ p{
     }
   }
 }
+
+
+/* =====================================================================
+   IMAGE ZOOM – APPEND TO THE END OF medicine-detail.component.scss
+   (existing .left styles stay; this only adds the zoom behavior)
+   ===================================================================== */
+.zoom-frame {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;        // normal page scroll while the image is not magnified
+
+  &.zoomed {
+    touch-action: none;       // while magnified, the finger pans the image instead of the page
+  }
+
+  img {
+    transform-origin: center center;
+    will-change: transform;
+
+    &:focus-visible {
+      outline: 3px solid #4976b5;
+      outline-offset: 2px;
+    }
+  }
+}
+
+.zoom-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.7);
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zoom-frame img {
+    transition: none !important;
+  }
+}

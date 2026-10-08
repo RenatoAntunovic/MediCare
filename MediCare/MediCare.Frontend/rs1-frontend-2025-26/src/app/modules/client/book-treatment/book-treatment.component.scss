@@ -1,44 +1,160 @@
+$primary: #4976b5;
+$success: #10b981;
+$text: #1e293b;
+$muted: #64748b;
+$border: #e2e8f0;
+
 .dialog-title {
   display: flex;
   align-items: center;
   gap: 8px;
   font-weight: 500;
-  color: #1e293b;
+  color: $text;
 }
 
 .dialog-content {
-  padding: 24px;
+  padding: 8px 24px 16px;
+  max-height: 75vh;
 }
 
 .booking-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
-.datetime-row {
-  display: flex;
-  gap: 16px;
-}
+.step-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: $text;
 
-.half-width {
-  width: 100%;
-}
-
-@media (min-width: 600px) {
-  .half-width {
-    width: calc(50% - 8px);
+  &::first-letter {
+    text-transform: uppercase;
   }
+}
+
+.calendar-card {
+  border: 1px solid $border;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.field-hint {
+  margin: 6px 2px 0;
+  font-size: 12px;
+  color: $muted;
+}
+
+// ==================== TIME SLOTS ====================
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px;
+}
+
+.slot {
+  padding: 8px 0;
+  border: 1px solid $border;
+  border-radius: 8px;
+  background: #fff;
+  color: $text;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+
+  &:hover:not(:disabled) {
+    border-color: $primary;
+    background: rgba(73, 118, 181, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(73, 118, 181, 0.45);
+    outline-offset: 1px;
+  }
+
+  &.slot-selected {
+    background: $primary;
+    border-color: $primary;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  &.slot-taken {
+    background: #f1f5f9;
+    color: #94a3b8;
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: $muted;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+  border: 1px solid $border;
+
+  &.dot-free { background: #fff; }
+  &.dot-taken { background: #f1f5f9; }
+  &.dot-selected { background: $primary; border-color: $primary; }
+}
+
+.slots-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: $muted;
+  font-size: 14px;
+}
+
+.slots-warning {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 13px;
+}
+
+.form-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 4px solid #dc2626;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 14px;
 }
 
 .full-width {
   width: 100%;
 }
 
+// ==================== ACTIONS ====================
+
 .dialog-actions {
-  padding: 20px 24px 24px;
+  padding: 16px 24px 20px;
   background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid $border;
   display: flex;
   align-items: center;
 }
@@ -46,29 +162,33 @@
 .total-text {
   font-weight: 600;
   color: #0f172a;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .flex-spacer {
   flex: 1 1 auto;
 }
 
-::ng-deep {
-  .workday-calendar {
-    .mat-calendar-body-cell {
-      &.available-date {
-        background-color: #dcfce7 !important;
-        color: #166534 !important;
-        &.mat-calendar-body-selected {
-          background-color: #10b981 !important;
-          color: white !important;
-        }
-      }
-      &.mat-calendar-body-weekend {
-        pointer-events: none !important;
-        opacity: 0.3 !important;
-        background-color: #fee2e2 !important;
-      }
-    }
+// ==================== CALENDAR – day colors ====================
+
+::ng-deep .workday-calendar {
+  .mat-calendar-body-cell.available-date .mat-calendar-body-cell-content {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  .mat-calendar-body-cell.available-date .mat-calendar-body-selected {
+    background-color: $success;
+    color: #fff;
+  }
+
+  .mat-calendar-body-disabled .mat-calendar-body-cell-content {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot {
+    transition: none;
   }
 }

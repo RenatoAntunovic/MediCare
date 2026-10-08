@@ -41,6 +41,16 @@
           </mat-hint>
         </mat-form-field>
 
+        <!-- Parameterized PDF report -->
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="openReportDialog()"
+          class="report-btn">
+          <mat-icon>picture_as_pdf</mat-icon>
+          <span>PDF izvještaj</span>
+        </button>
+
         <!-- Clear Filters Button -->
         <button
           mat-stroked-button
@@ -183,7 +193,7 @@
         class="action-btn status-btn">
         <mat-icon>swap_horiz</mat-icon>
       </button>
-      <!-- PDF Download Button - samo za COMPLETED status -->
+      <!-- PDF Download Button - COMPLETED status only -->
       <button
         *ngIf="order.statusId === 4"
         mat-icon-button
