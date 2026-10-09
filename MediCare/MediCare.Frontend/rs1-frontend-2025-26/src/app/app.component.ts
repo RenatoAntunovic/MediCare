@@ -3,6 +3,7 @@ import { ThemeService } from './core/services/theme.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { PushNotificationService } from './core/services/push-notification.service';
 
 @Component({
   selector: 'app-root',
@@ -16,16 +17,19 @@ export class AppComponent implements OnInit {
   /** created here so the saved light/dark choice is applied on every page from the first render */
   protected readonly theme = inject(ThemeService);
 
+    /** created at startup so push notifications are registered as soon as a user is logged in */
+  private readonly push = inject(PushNotificationService);
+
   constructor(
     private translate: TranslateService, 
     private snackBar: MatSnackBar) {
     console.log('AppComponent constructor - initializing TranslateService');
 
-    // Inicijalizacija translate servisa
+    // Initialization translate services
     this.translate.addLangs(['en', 'bs']);
     this.translate.setDefaultLang('bs');
 
-    // Učitaj jezik iz localStorage ili koristi default
+    //Load language from localStorage or use default
     const savedLang = localStorage.getItem('language') || 'bs';
     this.currentLang = savedLang;
 
