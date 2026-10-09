@@ -5,6 +5,7 @@ namespace MediCare.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class FcmController : ControllerBase
     {
         private readonly IMediator _mediator;

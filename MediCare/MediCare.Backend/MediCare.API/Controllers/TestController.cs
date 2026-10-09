@@ -2,6 +2,7 @@
 
 [ApiController]
 [Route("api/test")]
+[Authorize(Roles = "Admin")]
 public class TestController : ControllerBase
 {
     private readonly IFcmService _fcmService;
