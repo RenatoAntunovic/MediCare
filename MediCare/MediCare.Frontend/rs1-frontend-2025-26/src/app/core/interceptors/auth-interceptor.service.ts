@@ -9,19 +9,19 @@ import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { AuthFacadeService } from '../services/auth/auth-facade.service';
 
-// Global state for refresh (shared between requests)
+// Global refresh state (shared between all requests)
 let refreshInProgress = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const auth = inject(AuthFacadeService);
 
-    // 1) Preskoči sve AllowAnonymous endpoint-e
+    // 1) Skip anonymous endpoints
     if (isAnonymousEndpoint(req.url)) {
-        return next(req); // šalji request bez Authorization header-a
+        return next(req); // send request without the Authorization header
     }
 
-    // 2) Dodaj Authorization header ako postoji access token
+    // 2) Attach the Authorization header if an access token exists
     const accessToken = auth.getAccessToken();
     let authReq = req;
 
@@ -34,31 +34,29 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     }
 
     // 3) Handle 401 → refresh → retry
-return next(authReq).pipe(
-  catchError((err) => {
+    return next(authReq).pipe(
+        catchError((err) => {
+            // Don't try to refresh on anonymous endpoints (login, register, refresh)
+            if (
+                err instanceof HttpErrorResponse &&
+                err.status === 401 &&
+                !isAnonymousEndpoint(req.url)
+            ) {
+                return handle401Error(authReq, next, auth);
+            }
 
-    // 🔴 AKO JE REGISTER / LOGIN → NE DIRAJ 401
-    if (
-      err instanceof HttpErrorResponse &&
-      err.status === 401 &&
-      !isAnonymousEndpoint(req.url)
-    ) {
-      return handle401Error(authReq, next, auth);
-    }
-
-    return throwError(() => err);
-  })
-);
-
+            return throwError(() => err);
+        })
+    );
 };
 
 function isAnonymousEndpoint(url: string): boolean {
     const lowerUrl = url.toLowerCase();
-    // FORCED: preskači sve AllowAnonymous (login, register, refresh, logout)
-    return lowerUrl.includes('/api/auth/login') 
-        || lowerUrl.includes('/api/auth/register') 
-        || lowerUrl.includes('/api/auth/refresh') 
-        || lowerUrl.includes('/api/auth/logout');
+    // Login, register and refresh are sent without a token.
+    // Logout is NOT here: the backend action has [Authorize], so it needs the Bearer token.
+    return lowerUrl.includes('/api/auth/login')
+        || lowerUrl.includes('/api/auth/register')
+        || lowerUrl.includes('/api/auth/refresh');
 }
 
 function handle401Error(
@@ -68,11 +66,13 @@ function handle401Error(
 ): Observable<any> {
     const refreshToken = auth.getRefreshToken();
 
+    // No refresh token → the session can't be renewed, go to login
     if (!refreshToken) {
         auth.redirectToLogin();
         return throwError(() => new Error('No refresh token'));
     }
 
+    // A refresh is already running → wait for the new token, then retry
     if (refreshInProgress) {
         return refreshTokenSubject.pipe(
             filter((token) => token !== null),
@@ -86,6 +86,7 @@ function handle401Error(
         );
     }
 
+    // Start a new refresh
     refreshInProgress = true;
     refreshTokenSubject.next(null);
 
@@ -95,6 +96,7 @@ function handle401Error(
             const newAccessToken = res.accessToken;
             refreshTokenSubject.next(newAccessToken);
 
+            // Retry the original request with the new token
             const clonedReq = req.clone({
                 setHeaders: { Authorization: `Bearer ${newAccessToken}` }
             });
@@ -102,6 +104,7 @@ function handle401Error(
             return next(clonedReq);
         }),
         catchError((error) => {
+            // Refresh failed → clear state and send the user to login
             refreshInProgress = false;
             refreshTokenSubject.next(null);
             auth.redirectToLogin();

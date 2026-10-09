@@ -1,7 +1,7 @@
 // src/app/core/services/auth/auth-facade.service.ts
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, of, tap, catchError, map } from 'rxjs';
+import { Observable, of, tap, catchError, map, finalize } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 
 import { AuthApiService } from '../../../api-services/auth/auth-api.service';
@@ -18,15 +18,15 @@ import { CurrentUserDto } from './current-user.dto';
 import { JwtPayloadDto } from './jwt-payload.dto';
 
 /**
- * Glavni auth servis (façade).
- * - priča sa AuthApiService (HTTP)
- * - priča sa AuthStorageService (localStorage)
- * - dekodira JWT i drži CurrentUser kao signal
+ * Main auth service (façade).
+ * - talks to AuthApiService (HTTP)
+ * - talks to AuthStorageService (localStorage)
+ * - decodes the JWT and holds the current user as a signal
  *
- * Koristi se u:
- * - interceptoru (getAccessToken, refresh)
- * - guardovima (isAuthenticated, isAdmin)
- * - komponentama (login, logout, navbar)
+ * Used in:
+ * - the interceptor (getAccessToken, refresh)
+ * - guards (isAuthenticated, isAdmin)
+ * - components (login, logout, navbar)
  */
 @Injectable({ providedIn: 'root' })
 export class AuthFacadeService {
@@ -38,17 +38,17 @@ export class AuthFacadeService {
 
   private _currentUser = signal<CurrentUserDto | null>(null);
 
-  /** readonly signal za UI – čita se kao auth.currentUser() */
+  /** Read-only signal for the UI – read as auth.currentUser() */
   currentUser = this._currentUser.asReadonly();
 
-  /** computed signali nad current userom */
+  /** Computed signals based on the current user */
   isAuthenticated = computed(() => !!this._currentUser());
   isAdmin = computed(() => this._currentUser()?.isAdmin ?? false);
   isManager = computed(() => this._currentUser()?.isManager ?? false);
   isEmployee = computed(() => this._currentUser()?.isEmployee ?? false);
 
   constructor() {
-    // pokušaj inicijalizacije iz postojećeg access tokena
+    // Try to restore state from an existing access token
     this.initializeFromToken();
   }
 
@@ -57,73 +57,73 @@ export class AuthFacadeService {
   // =========================================================
 
   /**
-   * Login korisnika (email + password).
-   * Snima tokene u storage, dekodira JWT i popunjava current user state.
+   * Logs the user in (email + password).
+   * Saves tokens to storage, decodes the JWT and sets the current user state.
    */
-login(payload: LoginCommand): Observable<CurrentUserDto> {
-  return this.api.login(payload).pipe(
-    tap((response: LoginCommandDto) => {
-      this.storage.saveLogin(response);           
-    }),
-    map((response: LoginCommandDto) => {
-      const token = response.accessToken;
-      const payloadDecoded = jwtDecode<any>(token);
+  login(payload: LoginCommand): Observable<CurrentUserDto> {
+    return this.api.login(payload).pipe(
+      tap((response: LoginCommandDto) => {
+        this.storage.saveLogin(response);
+      }),
+      map((response: LoginCommandDto) => {
+        const token = response.accessToken;
+        const payloadDecoded = jwtDecode<any>(token);
 
-      const roleName = payloadDecoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? '';
-      const user: CurrentUserDto = {
-        userId: Number(payloadDecoded.sub),
-        email: payloadDecoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
-        isAdmin: roleName === 'Admin',
-        isManager: roleName === 'Manager',
-        isEmployee: roleName === 'User',
-        tokenVersion: Number(payloadDecoded.ver),
-      };
+        const roleName = payloadDecoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? '';
+        const user: CurrentUserDto = {
+          userId: Number(payloadDecoded.sub),
+          email: payloadDecoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+          isAdmin: roleName === 'Admin',
+          isManager: roleName === 'Manager',
+          isEmployee: roleName === 'User',
+          tokenVersion: Number(payloadDecoded.ver),
+        };
 
-      this._currentUser.set(user);
+        this._currentUser.set(user);
 
-      return user;  // ← vraća user za frontend
-    })
-  );
-}
-
-
-  /**
-   * Logout korisnika:
-   * - lokalno očisti state i tokene
-   * - pokuša invalidirati refresh token na serveru (bez drame na error)
-   */
-  logout(): Observable<void> {
-    const refreshToken = this.storage.getRefreshToken();
-
-    // 1) lokalno očisti (optimistic logout)
-    this.clearUserState();
-
-    // 2) nema refresh tokena → nema ni API poziva
-    if (!refreshToken) {
-      return of(void 0);
-    }
-
-    const payload: LogoutCommand = { refreshToken };
-
-    // 3) pokušaj server-side logout, ignoriši greške
-    return this.api.logout(payload).pipe(catchError(() => of(void 0)));
-  }
-
-  /**
-   * Refresh access tokena – koristi refresh token.
-   * Poziva interceptor kada dobije 401.
-   */
-  refresh(payload: RefreshTokenCommand): Observable<RefreshTokenCommandDto> {
-    return this.api.refresh(payload).pipe(
-      tap((response: RefreshTokenCommandDto) => {
-        this.storage.saveRefresh(response);           // snimi nove tokene
-        this.decodeAndSetUser(response.accessToken);  // update current usera
+        return user; // returns the user to the caller
       })
     );
   }
 
   /**
-   * Utility za guardove/interceptore – očisti auth state i prebaci na /login.
+   * Logs the user out:
+   * - revokes the refresh token on the server (errors are ignored)
+   * - clears local state and tokens AFTER the request finishes,
+   *   so the interceptor can still attach the access token
+   */
+  logout(): Observable<void> {
+    const refreshToken = this.storage.getRefreshToken();
+
+    // No refresh token → nothing to revoke, just clear locally
+    if (!refreshToken) {
+      this.clearUserState();
+      return of(void 0);
+    }
+
+    const payload: LogoutCommand = { refreshToken };
+
+    return this.api.logout(payload).pipe(
+      catchError(() => of(void 0)),         // ignore server errors
+      finalize(() => this.clearUserState()) // always clear locally at the end
+    );
+  }
+
+  /**
+   * Refreshes the access token using the refresh token.
+   * Called by the interceptor when it receives a 401.
+   */
+  refresh(payload: RefreshTokenCommand): Observable<RefreshTokenCommandDto> {
+    return this.api.refresh(payload).pipe(
+      tap((response: RefreshTokenCommandDto) => {
+        this.storage.saveRefresh(response);          // save the new tokens
+        this.decodeAndSetUser(response.accessToken); // update the current user
+      })
+    );
+  }
+
+  /**
+   * Utility for guards/interceptors – clears auth state and navigates to login.
    */
   redirectToLogin(): void {
     this.clearUserState();
@@ -131,18 +131,18 @@ login(payload: LoginCommand): Observable<CurrentUserDto> {
   }
 
   // =========================================================
-  // GETTERI ZA INTERCEPTOR
+  // GETTERS FOR THE INTERCEPTOR
   // =========================================================
 
   /**
-   * Access token za Authorization header.
+   * Access token for the Authorization header.
    */
   getAccessToken(): string | null {
     return this.storage.getAccessToken();
   }
 
   /**
-   * Refresh token za refresh poziv.
+   * Refresh token for the refresh call.
    */
   getRefreshToken(): string | null {
     return this.storage.getRefreshToken();
@@ -153,7 +153,7 @@ login(payload: LoginCommand): Observable<CurrentUserDto> {
   // =========================================================
 
   /**
-   * Na startu aplikacije (konstruktor) – pokušaj obnoviti stanje iz postojećeg tokena.
+   * On app start (constructor) – try to restore state from an existing token.
    */
   private initializeFromToken(): void {
     const token = this.storage.getAccessToken();
@@ -163,34 +163,33 @@ login(payload: LoginCommand): Observable<CurrentUserDto> {
   }
 
   /**
-   * Dekodiraj JWT i postavi current user state.
+   * Decodes the JWT and sets the current user state.
    */
-private decodeAndSetUser(token: string): void {
-  try {
-    const payload = jwtDecode<any>(token); // možeš staviti `any` da TypeScript ne prigovara
+  private decodeAndSetUser(token: string): void {
+    try {
+      const payload = jwtDecode<any>(token);
 
-    const roleName = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? '';
+      const roleName = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? '';
 
-    const user: CurrentUserDto = {
-      userId: Number(payload.sub),
-      email: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
-      isAdmin: roleName === 'Admin',
-      isManager: roleName === 'Manager',
-      isEmployee: roleName === 'User', // ili whatever tvoji role-i
-      tokenVersion: Number(payload.ver),
-    };
+      const user: CurrentUserDto = {
+        userId: Number(payload.sub),
+        email: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+        isAdmin: roleName === 'Admin',
+        isManager: roleName === 'Manager',
+        isEmployee: roleName === 'User',
+        tokenVersion: Number(payload.ver),
+      };
 
-    this._currentUser.set(user);
-    console.log('Decoded user:', user);
-  } catch (error) {
-    console.error('Failed to decode JWT token:', error);
-    this._currentUser.set(null);
+      this._currentUser.set(user);
+      console.log('Decoded user:', user);
+    } catch (error) {
+      console.error('Failed to decode JWT token:', error);
+      this._currentUser.set(null);
+    }
   }
-}
-
 
   /**
-   * Očisti user state + sve tokene iz storage-a.
+   * Clears the user state and all tokens from storage.
    */
   private clearUserState(): void {
     this._currentUser.set(null);
