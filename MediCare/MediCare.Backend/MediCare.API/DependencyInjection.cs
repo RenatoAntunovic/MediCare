@@ -87,7 +87,7 @@ public static class DependencyInjection
             c.AddSecurityRequirement(new OpenApiSecurityRequirement { { bearer, Array.Empty<string>() } });
         });
 
-        services.AddExceptionHandler<MarketExceptionHandler>();
+        services.AddExceptionHandler<MediCareExceptionHandler>();
         services.AddProblemDetails();
 
         return services;

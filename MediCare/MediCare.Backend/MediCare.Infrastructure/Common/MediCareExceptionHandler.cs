@@ -13,8 +13,8 @@ namespace MediCare.Infrastructure.Common;
 /// Global exception handler for unhandled exceptions.
 /// Keeps the same ErrorDto format as the previous middleware.
 /// </summary>
-public sealed class MarketExceptionHandler(
-    ILogger<MarketExceptionHandler> logger,
+public sealed class MediCareExceptionHandler(
+    ILogger<MediCareExceptionHandler> logger,
     IHostEnvironment env
 ) : IExceptionHandler
 {
@@ -43,6 +43,8 @@ public sealed class MarketExceptionHandler(
             MediCareNotFoundException => StatusCodes.Status404NotFound,
             MediCareConflictException or MediCareBusinessRuleException => StatusCodes.Status409Conflict,
             ValidationException => StatusCodes.Status400BadRequest,
+            KeyNotFoundException => StatusCodes.Status404NotFound,
+            UnauthorizedAccessException => StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status500InternalServerError
         };
 
@@ -64,6 +66,16 @@ public sealed class MarketExceptionHandler(
             case MediCareBusinessRuleException:
                 code = "entity.error";
                 message = ex.Message;
+                break;
+
+            case KeyNotFoundException:
+                code = "entity.notFound";
+                message = ex.Message;
+                break;
+
+            case UnauthorizedAccessException:
+                code = "auth.forbidden";
+                message = "You are not allowed to perform this action.";
                 break;
 
             case ValidationException vex:

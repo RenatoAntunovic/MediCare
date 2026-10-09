@@ -18,12 +18,12 @@ namespace MediCare.Application.Modules.Auth.Commands.Register
             var userRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "User", cancellationToken);
             if (userRole == null)
                 throw new Exception("Role 'User' not found in database. Seed it first.");
-            
+
             if (await context.Users.AnyAsync(u => u.Email == normalizedEmail, cancellationToken))
-                throw new Exception("Email already exists.");
+                throw new MediCareConflictException("Ovaj email je već registrovan.");
 
             if (await context.Users.AnyAsync(u => u.UserName == normalizedUsername, cancellationToken))
-                throw new Exception("Username already exists.");
+                throw new MediCareConflictException("Ovo korisničko ime je već zauzeto.");
 
             var user = new Users
             {

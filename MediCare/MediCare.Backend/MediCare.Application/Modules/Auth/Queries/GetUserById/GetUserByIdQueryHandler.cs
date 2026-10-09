@@ -30,7 +30,7 @@
 
             if (user == null)
             {
-                throw new Exception($"User with Id {request.Id} not found."); // ili custom NotFoundException
+                throw new MediCareNotFoundException($"User with Id {request.Id} not found.");
             }
 
             return user;
