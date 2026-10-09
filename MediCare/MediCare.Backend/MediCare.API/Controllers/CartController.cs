@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using MediCare.API.FCM;
 using MediCare.Application.Modules.Cart.Command.AddToCart;
 using MediCare.Application.Modules.Cart.Command.AddToCartFromFavourites;
 using MediCare.Application.Modules.Cart.Command.AddToCartFromForLater;
@@ -16,14 +15,12 @@ namespace MediCare.API.Controllers
     public class CartController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IFcmService _fcmService;
         private readonly IAppDbContext _context;
 
-        public CartController(IMediator mediator, IFcmService fcmService, IAppDbContext context)
+        public CartController(IMediator mediator, IAppDbContext context)
         {
             _mediator = mediator;
             _context = context;
-            _fcmService = fcmService;
         }
 
         // GET /api/cart

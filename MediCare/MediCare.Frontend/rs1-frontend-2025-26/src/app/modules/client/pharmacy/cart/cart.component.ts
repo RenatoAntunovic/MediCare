@@ -80,7 +80,6 @@ checkout(): void {
       this.checkoutResponse = res;
 
        console.log('Checkout response:', res);
-      console.log('FCM token (test):', res.FcmToken);
 
       this.toaster.success(`Order placed! Order ID: ${res.orderId}`);
       this.items = [];

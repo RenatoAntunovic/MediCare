@@ -1,7 +1,5 @@
 using MediatR;
-using MediCare.API.FCM;
 using MediCare.API.Reports;
-using MediCare.Application.Modules.FCM;
 using MediCare.Application.Modules.Sales.Orders.Commands.Create;
 using MediCare.Application.Modules.Sales.Orders.Commands.Status;
 using MediCare.Application.Modules.Sales.Orders.Commands.Update;
@@ -19,12 +17,10 @@ namespace Market.API.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly ISender _sender;
-    private readonly IFcmService _fcmService;
 
-    public OrdersController(ISender sender, IFcmService fcmService)
+    public OrdersController(ISender sender)
     {
         _sender = sender;
-        _fcmService = fcmService;
     }
 
     [HttpPost]
@@ -32,15 +28,6 @@ public class OrdersController : ControllerBase
     public async Task<ActionResult<int>> Create(CreateOrderCommand command, CancellationToken ct)
     {
         int id = await _sender.Send(command, ct);
-
-        if (SaveFcmTokenHandler.TryGetToken(command.UserId, out var fcmToken))
-        {
-            await _fcmService.SendNotificationAsync(
-                fcmToken,
-                "Nova narudžba",
-                $"Imate novu narudžbu #{id}"
-            );
-        }
 
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }

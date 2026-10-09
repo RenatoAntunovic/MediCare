@@ -1,15 +1,11 @@
 using Elastic.Clients.Elasticsearch;
 using Elastic.Transport;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
 using Market.API;
 using Market.API.Middlewares;
 using Market.Application;
 using Market.Infrastructure;
-using MediCare.API.FCM;
 using MediCare.Application.Abstractions;
 using MediCare.Application.Common.Behaviors;
-using MediCare.Application.Modules.FCM.Services;
 using MediCare.Application.Modules.MedicineSearch;
 using MediCare.Infrastructure.Services;
 using Microsoft.AspNetCore.RateLimiting;
@@ -93,7 +89,6 @@ public partial class Program
             });
 
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            builder.Services.AddSingleton<IFcmService, FcmService>();
             builder.Services.AddHttpClient();
 
             // ---------------------------------------------------------

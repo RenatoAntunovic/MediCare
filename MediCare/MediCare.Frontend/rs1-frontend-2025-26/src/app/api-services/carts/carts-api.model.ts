@@ -39,5 +39,4 @@ export interface AddFromForLaterDto{
 export interface CheckoutOrderResponseDto {
   orderId: number;
   totalPrice: number;
-  FcmToken: string;
 }

@@ -1,5 +1,4 @@
 ﻿using MediCare.Application.Modules.Cart.Command.Checkout;
-using MediCare.Application.Modules.FCM;
 
 public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,CheckoutOrderResponseDto>
 {
@@ -59,16 +58,11 @@ public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,
         _context.CartItems.RemoveRange(cart.CartItems);
         await _context.SaveChangesAsync(cancellationToken);
 
-        string fcmToken = null;
-        SaveFcmTokenHandler.TryGetToken(command.UserId, out var token);
-        fcmToken = token;
-
         // Vrati response DTO
         return new CheckoutOrderResponseDto
         {
             OrderId = order.Id,
-            TotalPrice = order.TotalPrice,
-            UserFcmToken = fcmToken ?? "dummy_token_123"
+            TotalPrice = order.TotalPrice
         };
     }
 }
