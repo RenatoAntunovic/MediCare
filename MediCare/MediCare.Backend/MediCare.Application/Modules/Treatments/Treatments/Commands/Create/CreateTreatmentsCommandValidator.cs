@@ -9,5 +9,9 @@ public sealed class CreateTreatmentsCommandValidator
                 .NotEmpty().WithMessage("Name is required.")
                 .MaximumLength(Medicine.Constraints.NameMaxLength)
                 .WithMessage($"Name can be at most {Medicine.Constraints.NameMaxLength} characters long.");
+
+        RuleFor(x => x.ImageFile)
+           .NotNull().WithMessage("Image is required.")
+           .MustBeValidImage();
     }
 }

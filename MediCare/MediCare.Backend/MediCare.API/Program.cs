@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
+using Microsoft.AspNetCore.StaticFiles; 
 
 
 public partial class Program
@@ -154,16 +155,21 @@ public partial class Program
             app.UseExceptionHandler();
             app.UseMiddleware<RequestResponseLoggingMiddleware>();
             app.UseStaticFiles();
+
+            var imageContentTypes = new FileExtensionContentTypeProvider();
+            imageContentTypes.Mappings[".jfif"] = "image/jpeg";
+
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
                     Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images")
                 ),
                 RequestPath = "/images",
-                ServeUnknownFileTypes = true,
+                ContentTypeProvider = imageContentTypes,
                 OnPrepareResponse = ctx =>
                 {
                     ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=600");
+                    ctx.Context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
                 }
             });
             app.UseCors("AllowAngularDev");

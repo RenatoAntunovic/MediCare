@@ -22,7 +22,8 @@ public sealed class CreateMedicineCommandValidator
             .GreaterThan(0).WithMessage("Medicine category must be selected.");
 
         RuleFor(x => x.ImageFile)
-            .NotEmpty().WithMessage("Image path is required.");
+            .NotEmpty().WithMessage("Image path is required.")
+            .MustBeValidImage();
 
         RuleFor(x => x.Weight)
             .GreaterThan(0).WithMessage("Weight must be greater than 0.");

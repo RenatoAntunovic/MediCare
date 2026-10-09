@@ -38,12 +38,12 @@ public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
             // (opciono) obriši staru sliku
             if (!string.IsNullOrWhiteSpace(entity.ImagePath))
             {
-                var oldPath = Path.Combine("wwwroot", entity.ImagePath);
+                var oldPath = Path.Combine("wwwroot", entity.ImagePath.TrimStart('/', '\\'));
                 if (File.Exists(oldPath))
                     File.Delete(oldPath);
             }
 
-            var uniqueFileName = $"{Guid.NewGuid()}_{request.ImageFile.FileName}";
+            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(request.ImageFile.FileName)}";
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using var stream = new FileStream(filePath, FileMode.Create);

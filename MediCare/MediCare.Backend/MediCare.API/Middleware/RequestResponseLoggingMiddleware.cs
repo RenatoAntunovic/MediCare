@@ -4,74 +4,75 @@ using System.Text;
 namespace Market.API.Middlewares;
 
 /// <summary>
-/// Middleware that logs incoming HTTP requests and outgoing responses,
-/// including duration, method, path, and status code.
+/// Logs incoming HTTP requests: method, path, status code and duration.
+/// Request bodies are logged only for JSON requests, never for /api/auth (passwords, tokens).
+/// Response bodies are never logged (they can contain tokens or large files).
 /// </summary>
 public sealed class RequestResponseLoggingMiddleware(
     RequestDelegate next,
     ILogger<RequestResponseLoggingMiddleware> logger)
 {
-    private const int SlowRequestThresholdMs = 400; // 2 seconds
+    private const int SlowRequestThresholdMs = 400;
+    private const int MaxLoggedBodyLength = 2000;
 
     public async Task InvokeAsync(HttpContext context)
     {
         var stopwatch = Stopwatch.StartNew();
         var request = context.Request;
 
-        // Read request body (only for POST/PUT)
         string? requestBody = null;
-        if (request.Method is "POST" or "PUT")
+        if (ShouldLogRequestBody(request))
         {
             request.EnableBuffering();
             using var reader = new StreamReader(request.Body, Encoding.UTF8, leaveOpen: true);
             requestBody = await reader.ReadToEndAsync();
             request.Body.Position = 0;
-        }
 
-        // Capture original response stream
-        var originalBodyStream = context.Response.Body;
-        await using var responseBody = new MemoryStream();
-        context.Response.Body = responseBody;
+            if (requestBody.Length > MaxLoggedBodyLength)
+                requestBody = requestBody[..MaxLoggedBodyLength] + "... (truncated)";
+        }
 
         try
         {
-            // Continue pipeline
             await next(context);
         }
         finally
         {
             stopwatch.Stop();
-
-            // Read response body
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
-            var responseText = await new StreamReader(context.Response.Body).ReadToEndAsync();
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
+            var elapsed = stopwatch.ElapsedMilliseconds;
 
             var logMessage = new StringBuilder()
-                .AppendLine("HTTP Request/Response Log:")
+                .AppendLine("HTTP Request Log:")
                 .AppendLine($"  Path: {request.Path}")
                 .AppendLine($"  Method: {request.Method}")
                 .AppendLine($"  Status: {context.Response.StatusCode}")
-                .AppendLine($"  Duration: {stopwatch.ElapsedMilliseconds} ms");
+                .AppendLine($"  Duration: {elapsed} ms");
 
             if (!string.IsNullOrWhiteSpace(requestBody))
                 logMessage.AppendLine($"  Request Body: {requestBody}");
 
-            if (!string.IsNullOrWhiteSpace(responseText))
-                logMessage.AppendLine($"  Response Body: {responseText}");
+            logger.LogInformation("{Log}", logMessage.ToString());
 
-            var elapsed = stopwatch.ElapsedMilliseconds;
             if (elapsed > SlowRequestThresholdMs)
             {
                 logger.LogWarning("[SLOW REQUEST] {Path} took {Elapsed} ms", request.Path, elapsed);
+                Directory.CreateDirectory("Logs");
                 await File.AppendAllTextAsync("Logs/slow-requests.log",
                     $"{DateTime.UtcNow:u} | {request.Path} | {elapsed} ms{Environment.NewLine}");
             }
-
-            logger.LogInformation("{Log}", logMessage.ToString());
-
-            // Copy the response back to the original stream
-            await responseBody.CopyToAsync(originalBodyStream);
         }
+    }
+
+    private static bool ShouldLogRequestBody(HttpRequest request)
+    {
+        if (request.Method is not ("POST" or "PUT"))
+            return false;
+
+        // Never log auth bodies: they contain passwords and refresh tokens
+        if (request.Path.StartsWithSegments("/api/auth", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        // Only JSON (skip file uploads / multipart forms)
+        return request.ContentType?.Contains("application/json", StringComparison.OrdinalIgnoreCase) == true;
     }
 }

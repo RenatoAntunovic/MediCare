@@ -3,26 +3,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MediCare.Application.Modules.Sales.Orders.Commands.Update;
 
-public class UpdateOrderCommandHandler(IAppDbContext db)
+public class UpdateOrderCommandHandler(IAppDbContext db, IAppCurrentUser currentUser)
     : IRequestHandler<UpdateOrderCommand, int>
 {
     public async Task<int> Handle(UpdateOrderCommand request, CancellationToken ct)
     {
-        #region Dohvati postojeću narudžbu s korisnikom i ulogom
-        var orderQuery = db.Orders
+        #region Load the order and check permissions
+        // Only admins can edit orders (checked on the current user, not the order owner)
+        if (!currentUser.IsAdmin)
+            throw new UnauthorizedAccessException("You are not allowed to edit this order.");
+
+        var order = await db.Orders
             .Include(o => o.OrderItems)
-            .Include(o => o.User)
-                .ThenInclude(u => u.Role) // dohvatimo ulogu korisnika
-            .Where(x => x.Id == request.Id);
-
-        var order = await orderQuery.FirstOrDefaultAsync(ct)
-            ?? throw new KeyNotFoundException($"Order (ID={request.Id}) nije pronađen.");
-
-        // Provjera prava: samo korisnik s određenom ulogom može mijenjati tu narudžbu
-        if (order.User?.Role?.Name != "Admin")
-        {
-            throw new UnauthorizedAccessException("Nemate prava mijenjati ovu narudžbu.");
-        }
+            .FirstOrDefaultAsync(x => x.Id == request.Id, ct)
+            ?? throw new MediCareNotFoundException($"Order (ID={request.Id}) not found.");
 
         order.TotalPrice = 0m;
         #endregion
