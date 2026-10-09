@@ -35,7 +35,6 @@ namespace MediCare.Application.Modules.Auth.Commands.Register
                 Email = normalizedEmail,
                 UserName = normalizedUsername,
                 PhoneNumber = request.PhoneNumber,
-                Password=request.Password,
                 RoleId=2,
                 IsEnabled = true,
                 TokenVersion = 0

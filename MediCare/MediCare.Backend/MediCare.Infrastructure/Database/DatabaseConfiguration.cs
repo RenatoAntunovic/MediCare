@@ -44,7 +44,10 @@ public partial class DatabaseContext
     {
         base.OnModelCreating(modelBuilder);
 
-        foreach(var fk in modelBuilder.Model.GetEntityTypes().SelectMany(e=>e.GetForeignKeys()))
+        // Apply all IEntityTypeConfiguration classes from the Configurations folder
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
+
+        foreach (var fk in modelBuilder.Model.GetEntityTypes().SelectMany(e=>e.GetForeignKeys()))
         {
             fk.DeleteBehavior = DeleteBehavior.Restrict;
         }
