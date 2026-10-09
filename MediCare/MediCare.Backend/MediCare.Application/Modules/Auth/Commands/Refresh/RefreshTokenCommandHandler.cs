@@ -13,9 +13,10 @@ public sealed class RefreshTokenCommandHandler(
 
         // 2) Find the valid refresh token in the database (TRACKING because we will modify it)
         var rt = await ctx.RefreshTokens
-            .Include(x => x.User)
-            .FirstOrDefaultAsync(x =>
-                x.TokenHash == incomingHash &&
+    .Include(x => x.User)
+        .ThenInclude(u => u!.Role) // the role is needed for the role claim in the new access token
+    .FirstOrDefaultAsync(x =>
+        x.TokenHash == incomingHash &&
                 !x.IsRevoked &&
                 !x.IsDeleted, ct);
 
