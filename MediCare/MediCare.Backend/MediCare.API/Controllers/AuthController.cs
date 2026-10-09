@@ -15,7 +15,7 @@ public sealed class AuthController : ControllerBase
 {
     private readonly ISender _sender; // MediatR sender
 
-    // Konstruktor - dependency injection
+    // Constructor - dependency injection
     public AuthController(ISender sender)
     {
         _sender = sender;
@@ -36,7 +36,7 @@ public sealed class AuthController : ControllerBase
     {
         int id = await _sender.Send(command, ct);
 
-        // Vraćamo 201 Created sa lokacijom novog korisnika
+        // Return 201 Created with the location of the new user
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 
@@ -56,7 +56,7 @@ public sealed class AuthController : ControllerBase
         return NoContent();
     }
 
-    // Primjer GetById endpoint-a za CreatedAtAction
+    // GetById endpoint used by CreatedAtAction
     // Users can only see their own profile; admins can see anyone
     [Authorize]
     [HttpGet("{id}")]

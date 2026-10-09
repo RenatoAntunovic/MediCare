@@ -1,7 +1,7 @@
 export interface RegisterRequest {
   firstName: string;
   lastName: string;
-  dateOfBirth: string; // ili Date
+  dateOfBirth: string; // or Date
   address: string;
   city: string;
   userName: string;
@@ -12,7 +12,7 @@ export interface RegisterRequest {
 
 // response
 export interface RegisterResponse {
-  id: number;          // ID korisnika
+  id: number;          // user ID
   userName: string;
   email: string;
   role: string;        // "User"

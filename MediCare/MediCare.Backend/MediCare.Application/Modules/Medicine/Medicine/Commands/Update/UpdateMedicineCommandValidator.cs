@@ -34,7 +34,7 @@ public sealed class UpdateMedicineCommandValidator
 
         RuleFor(x => x.ImageFile).MustBeValidImage();
 
-        // ImageFile je OPCIONALNO - može biti null ili prazan
-        // Za inline edit - nema slike!
+        // ImageFile is OPTIONAL - it can be null or empty
+        // For inline edit - no image!
     }
 }

@@ -14,7 +14,7 @@ public sealed class ListOrdersQueryHandler(IAppDbContext ctx, IAppCurrentUser cu
         if (currentUserEntity == null)
             throw new Exception("Current user not found");
 
-        // Ako nije admin, filtriraj po korisniku
+        // If not admin, filter by user
         if (!string.Equals(currentUserEntity.Role.Name, "Admin", StringComparison.OrdinalIgnoreCase))
         {
             q = q.Where(x => x.UserId == currentUser.UserId);

@@ -59,7 +59,7 @@ getNextStatuses(currentStatusId: number): { id: number; name: string }[] {
         { id: 6, name: 'Cancelled' }
       ];
     default:
-      return []; // Completed i Cancelled nemaju dalje
+      return []; // Completed and Cancelled have no next status
   }
 }
 

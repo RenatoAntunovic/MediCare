@@ -32,7 +32,7 @@ export class ForLaterComponent extends BaseListPagedComponent<ForLaterDto, any> 
 
   constructor() {
     super();
-    this.request = {}; // nema filtera
+    this.request = {}; // no filters
   }
 
   ngOnInit(): void {

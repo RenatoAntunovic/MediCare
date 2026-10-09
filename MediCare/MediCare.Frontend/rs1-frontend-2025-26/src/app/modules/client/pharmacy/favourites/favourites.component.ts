@@ -32,7 +32,7 @@ export class FavouritesComponent extends BaseListPagedComponent<FavouritesDto, a
 
   constructor() {
     super();
-    this.request = {}; // nema filtera
+    this.request = {}; // no filters
   }
 
   ngOnInit(): void {

@@ -35,7 +35,7 @@ public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
-            // (opciono) obriši staru sliku
+            // (optional) delete the old image
             if (!string.IsNullOrWhiteSpace(entity.ImagePath))
             {
                 var oldPath = Path.Combine("wwwroot", entity.ImagePath.TrimStart('/', '\\'));
@@ -49,7 +49,7 @@ public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
             using var stream = new FileStream(filePath, FileMode.Create);
             await request.ImageFile.CopyToAsync(stream, ct);
 
-            // ⬅️ JEDINO MJESTO gdje se postavlja ImagePath
+            // ⬅️ The ONLY place where ImagePath is set
             entity.ImagePath = $"images/{uniqueFileName}";
         }
 

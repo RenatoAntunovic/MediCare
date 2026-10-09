@@ -99,10 +99,10 @@ formData.append('isEnabled','true');
 if (this.selectedFile) {
   formData.append('ImageFile', this.selectedFile);
 } else if (this.originalImageFile) {
-  // šalje originalnu sliku ako korisnik nije promijenio
+  // sends the original image if the user didn't change it
   formData.append('ImageFile', this.originalImageFile);
 } else {
-  // ako backend dopušta, pošalji prazno polje
+  // if the backend allows it, send an empty field
   formData.append('ImageFile', '');
 }
 

@@ -111,7 +111,7 @@ onToggleStatus(treatment: ListTreatmentsQueryDto): void {
     error: (err) => {
       console.error('Toggle status error:', err);
       this.stopLoading();
-      this.toaster.error('Failed to update status'); // ili dialog ako želiš
+      this.toaster.error('Failed to update status'); // or a dialog if you prefer
     }
   });
 }

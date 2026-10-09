@@ -12,15 +12,15 @@ public class AddToCartFromFavouritesHandler : IRequestHandler<AddToCartFromFavou
 
     public async Task<bool> Handle(AddToCartFromFavouritesCommand request, CancellationToken cancellationToken)
     {
-        // 1️⃣ Dohvati Favorites stavku
+        // 1️⃣ Get the favourite item
         var favourite = await _context.Favourites
             .Include(f => f.Medicine)
             .FirstOrDefaultAsync(f => f.Id == request.FavouriteId && f.UserId == request.UserId, cancellationToken);
 
         if (favourite == null || favourite.Medicine == null)
-            return false; // ili throw new Exception("Favourite ili medicine ne postoji");
+            return false; // or throw new Exception("Favourite or medicine does not exist");
 
-        // 2️⃣ Dohvati ili kreiraj Cart za korisnika
+        // 2️⃣ Get or create the cart for the user
         var cart = await _context.Carts
             .Include(c => c.CartItems)
             .FirstOrDefaultAsync(c => c.UserId == request.UserId, cancellationToken);
@@ -29,10 +29,10 @@ public class AddToCartFromFavouritesHandler : IRequestHandler<AddToCartFromFavou
         {
             cart = new Carts { UserId = request.UserId };
             await _context.Carts.AddAsync(cart, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken); // da dobijemo CartId
+            await _context.SaveChangesAsync(cancellationToken); // so we get the CartId
         }
 
-        // 3️⃣ Provjeri da li već postoji stavka u cartu
+        // 3️⃣ Check whether the item is already in the cart
         var existingItem = cart.CartItems.FirstOrDefault(ci => ci.MedicineId == favourite.MedicineId);
 
         if (existingItem != null)

@@ -7,7 +7,7 @@ export interface CartItemDto {
   medicineId: number;
   medicineName: string;
   quantity: number;
-  price: number; // cijena po stavci (Medicine.Price * quantity)
+  price: number; // price per line (Medicine.Price * quantity)
   imagePath:string
 }
 

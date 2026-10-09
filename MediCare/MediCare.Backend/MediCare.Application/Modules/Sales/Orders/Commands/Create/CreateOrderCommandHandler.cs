@@ -16,7 +16,7 @@ using MediCare.Domain.Entities.HospitalRecords;
                 UserId = currentUser.UserId!.Value,
                 OrderDate = DateTime.UtcNow,
                 TotalPrice = 0m,
-                OrderStatusId = 1 // npr. Draft / Created
+                OrderStatusId = 1 // e.g. Draft / Created
             };
 
             ctx.Orders.Add(order);
@@ -50,7 +50,7 @@ using MediCare.Domain.Entities.HospitalRecords;
                     throw new ValidationException($"Invalid MedicineId: {item.MedicineId}");
                 }
 
-                if (medicine.isEnabled == false) // Ako imaš Enabled flag
+                if (medicine.isEnabled == false) // If there is an Enabled flag
                 {
                     throw new ValidationException($"Medicine {medicine.Name} is disabled.");
                 }

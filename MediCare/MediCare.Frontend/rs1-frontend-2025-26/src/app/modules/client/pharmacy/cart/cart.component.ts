@@ -34,7 +34,7 @@ export class CartComponent extends BaseListPagedComponent<CartItemDto, any> impl
 
   constructor() {
     super();
-    this.request = {}; // nema filtera za korpu
+    this.request = {}; // no filters for the cart
   }
 
   ngOnInit(): void {
@@ -48,7 +48,7 @@ export class CartComponent extends BaseListPagedComponent<CartItemDto, any> impl
          console.log('Cart items from backend:', res.items);
         this.items = res.items;
 
-        // inicijalizacija količina
+        // initialize quantities
         this.items.forEach(item => {
           this.quantities[item.medicineId] = item.quantity;
         });
@@ -94,7 +94,7 @@ checkout(): void {
 }
 
 removeItem(cartItem: any): void {
-  const command: DeleteCartItemCommand = { id: cartItem.cartItemId }; // <--- koristimo cartItemId
+  const command: DeleteCartItemCommand = { id: cartItem.cartItemId }; // <--- use cartItemId
   this.api.deleteCartItem(command.id).subscribe({
     next: () => {
       this.items = this.items.filter(i => i.cartItemId !== cartItem.cartItemId);

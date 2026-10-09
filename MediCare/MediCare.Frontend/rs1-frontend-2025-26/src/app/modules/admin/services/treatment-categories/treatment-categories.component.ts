@@ -44,7 +44,7 @@ export class TreatmentCategoriesComponent
 
     this.api.list(this.request).subscribe({
       next: (response) => {
-        // mapiramo categoryName u name
+        // map categoryName to name
         const itemsWithName = response.items.map(item => ({
           ...item,
           name: item.categoryName

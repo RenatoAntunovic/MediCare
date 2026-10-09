@@ -17,7 +17,7 @@ export class ForLaterApiService {
 
   /**
    * GET /Cart
-   * Dohvati cijelu korpu trenutnog korisnika
+   * Get the whole cart of the current user
    */
   getForLater(): Observable<ForLaterDto[]> {
     return this.http.get<ForLaterDto[]>(this.baseUrl);
@@ -25,7 +25,7 @@ export class ForLaterApiService {
 
   /**
    * POST /Cart
-   * Dodaj stavku u korpu
+   * Add an item to the cart
    */
   addToForLater(command: AddToForLaterCommand): Observable<{ forLaterId: number }> {
     return this.http.post<{ forLaterId: number }>(`${this.baseUrl}`, command);
@@ -34,7 +34,7 @@ export class ForLaterApiService {
 
   /**
    * DELETE /Cart/{id}
-   * Ukloni stavku iz korpe
+   * Remove an item from the cart
    */
   deleteForLater(id: number): Observable<void> {
   return this.http.delete<void>(`${this.baseUrl}/${id}`);

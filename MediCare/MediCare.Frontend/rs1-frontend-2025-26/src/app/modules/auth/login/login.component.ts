@@ -36,7 +36,7 @@ export class LoginComponent extends BaseComponent {
   onSubmit(): void {
      const now = Date.now();
 
-  // Resetuj pokušaje ako je prošlo više od blockTimeMs
+  // Reset the attempts if more than blockTimeMs has passed
   if (now - this.lastAttemptTime > this.blockTimeMs) {
     this.loginAttempts = 0;
   }
@@ -63,7 +63,7 @@ export class LoginComponent extends BaseComponent {
       next: (loggedInUser: CurrentUserDto) => {
         this.stopLoading();
 
-         this.authApi.setCurrentUserId(loggedInUser.userId); // ← OVDJE
+         this.authApi.setCurrentUserId(loggedInUser.userId); // ← HERE
 
     console.log('Logged in user ID:', loggedInUser.userId);
 

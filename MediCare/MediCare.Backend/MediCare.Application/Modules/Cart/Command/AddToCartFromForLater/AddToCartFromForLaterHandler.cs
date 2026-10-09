@@ -31,7 +31,7 @@ public class AddToCartFromForLaterHandler : IRequestHandler<AddToCartFromForLate
             await _context.SaveChangesAsync(cancellationToken); 
         }
 
-        // 3️⃣ Provjeri da li već postoji stavka u cartu
+        // 3️⃣ Check whether the item is already in the cart
         var existingItem = cart.CartItems.FirstOrDefault(ci => ci.MedicineId == forLater.MedicineId);
 
         if (existingItem != null)

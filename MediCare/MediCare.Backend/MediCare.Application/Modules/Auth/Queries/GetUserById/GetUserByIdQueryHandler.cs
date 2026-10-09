@@ -24,7 +24,7 @@
                     UserName = u.UserName,
                     Email = u.Email,
                     PhoneNumber = u.PhoneNumber,
-                    Role = u.Role.Name  // ime role, npr. "User" ili "Admin"
+                    Role = u.Role.Name  // role name, e.g. "User" or "Admin"
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

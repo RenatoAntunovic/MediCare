@@ -32,7 +32,7 @@ public class CreateTreatmentsCommandHandler(IAppDbContext context)
 
         if (request.ImageFile != null && request.ImageFile.Length > 0)
         {
-            var uploadsFolder = Path.Combine("wwwroot", "images"); // folder za slike
+            var uploadsFolder = Path.Combine("wwwroot", "images"); // images folder
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
@@ -43,7 +43,7 @@ public class CreateTreatmentsCommandHandler(IAppDbContext context)
                 await request.ImageFile.CopyToAsync(fileStream, cancellationToken);
             }
 
-            // Spremi relativnu putanju u bazu
+            // Save the relative path to the database
             treatment.ImagePath = "images/" + uniqueFileName;
         }
 

@@ -16,7 +16,7 @@ public partial class DatabaseContext
             {
                 case EntityState.Added:
                     entry.Entity.CreatedAtUtc = UtcNow;
-                    entry.Entity.ModifiedAtUtc = null; // ili = UtcNow
+                    entry.Entity.ModifiedAtUtc = null; // or = UtcNow
                     entry.Entity.IsDeleted = false;
                     break;
 

@@ -123,7 +123,7 @@ onStatusFilterChange(status: number | null): void {
   // === Actions ===
 
   onViewDetails(order: ListOrdersQueryDto, event?: MouseEvent): void {
-    // spriječi da klik sa dugmeta ode na <tr> i ponovo otvori dialog
+    // stop the button click from reaching the <tr> and opening the dialog again
     event?.stopPropagation();
 
     console.log('Order ID being sent to dialog:', order.id);

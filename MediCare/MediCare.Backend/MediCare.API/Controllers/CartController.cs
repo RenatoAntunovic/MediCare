@@ -53,7 +53,7 @@ namespace MediCare.API.Controllers
         {
             var userIdClaim = User.FindFirst("id") ?? User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-                return Unauthorized(); // ili BadRequest
+                return Unauthorized(); // or BadRequest
 
             var command = new AddToCartFromFavouritesCommand(userId, dto.FavouriteId, dto.Quantity);
             var result = await _mediator.Send(command);
@@ -71,7 +71,7 @@ namespace MediCare.API.Controllers
         {
             var userIdClaim = User.FindFirst("id") ?? User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-                return Unauthorized(); // ili BadRequest
+                return Unauthorized(); // or BadRequest
 
             var command = new AddToCartFromForLaterCommand(userId, dto.ForLaterId, dto.Quantity);
             var result = await _mediator.Send(command);

@@ -29,7 +29,7 @@ public sealed class ListOrdersWithItemsQueryHandler(IAppDbContext ctx, IAppCurre
                 OrderDate = x.OrderDate,
                 StatusId = x.OrderStatusId,
                 StatusName = x.OrderStatus.StatusName,
-                //"x.Items" ili "ctx.OrderItems.Where(x => x.OrderId == x.Id)"
+                //"x.Items" or "ctx.OrderItems.Where(x => x.OrderId == x.Id)"
                 Items = x.OrderItems.Select(i => new ListOrdersWithItemsQueryDtoItem
                 {
                     Id = i.Id,

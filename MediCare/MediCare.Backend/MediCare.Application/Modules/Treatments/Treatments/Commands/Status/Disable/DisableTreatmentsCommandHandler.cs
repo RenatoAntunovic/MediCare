@@ -12,7 +12,7 @@ public sealed class DisableTreatmentsCommandHandler(IAppDbContext ctx)
 
         //if (cat is null)
         //{
-        //    throw new MarketNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
+        //    throw new MarketNotFoundException($"Category (ID={request.Id}) not found.");
         //}
 
         //if (!cat.isEnabled) return Unit.Value; // idempotent
@@ -39,10 +39,10 @@ public sealed class DisableTreatmentsCommandHandler(IAppDbContext ctx)
 
 
 
-        //Ovo radi ovo gore ne radi fazon je sto gore ima provjeravanje npr ako deaktiviras kategoriju
-        //koja ima aktivne medicinne nece dozvoliti deaktivaciju iako sam sad to probao na MedicineCategory i opet ne radi
-        //Vjerovatno ne zeli da radi kako treba zato sto ipak postoji child(Medicine) iako nisu aktivni
-        //Druga opcija jest da FK u bazi nisu ispravno postavljeni za Medicinu i Kategorije
+        //This works, the code above does not – the code above checks e.g. when you deactivate a category
+        //that has active medicines it won't allow the deactivation, but I just tried it on MedicineCategory and it still doesn't work
+        //Probably it doesn't work as intended because a child (Medicine) still exists even though it is not active
+        //Another possibility is that the foreign keys for Medicine and Categories are not set up correctly in the database
         var trea = await ctx.Treatments.FirstOrDefaultAsync(x => x.Id == request.Id, ct);
         if (trea == null) return Unit.Value;
 

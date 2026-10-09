@@ -17,7 +17,7 @@ export class FavouritesService {
 
   /**
    * GET /Cart
-   * Dohvati cijelu korpu trenutnog korisnika
+   * Get the whole cart of the current user
    */
   getFavourites(): Observable<FavouritesDto[]> {
     return this.http.get<FavouritesDto[]>(this.baseUrl);
@@ -25,7 +25,7 @@ export class FavouritesService {
 
   /**
    * POST /Cart
-   * Dodaj stavku u korpu
+   * Add an item to the cart
    */
   addToFavourites(command: AddToFavouritesCommand): Observable<{ favouriteId: number }> {
     return this.http.post<{ favouriteId: number }>(`${this.baseUrl}`, command);
@@ -34,7 +34,7 @@ export class FavouritesService {
 
   /**
    * DELETE /Cart/{id}
-   * Ukloni stavku iz korpe
+   * Remove an item from the cart
    */
   deleteFavourites(id: number): Observable<void> {
   return this.http.delete<void>(`${this.baseUrl}/${id}`);

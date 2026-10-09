@@ -1,7 +1,7 @@
 ﻿namespace MediCare.Infrastructure.Models
 {
     /// <summary>
-    /// Elasticsearch document za Full-Text Search
+    /// Elasticsearch document for full-text search
     /// </summary>
     public class MedicineDocument
     {

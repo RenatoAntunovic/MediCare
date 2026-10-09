@@ -92,10 +92,10 @@ const payload: RegisterCommand = {
  this.authService.register(payload).subscribe({
       next: (res) => {
         this.isLoading = false;
-        // Prikaz poruke uspješne registracije
+        // Show the registration success message
         this.toaster.success('Registracija uspješna! Možete se sada prijaviti.');
         
-        // Automatski redirect na login stranicu
+        // Automatically redirect to the login page
        this.router.navigate(['/auth/login']);
       },
       error: (err) => {

@@ -5,15 +5,15 @@ using System.Runtime.CompilerServices;
 namespace MediCare.Infrastructure.Database.Seeders;
 
 /// <summary>
-/// Dynamic seeder koji se pokreće u runtime-u,
-/// obično pri startu aplikacije (npr. u Program.cs).
-/// Koristi se za unos demo/test podataka koji nisu dio migracije.
+/// Dynamic seeder that runs at runtime,
+/// usually when the application starts (e.g. in Program.cs).
+/// Used to insert demo/test data that is not part of the migrations.
 /// </summary>
 public static class DynamicDataSeeder
 {
     public static async Task SeedAsync(DatabaseContext context)
     {
-        // Osiguraj da baza postoji (bez migracija)
+        // Make sure the database exists (without migrations)
         await context.Database.EnsureCreatedAsync();
 
         await SeedRolesAsync(context);
@@ -342,14 +342,14 @@ public static class DynamicDataSeeder
     public static async Task SeedOrderAndItemsAsync(DatabaseContext context)
     {
         if (await context.Orders.AnyAsync())
-            return; // seed je već pokrenut
+            return; // seed has already run
 
-        // 1️⃣ Kreiramo ordere s itemima
+        // 1️⃣ Create orders with items
         var orders = new List<Orders>
         {
             new Orders
             {
-                UserId = 1, // mora postojati u Users
+                UserId = 1, // must exist in Users
                 OrderDate = new DateTime(2025, 11, 5),
                 OrderStatusId = 1, // Pending
                 OrderItems = new List<OrderItems>
@@ -381,13 +381,13 @@ public static class DynamicDataSeeder
             },
         };
 
-        // 2️⃣ Automatski računamo TotalPrice za svaki order
+        // 2️⃣ Calculate TotalPrice for each order
         foreach (var order in orders)
         {
             order.TotalPrice = order.OrderItems.Sum(i => i.Price * i.Quantity);
         }
 
-        // 3️⃣ Dodajemo u bazu
+        // 3️⃣ Add to the database
         context.Orders.AddRange(orders);
         await context.SaveChangesAsync();
 
@@ -583,7 +583,7 @@ public static class DynamicDataSeeder
                     Price = 50.00m,
                     Description = "Dijabetes i zljezde.",
                     ImagePath = "/images/Endokrinologija.jpg",
-                    TreatmentCategoryId = 1, // pretpostavljamo da postoji kategorija sa Id = 1
+                    TreatmentCategoryId = 1, // assumes a category with Id = 1 exists
                     isEnabled = true
                 },
                 new Treatments
@@ -592,7 +592,7 @@ public static class DynamicDataSeeder
                     Price = 80.00m,
                     Description = "Zenski reproduktivni organi",
                     ImagePath = "/images/Ginekologija.jfif",
-                    TreatmentCategoryId = 2, // pretpostavljamo da postoji kategorija sa Id = 2
+                    TreatmentCategoryId = 2, // assumes a category with Id = 2 exists
                     isEnabled = true
                 }
             );
@@ -611,7 +611,7 @@ public static class DynamicDataSeeder
                     Name = "Brufen",
                     Price = 5.50m,
                     Description = "Pain reliever and anti-inflammatory medication.",
-                    MedicineCategoryId = 1, // pretpostavljamo da postoji kategorija sa Id = 1
+                    MedicineCategoryId = 1, // assumes a category with Id = 1 exists
                     ImagePath = "/images/Brufen.png",
                     Weight = 200, // mg
                     isEnabled = true
@@ -647,19 +647,19 @@ public static class DynamicDataSeeder
         if (await context.Orders.AnyAsync())
             return;
 
-        // Dohvati korisnike koji postoje
+        // Get existing users
         var userAdmin = await context.Users.FirstAsync(u => u.Email == "admin@market.com");
         var userManager = await context.Users.FirstAsync(u => u.Email == "manager@market.local");
 
-        // Dohvati statuse narudžbi
+        // Get order statuses
         var statusPending = await context.OrderStatus.FirstAsync(s => s.StatusName == "DRAFT");
         var statusProcessing = await context.OrderStatus.FirstAsync(s => s.StatusName == "CONFIRMED");
-        // Dohvati lijekove
+        // Get medicines
         var medBrufen = await context.Medicine.FirstAsync(m => m.Name == "Brufen");
         var medAspirin = await context.Medicine.FirstAsync(m => m.Name == "Aspirin");
         var medParacetamol = await context.Medicine.FirstAsync(m => m.Name == "Paracetamol");
 
-        // Kreiraj narudžbe
+        // Create orders
         var orders = new List<Orders>
     {
         new Orders
@@ -685,13 +685,13 @@ public static class DynamicDataSeeder
         }
     };
 
-        // Izračunaj ukupnu cijenu za svaku narudžbu
+        // Calculate the total price for each order
         foreach (var order in orders)
         {
             order.TotalPrice = order.OrderItems.Sum(i => i.Price);
         }
 
-        // Dodaj u kontekst i snimi
+        // Add to the context and save
         context.Orders.AddRange(orders);
         await context.SaveChangesAsync();
 

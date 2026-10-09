@@ -52,7 +52,7 @@ public class UpdateOrderCommandHandler(IAppDbContext db, IAppCurrentUser current
 
             if (existingItem == null)
             {
-                // Novi item
+                // New item
                 var newItem = new OrderItems
                 {
                     Order = order,
@@ -65,7 +65,7 @@ public class UpdateOrderCommandHandler(IAppDbContext db, IAppCurrentUser current
             }
             else
             {
-                // Update postojeće stavke
+                // Update the existing item
                 existingItem.Quantity = item.Quantity;
                 existingItem.SetPriceFromMedicine();
                 order.TotalPrice += existingItem.Price;
