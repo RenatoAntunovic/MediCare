@@ -21,6 +21,7 @@ public class NotificationsController(
 
     // POST api/notifications/test – sends a test notification to yourself
     [HttpPost("test")]
+    [EnableRateLimiting("notifications")]
     public async Task<IActionResult> SendTest(CancellationToken ct)
     {
         await push.SendToUserAsync(currentUser.UserId!.Value,

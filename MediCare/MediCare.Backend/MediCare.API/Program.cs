@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.StaticFiles;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using MediCare.API.Notifications;
+using System.Security.Claims;
+using System.Threading.RateLimiting;
 
 
 public partial class Program
@@ -59,35 +61,90 @@ public partial class Program
             {
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-                options.AddFixedWindowLimiter("default", limiter =>
-                {
-                    limiter.PermitLimit = 100;
-                    limiter.Window = TimeSpan.FromMinutes(1);
-                    limiter.QueueLimit = 0;
-                });
+                // Every limit is counted PER CLIENT (logged-in user, otherwise IP address),
+                // so one client hitting the limit never blocks everybody else.
+                static string ClientKey(HttpContext ctx) =>
+                    ctx.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? ctx.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown";
 
-                options.AddFixedWindowLimiter("login", limiter =>
-                {
-                    limiter.PermitLimit = 5;
-                    limiter.Window = TimeSpan.FromMinutes(1);
-                    limiter.QueueLimit = 0;
-                });
+                static RateLimitPartition<string> PerClient(HttpContext ctx, int permitLimit, TimeSpan window) =>
+                    RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = permitLimit,
+                        Window = window,
+                        QueueLimit = 0
+                    });
 
-                options.AddFixedWindowLimiter("search", limiter =>
+                // Global limit for the whole API: 200 requests per minute per client
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
+                    RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 200,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0
+                    }));
+
+                // Login: 5 attempts per minute per IP address (brute-force protection)
+                options.AddPolicy("login", ctx =>
+                    RateLimitPartition.GetFixedWindowLimiter(ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0
+                        }));
+
+                // Search: 10 requests per 10 seconds per client
+                options.AddPolicy("search", ctx =>
+                    RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 10,
+                        Window = TimeSpan.FromSeconds(10),
+                        QueueLimit = 0
+                    }));
+
+                // Register: 3 new accounts per 10 minutes per IP address (fake account spam)
+                options.AddPolicy("register", ctx =>
+                    RateLimitPartition.GetFixedWindowLimiter(ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 3,
+                            Window = TimeSpan.FromMinutes(10),
+                            QueueLimit = 0
+                        }));
+
+                // Checkout and reservations: 5 per minute per user (order / booking spam)
+                options.AddPolicy("orders", ctx => PerClient(ctx, 5, TimeSpan.FromMinutes(1)));
+
+                // PDF generation is expensive: 10 per minute per user
+                options.AddPolicy("reports", ctx => PerClient(ctx, 10, TimeSpan.FromMinutes(1)));
+
+                // Test notifications: 5 per minute per user
+                options.AddPolicy("notifications", ctx => PerClient(ctx, 5, TimeSpan.FromMinutes(1)));
+
+                // Tell the client how long to wait and return a readable message
+                options.OnRejected = async (context, ct) =>
                 {
-                    limiter.PermitLimit = 2;
-                    limiter.Window = TimeSpan.FromSeconds(5);
-                    limiter.QueueLimit = 0;
-                });
+                    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                        context.HttpContext.Response.Headers.RetryAfter =
+                            ((int)Math.Ceiling(retryAfter.TotalSeconds)).ToString();
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(new
+                    {
+                        code = "rate.limit",
+                        message = "Previše zahtjeva. Sačekajte malo pa pokušajte ponovo."
+                    }, ct);
+                };
             });
-
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAngularDev",
                     policy =>
                     {
                         policy.WithOrigins("http://localhost:4200")
-                        .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+                              .AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+                              .WithExposedHeaders("Retry-After"); // lets the frontend read how long to wait
                     });
             });
 

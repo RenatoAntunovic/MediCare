@@ -76,6 +76,7 @@ public class OrdersController : ControllerBase
     // =========================================================
     [HttpGet("{id:int}/pdf")]
     [Authorize]
+    [EnableRateLimiting("reports")]
     public async Task<IActionResult> GeneratePdf(int id, CancellationToken ct)
     {
         var order = await _sender.Send(new GetOrderByIdQuery { Id = id }, ct);
@@ -90,6 +91,7 @@ public class OrdersController : ControllerBase
     // =========================================================
     [HttpGet("report/pdf")]
     [Authorize(Roles = "Admin")]
+    [EnableRateLimiting("reports")]
     public async Task<IActionResult> GenerateReportPdf([FromQuery] OrdersReportQuery query, CancellationToken ct)
     {
         var report = await _sender.Send(query, ct);

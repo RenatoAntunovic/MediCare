@@ -25,6 +25,7 @@ namespace MediCare.API.Controllers
 
         // POST /api/reservations
         [HttpPost]
+        [EnableRateLimiting("orders")]
         public async Task<IActionResult> CreateReservation([FromBody] CreateReservationCommand command, CancellationToken ct)
         {
             command.UserId = GetUserId();

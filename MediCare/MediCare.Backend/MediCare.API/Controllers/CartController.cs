@@ -84,6 +84,7 @@ namespace MediCare.API.Controllers
         }
 
         [HttpPost("checkout")]
+        [EnableRateLimiting("orders")]
         public async Task<IActionResult> Checkout(CancellationToken ct)
         {
             var userId = int.Parse(
