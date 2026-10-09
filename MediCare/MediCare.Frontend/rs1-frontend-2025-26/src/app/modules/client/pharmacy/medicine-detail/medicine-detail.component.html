@@ -57,11 +57,15 @@
         <!-- Quantity -->
         <mat-form-field appearance="outline" class="quantity-field" subscriptSizing="dynamic">
           <mat-label>Količina</mat-label>
-          <input matInput type="number" min="1" [(ngModel)]="quantity" />
+          <input matInput type="number" min="1" max="100" [formControl]="quantityControl" />
+          <mat-error *ngIf="quantityControl.hasError('required')">Unesite količinu</mat-error>
+          <mat-error *ngIf="quantityControl.hasError('min')">Najmanje 1</mat-error>
+          <mat-error *ngIf="quantityControl.hasError('max')">Najviše 100</mat-error>
         </mat-form-field>
 
         <!-- Add to cart -->
-        <button mat-flat-button color="primary" type="button" class="mc-detail__cta" (click)="addToCart()">
+               <button mat-flat-button color="primary" type="button" class="mc-detail__cta"
+                [disabled]="quantityControl.invalid" (click)="addToCart()">
           <mat-icon>shopping_cart</mat-icon>
           Dodaj u korpu
         </button>
