@@ -21,7 +21,7 @@ export class CurrentUserService {
   /** Pravilo: admin > ostali → client */
   getDefaultRoute(): string {
     const user = this.snapshot;
-    if (!user) return '/login';
+    if (!user) return '/auth/login';
 
     if (user.isAdmin) return '/admin';
     return '/client';

@@ -4,6 +4,7 @@ import { AuthService } from '../../../api-services/auth/register-api.service';
 import { RegisterCommand } from '../../../api-services/auth/register-api.model';
 import { Router } from '@angular/router';
 import { ToasterService } from '../../../core/services/toaster.service';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-register',
@@ -83,21 +84,10 @@ const payload: RegisterCommand = {
   phoneNumber: this.form.value.phoneNumber,
   address: this.form.value.address,
   city: this.form.value.city,
-  dateOfBirth: this.form.value.dateOfBirth
-    .toISOString()
-    .split('T')[0]
+  dateOfBirth: formatDate(this.form.value.dateOfBirth, 'yyyy-MM-dd', 'en')
 };
 
-fetch('https://localhost:7260/api/auth/register', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(payload)
-})
-.then(res => res.json())
-.then(data => console.log('Fetch test response:', data))
-.catch(err => console.error('Fetch test error:', err));
+
 
  this.authService.register(payload).subscribe({
       next: (res) => {
@@ -106,7 +96,7 @@ fetch('https://localhost:7260/api/auth/register', {
         this.toaster.success('Registracija uspješna! Možete se sada prijaviti.');
         
         // Automatski redirect na login stranicu
-        this.router.navigate(['/login']);
+       this.router.navigate(['/auth/login']);
       },
       error: (err) => {
         this.isLoading = false;

@@ -12,10 +12,10 @@ import {
 import { MedicineCategoryUpsertComponent } from './medicine-category-upsert/medicine-category-upsert.component';
 
 @Component({
-  selector: 'app-Medicine-categories',
+  selector: 'app-medicine-categories',
   standalone: false,
-  templateUrl: './Medicine-categories.component.html',
-  styleUrl: './Medicine-categories.component.scss',
+  templateUrl: './medicine-categories.component.html',
+  styleUrl: './medicine-categories.component.scss',
 })
 export class MedicineCategoriesComponent
   extends BaseListPagedComponent<ListMedicineCategoriesQueryDto, ListMedicineCategoriesRequest>

@@ -127,7 +127,7 @@ login(payload: LoginCommand): Observable<CurrentUserDto> {
    */
   redirectToLogin(): void {
     this.clearUserState();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth/login']);
   }
 
   // =========================================================
