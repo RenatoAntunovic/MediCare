@@ -7,6 +7,7 @@ using MediCare.Application.Modules.Sales.Orders.Queries.GetById;
 using MediCare.Application.Modules.Sales.Orders.Queries.List;
 using MediCare.Application.Modules.Sales.Orders.Queries.ListWithItems;
 using MediCare.Application.Modules.Sales.Orders.Queries.Report;
+using MediCare.Application.Modules.Sales.Orders.Queries.MyReport;
 
 
 namespace Market.API.Controllers;
@@ -98,5 +99,19 @@ public class OrdersController : ControllerBase
         var bytes = OrderPdfBuilder.BuildOrdersReportPdf(report);
 
         return File(bytes, "application/pdf", $"Izvjestaj_narudzbi_{DateTime.Now:yyyyMMdd_HHmm}.pdf");
+    }
+
+    // =========================================================
+    // PDF – client report of their own orders
+    // GET /Orders/my-report/pdf?from=2026-01-01&to=2026-01-31&statusId=4&includeItems=true
+    // =========================================================
+    [HttpGet("my-report/pdf")]
+    [EnableRateLimiting("reports")]
+    public async Task<IActionResult> GenerateMyReportPdf([FromQuery] MyOrdersReportQuery query, CancellationToken ct)
+    {
+        var report = await _sender.Send(query, ct);
+        var bytes = OrderPdfBuilder.BuildMyOrdersReportPdf(report);
+
+        return File(bytes, "application/pdf", $"Moje_narudzbe_{DateTime.Now:yyyyMMdd_HHmm}.pdf");
     }
 }

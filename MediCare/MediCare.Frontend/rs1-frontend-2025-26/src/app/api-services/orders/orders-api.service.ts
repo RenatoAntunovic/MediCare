@@ -20,6 +20,11 @@ export interface OrdersReportParams {
   statusId?: number | null;
 }
 
+/** Parameters for the client "My orders" PDF report. */
+export interface MyOrdersReportParams extends OrdersReportParams {
+  includeItems: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -89,5 +94,17 @@ export class OrdersApiService {
     if (p.statusId) params = params.set('statusId', p.statusId);
 
     return this.http.get(`${this.baseUrl}/report/pdf`, { params, responseType: 'blob' });
+  }
+
+    /**
+   * GET /Orders/my-report/pdf?from=...&to=...&statusId=...&includeItems=... – client report of own orders
+   */
+  downloadMyReportPdf(p: MyOrdersReportParams): Observable<Blob> {
+    let params = new HttpParams().set('includeItems', p.includeItems);
+    if (p.from) params = params.set('from', p.from);
+    if (p.to) params = params.set('to', p.to);
+    if (p.statusId) params = params.set('statusId', p.statusId);
+
+    return this.http.get(`${this.baseUrl}/my-report/pdf`, { params, responseType: 'blob' });
   }
 }

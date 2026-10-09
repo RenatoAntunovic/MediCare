@@ -1,6 +1,11 @@
 <div class="mc-page">
   <header class="mc-page-header">
     <h1 class="mc-page-header__title">{{ 'ORDERS.TITLE' | translate }}</h1>
+
+    <button mat-flat-button color="primary" type="button" (click)="openReportDialog()">
+      <mat-icon>picture_as_pdf</mat-icon>
+      PDF izvještaj
+    </button>
   </header>
 
   <!-- Skeleton loader -->
