@@ -94,23 +94,6 @@ checkout(): void {
   });
 }
 
-
-
-
-  updateQuantity(cartItem: CartItemDto, newQuantity: number): void {
-    if (newQuantity <= 0) return;
-    this.quantities[cartItem.medicineId] = newQuantity;
-    // opcionalno: update backenda odmah
-    const command: AddToCartCommand = {
-      medicineId: cartItem.medicineId,
-      quantity: newQuantity
-    };
-    this.api.addToCart(command).subscribe({
-      next: () => this.toaster.success('Quantity updated'),
-      error: () => this.toaster.error('Failed to update quantity')
-    });
-  }
-
 removeItem(cartItem: any): void {
   const command: DeleteCartItemCommand = { id: cartItem.cartItemId }; // <--- koristimo cartItemId
   this.api.deleteCartItem(command.id).subscribe({
@@ -122,7 +105,4 @@ removeItem(cartItem: any): void {
   });
 }
 
-  getTotal(cartItem: CartItemDto): number {
-    return (this.quantities[cartItem.medicineId] || cartItem.quantity) * cartItem.price;
-  }
 }
