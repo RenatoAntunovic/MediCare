@@ -40,3 +40,10 @@ export interface CheckoutOrderResponseDto {
   orderId: number;
   totalPrice: number;
 }
+
+/** Response of PUT /Cart/items/{id} – the updated row */
+export interface SetCartItemQuantityResultDto {
+  cartItemId: number;
+  quantity: number;
+  price: number; // new line total
+}

@@ -6,6 +6,7 @@ using MediCare.Application.Modules.Cart.Command.Checkout;
 using MediCare.Application.Modules.Cart.Command.Delete;
 using MediCare.Application.Modules.Cart.Queries;
 using MediCare.Application.Abstractions;
+using MediCare.Application.Modules.Cart.Command.SetQuantity;
 
 namespace MediCare.API.Controllers
 {
@@ -45,6 +46,15 @@ namespace MediCare.API.Controllers
         {
             await _mediator.Send(new DeleteCartItemCommand { Id = id });
             return NoContent();
+        }
+
+        // PUT /api/cart/items/{id} – set the quantity of one cart item
+        [HttpPut("items/{id}")]
+        public async Task<ActionResult<SetCartItemQuantityResultDto>> SetQuantity(
+            int id, [FromBody] SetCartItemQuantityCommand command, CancellationToken ct)
+        {
+            command.CartItemId = id;
+            return Ok(await _mediator.Send(command, ct));
         }
 
         [Authorize]

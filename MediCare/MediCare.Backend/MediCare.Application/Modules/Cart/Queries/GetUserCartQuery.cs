@@ -20,7 +20,7 @@ namespace MediCare.Application.Modules.Cart.Queries
     {
         public int CartItemId { get; set; }
         public int MedicineId { get; set; }
-        public string Name { get; set; }
+        public string MedicineName { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public string ImagePath { get; set; }

@@ -36,7 +36,7 @@ namespace MediCare.Application.Modules.Cart.Queries
                 {
                     CartItemId = ci.Id,
                     MedicineId = ci.MedicineId,
-                    Name = ci.Medicine.Name,
+                    MedicineName = ci.Medicine.Name,
                     Quantity = ci.Quantity,
                     Price = ci.Price,
                     ImagePath = ci.Medicine.ImagePath

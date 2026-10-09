@@ -30,7 +30,8 @@ export class CartComponent extends BaseListPagedComponent<CartItemDto, any> impl
     'actions'
   ];
 
-  quantities: { [medicineId: number]: number } = {};
+    /** Cart item whose quantity is being saved (its buttons are disabled meanwhile) */
+  updatingItemId: number | null = null;
 
   constructor() {
     super();
@@ -45,13 +46,7 @@ export class CartComponent extends BaseListPagedComponent<CartItemDto, any> impl
     this.startLoading();
     this.api.getUserCart().subscribe({
       next: (res: UserCartDto) => {
-         console.log('Cart items from backend:', res.items);
         this.items = res.items;
-
-        // initialize quantities
-        this.items.forEach(item => {
-          this.quantities[item.medicineId] = item.quantity;
-        });
 
         this.stopLoading();
       },
@@ -83,7 +78,6 @@ checkout(): void {
 
       this.toaster.success(`Order placed! Order ID: ${res.orderId}`);
       this.items = [];
-      this.quantities = {};
       this.isCheckingOut = false;
     },
     error: (err) => {
@@ -103,5 +97,26 @@ removeItem(cartItem: any): void {
     error: () => this.toaster.error('Failed to remove item')
   });
 }
+
+  /** − / + buttons: change the quantity by one and update the row with the server's result */
+  changeQuantity(item: CartItemDto, delta: number): void {
+    const newQuantity = item.quantity + delta;
+    if (newQuantity < 1 || newQuantity > 100 || this.updatingItemId !== null) return;
+
+    this.updatingItemId = item.cartItemId;
+
+    this.api.setQuantity(item.cartItemId, newQuantity).subscribe({
+      next: result => {
+        item.quantity = result.quantity;
+        item.price = result.price;
+        this.updatingItemId = null;
+      },
+      error: err => {
+        this.updatingItemId = null;
+        if (err.status === 429) return; // message already shown by the rate-limit interceptor
+        this.toaster.error(err.error?.message || 'Greška pri promjeni količine');
+      }
+    });
+  }
 
 }

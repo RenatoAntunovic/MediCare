@@ -9,7 +9,8 @@ import {
   AddFromFavouritesDto,
   AddFromForLaterDto,
   DeleteCartItemCommand,
-  CheckoutOrderResponseDto
+  CheckoutOrderResponseDto,
+  SetCartItemQuantityResultDto
 } from './carts-api.model';
 import { AuthApiService } from '../auth/auth-api.service';
 
@@ -51,6 +52,13 @@ export class CartsApiService {
    */
   deleteCartItem(id: number): Observable<void> {
   return this.http.delete<void>(`${this.baseUrl}/items/${id}`);
+  }
+
+    /**
+   * PUT /Cart/items/{id} – set the quantity of one item (not add to it)
+   */
+  setQuantity(cartItemId: number, quantity: number): Observable<SetCartItemQuantityResultDto> {
+    return this.http.put<SetCartItemQuantityResultDto>(`${this.baseUrl}/items/${cartItemId}`, { quantity });
   }
 
 checkout() {

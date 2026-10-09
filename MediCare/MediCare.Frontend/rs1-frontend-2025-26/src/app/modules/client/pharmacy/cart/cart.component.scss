@@ -1,1 +1,66 @@
-// Styles for this page live in the global design system: src/styles/_pages.scss
+// Name, unit price and quantity stacked under each other
+.mc-cart-item__info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+
+  .mc-list__meta {
+    margin-top: 0;
+    font-size: 0.9375rem;
+  }
+}
+
+// Quantity stepper: ( −  4  + )
+.mc-qty {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  margin-top: 2px;
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-border-strong);
+  border-radius: 999px;
+
+  &.is-busy .mc-qty__value { opacity: 0.45; } // saving…
+}
+
+.mc-qty__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--mc-primary);
+  cursor: pointer;
+  transition: background var(--mc-dur) var(--mc-ease), color var(--mc-dur) var(--mc-ease);
+
+  mat-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+  }
+
+  &:hover:not(:disabled) { background: var(--mc-primary-tint); }
+  &:focus-visible { outline: 3px solid var(--mc-focus); outline-offset: 1px; }
+
+  &:disabled {
+    color: var(--mc-text-muted);
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.mc-qty__value {
+  min-width: 3ch;
+  text-align: center;
+  color: var(--mc-text);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums; // digits don't "jump" when the number changes
+  transition: opacity var(--mc-dur) var(--mc-ease);
+}
