@@ -10,6 +10,7 @@ namespace MediCare.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize(Roles = "Admin")]
 public class TreatmentCategoriesController(ISender sender) : ControllerBase
 {
     [HttpPost]
@@ -37,6 +38,7 @@ public class TreatmentCategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<GetTreatmentCategoryByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         var category = await sender.Send(new GetTreatmentCategoryByIdQuery { Id = id }, ct);
@@ -44,6 +46,7 @@ public class TreatmentCategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<PageResult<ListTreatmentCategoriesQueryDto>> List([FromQuery] ListTreatmentCategoriesQuery query, CancellationToken ct)
     {
         var result = await sender.Send(query, ct);

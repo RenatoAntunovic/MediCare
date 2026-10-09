@@ -12,6 +12,7 @@ namespace MediCare.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly IMediator _mediator;

@@ -15,6 +15,7 @@ namespace Market.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class OrdersController : ControllerBase
 {
     private readonly ISender _sender;
@@ -27,6 +28,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<int>> Create(CreateOrderCommand command, CancellationToken ct)
     {
         int id = await _sender.Send(command, ct);
@@ -44,6 +46,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task Update(int id, UpdateOrderCommand command, CancellationToken ct)
     {
         command.Id = id;
