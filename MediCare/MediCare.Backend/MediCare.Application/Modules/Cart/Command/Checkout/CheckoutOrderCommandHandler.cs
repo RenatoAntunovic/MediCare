@@ -20,7 +20,13 @@ public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,
                .FirstOrDefaultAsync(c => c.UserId == command.UserId, cancellationToken);
 
         if (cart == null || !cart.CartItems.Any())
-            throw new Exception("Korpa je prazna");
+            throw new MediCareBusinessRuleException("cart.empty", "The cart is empty.");
+
+        // Don't allow ordering medicines that were disabled after being added to the cart
+        var disabled = cart.CartItems.Where(ci => !ci.Medicine.isEnabled).Select(ci => ci.Medicine.Name).ToList();
+        if (disabled.Count > 0)
+            throw new MediCareBusinessRuleException("cart.disabled-items",
+                $"These medicines are no longer available: {string.Join(", ", disabled)}");
 
         // Kreiraj narudžbu
         var order = new Orders

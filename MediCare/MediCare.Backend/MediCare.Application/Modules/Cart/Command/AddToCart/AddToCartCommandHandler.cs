@@ -40,8 +40,13 @@ namespace MediCare.Application.Modules.Cart.Command.AddToCart
             }
 
             // 2️⃣ Nađi medicine
+            // 2) Find the medicine: missing → 404, disabled → 409
             var medicine = await _context.Medicine
-                .FirstAsync(x => x.Id == request.MedicineId, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.MedicineId, cancellationToken)
+                ?? throw new MediCareNotFoundException($"Medicine with Id {request.MedicineId} not found.");
+
+            if (!medicine.isEnabled)
+                throw new MediCareBusinessRuleException("medicine.disabled", "This medicine is currently unavailable.");
 
             // 3️⃣ Provjeri postoji li već item
             var cartItem = await _context.CartItems

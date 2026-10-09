@@ -673,8 +673,8 @@ public static class DynamicDataSeeder
             OrderDate = new DateTime(2025, 11, 5),
             OrderItems = new List<OrderItems>
             {
-                new OrderItems { MedicineId = medBrufen.Id, Quantity = 2, Price = 10.5m },
-                new OrderItems { MedicineId = medAspirin.Id, Quantity = 1, Price = 20m }
+                new OrderItems { MedicineId = medBrufen.Id, Quantity = 2, Price = medBrufen.Price * 2 },
+                new OrderItems { MedicineId = medAspirin.Id, Quantity = 1, Price = medAspirin.Price * 1 }
             }
         },
         new Orders
@@ -684,7 +684,7 @@ public static class DynamicDataSeeder
             OrderDate = new DateTime(2025, 11, 6),
             OrderItems = new List<OrderItems>
             {
-                new OrderItems { MedicineId = medParacetamol.Id, Quantity = 3, Price = 15m }
+                new OrderItems { MedicineId = medParacetamol.Id, Quantity = 3, Price = medParacetamol.Price * 3 }
             }
         }
     };
@@ -692,7 +692,7 @@ public static class DynamicDataSeeder
         // Izračunaj ukupnu cijenu za svaku narudžbu
         foreach (var order in orders)
         {
-            order.TotalPrice = order.OrderItems.Sum(i => i.Quantity * i.Price);
+            order.TotalPrice = order.OrderItems.Sum(i => i.Price);
         }
 
         // Dodaj u kontekst i snimi
