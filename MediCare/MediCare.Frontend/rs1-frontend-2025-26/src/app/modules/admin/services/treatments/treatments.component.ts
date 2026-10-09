@@ -11,7 +11,7 @@ import { BaseListPagedComponent } from '../../../../core/components/base-classes
 import { ToasterService } from '../../../../core/services/toaster.service';
 import { DialogHelperService } from '../../../shared/services/dialog-helper.service';
 import { DialogButton } from '../../../shared/models/dialog-config.model';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
@@ -44,15 +44,20 @@ export class TreatmentComponent
   constructor() {
     super();
     this.request = new ListTreatmentsRequest();
-    console.log('ADMIN TREATMENT COMPONENT');
   }
 
-    ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-    } 
 
   ngOnInit(): void {
     this.initList();
+  }
+
+  
+  /** Column header clicked → sort ALL rows on the server and go back to page 1 */
+  onSortChange(sort: Sort): void {
+    this.request.sortBy = sort.direction ? sort.active : null;
+    this.request.sortDirection = sort.direction || null;
+    this.request.paging.page = 1;
+    this.loadPagedData();
   }
 
   protected loadPagedData(): void {
