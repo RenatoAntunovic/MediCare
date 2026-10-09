@@ -12,7 +12,10 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
-using Microsoft.AspNetCore.StaticFiles; 
+using Microsoft.AspNetCore.StaticFiles;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using MediCare.API.Notifications;
 
 
 public partial class Program
@@ -89,6 +92,27 @@ public partial class Program
             });
 
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+            // ---------------------------------------------------------
+            // PUSH NOTIFICATIONS (Firebase Cloud Messaging)
+            // The key file is NOT in git. Without it the app runs normally, notifications are skipped.
+            // ---------------------------------------------------------
+            var firebaseKeyPath = Path.Combine(
+                builder.Environment.ContentRootPath,
+                builder.Configuration["Firebase:CredentialsPath"] ?? "firebase-adminsdk.json");
+
+            if (File.Exists(firebaseKeyPath))
+            {
+                FirebaseApp.Create(new AppOptions { Credential = GoogleCredential.FromFile(firebaseKeyPath) });
+                builder.Services.AddScoped<IPushNotificationService, FirebasePushNotificationService>();
+                Log.Information("Firebase push notifications enabled.");
+            }
+            else
+            {
+                builder.Services.AddScoped<IPushNotificationService, NoOpPushNotificationService>();
+                Log.Warning("firebase-adminsdk.json not found – push notifications are disabled.");
+            }
+
             builder.Services.AddHttpClient();
 
             // ---------------------------------------------------------

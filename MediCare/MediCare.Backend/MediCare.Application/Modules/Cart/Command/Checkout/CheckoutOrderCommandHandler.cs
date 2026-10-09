@@ -3,16 +3,18 @@
 public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,CheckoutOrderResponseDto>
 {
     private readonly IAppDbContext _context;
+    private readonly IPushNotificationService _push;
 
-    public CheckoutOrderCommandHandler(IAppDbContext context)
+    public CheckoutOrderCommandHandler(IAppDbContext context, IPushNotificationService push)
     {
         _context = context;
+        _push = push;
     }
 
     public async Task<CheckoutOrderResponseDto> Handle(CheckoutOrderCommand command,CancellationToken cancellationToken)
     {
         Console.WriteLine($"CHECKOUT command.UserId: {command.UserId}");
-        // Dohvati korpu
+        // Get cart
         var cart = await _context.Carts
                .Include(c => c.CartItems)
                .ThenInclude(ci => ci.Medicine)
@@ -27,7 +29,7 @@ public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,
             throw new MediCareBusinessRuleException("cart.disabled-items",
                 $"These medicines are no longer available: {string.Join(", ", disabled)}");
 
-        // Kreiraj narudžbu
+        // Create order
         var order = new Orders
         {
             UserId = command.UserId,
@@ -58,7 +60,12 @@ public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,
         _context.CartItems.RemoveRange(cart.CartItems);
         await _context.SaveChangesAsync(cancellationToken);
 
-        // Vrati response DTO
+        await _push.SendToUserAsync(command.UserId,
+           "Narudžba zaprimljena",
+           $"Vaša narudžba #{order.Id} u iznosu od {order.TotalPrice:0.00} KM je zaprimljena.",
+           cancellationToken);
+
+        // Return response DTO
         return new CheckoutOrderResponseDto
         {
             OrderId = order.Id,

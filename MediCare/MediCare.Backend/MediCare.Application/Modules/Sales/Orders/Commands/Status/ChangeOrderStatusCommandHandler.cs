@@ -1,6 +1,7 @@
 ﻿using MediCare.Application.Modules.Sales.Orders.Commands.Status;
+using MediCare.Application.Modules.Notifications;
 
-public class ChangeOrderStatusCommandHandler(IAppDbContext db)
+public class ChangeOrderStatusCommandHandler(IAppDbContext db, IPushNotificationService push)
     : IRequestHandler<ChangeOrderStatusCommand>
 {
     public async Task Handle(ChangeOrderStatusCommand request, CancellationToken ct)
@@ -18,6 +19,11 @@ public class ChangeOrderStatusCommandHandler(IAppDbContext db)
         order.OrderStatus = newStatus;
 
         await db.SaveChangesAsync(ct);
+
+        await push.SendToUserAsync(order.UserId,
+            "Status narudžbe promijenjen",
+            $"Narudžba #{order.Id} je {StatusLabels.ToBosnian(newStatus.StatusName)}.",
+            ct);
     }
 
 
