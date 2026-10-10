@@ -43,7 +43,6 @@ export class FavouritesComponent extends BaseListPagedComponent<FavouritesDto, a
     this.startLoading();
     this.api.getFavourites().subscribe({
       next: (res: FavouritesDto[]) => {
-        console.log('Favourite items from backend:', res);
         this.items = res;
         this.stopLoading();
       },

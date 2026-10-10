@@ -54,7 +54,6 @@ protected loadPagedData(): void {
 
   this.api.list(this.request).subscribe({
     next: (response) => {
-      console.log('Categories:', response.items);
       this.items = response.items;
       this.stopLoading();
     },

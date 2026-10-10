@@ -65,10 +65,6 @@ protected save(): void {
     formData.append('ImageFile',this.selectedImage);
   }
 
-  console.log('FormData entries:');
-formData.forEach((value, key) => console.log(key, value));
-
-  console.log('Form data being sent:', formData);
   this.api.create(formData).subscribe({
     next: () => {
       this.stopLoading();

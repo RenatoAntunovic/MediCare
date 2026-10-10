@@ -13,6 +13,7 @@ import {
   ListMedicineCategoriesQueryDto
 } from '../../../../../api-services/medicine-categories/medicine-categories-api.model';
 import {largePaging} from '../../../../../core/models/paging/paging-utils';
+import { apiImageUrl } from '../../../../../core/utils/api-image-url';
 
 
 @Component({
@@ -53,7 +54,7 @@ export class MedicineEditComponent
 
 get currentImageSrc(): string | null {
   if (this.model && this.model.imagePath) {
-    return `https://localhost:7260/${this.model.imagePath}`;
+        return apiImageUrl(this.model.imagePath);
   }
   return null;
 }

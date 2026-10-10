@@ -147,8 +147,6 @@ onStatusFilterChange(status: number | null): void {
     // prevent the button click from bubbling to the <tr> and reopening the dialog
     event?.stopPropagation();
 
-    console.log('Order ID being sent to dialog:', order.id);
-
     const dialogRef = this.dialog.open(OrderDetailsDialogComponent, {
       width: '900px',
       maxWidth: '95vw',
@@ -184,7 +182,6 @@ onStatusFilterChange(status: number | null): void {
 }
 
 private changeOrderStatus(orderId: number, newStatusId: number): void {
-  console.log('Changing order status', { orderId, newStatusId });
   this.startLoading();
 
   this.ordersApi.changeStatus(orderId, newStatusId).subscribe({

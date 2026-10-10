@@ -63,11 +63,8 @@ export class TreatmentComponent
   protected loadPagedData(): void {
     this.startLoading();
 
-console.log(this.items);
-
-this.api.list(this.request).subscribe({
+  this.api.list(this.request).subscribe({
   next: (response) => {
-    console.log('Treatments:', response.items);
     this.items = response.items;
     this.dataSource.data = this.items;
     this.stopLoading();
@@ -76,7 +73,7 @@ this.api.list(this.request).subscribe({
     console.error('Load error:', err);
     this.stopLoading('Failed to load treatments');
   }
-});
+  });
   }
 
   // === UI Actions ===

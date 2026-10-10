@@ -18,7 +18,7 @@
   <ul class="mc-list" *ngIf="!isLoading && !errorMessage && items.length > 0">
     <li class="mc-list__item" *ngFor="let item of items">
       <a class="mc-list__thumb" [routerLink]="['/client/medicine', item.medicineId]" tabindex="-1" aria-hidden="true">
-        <img [src]="'https://localhost:7260/' + item.imagePath" [alt]="item.medicineName" loading="lazy" />
+        <img [src]="item.imagePath | apiImage" [alt]="item.medicineName" loading="lazy" />
       </a>
 
       <div>

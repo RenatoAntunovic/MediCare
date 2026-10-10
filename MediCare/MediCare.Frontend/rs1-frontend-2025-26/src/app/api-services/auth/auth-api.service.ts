@@ -38,7 +38,6 @@ export class AuthApiService {
   setCurrentUserId(id: number) {
     this.currentUserId = id;
     localStorage.setItem('currentUserId', id.toString()); // optional, for reload
-    console.log('User logged in, currentUserId set to:', id);
   }
 
   // get the userId for checkout

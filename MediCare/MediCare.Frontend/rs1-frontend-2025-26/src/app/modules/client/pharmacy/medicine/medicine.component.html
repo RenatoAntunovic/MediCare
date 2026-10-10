@@ -46,7 +46,7 @@
   <ul class="mc-grid" *ngIf="!isLoading && !errorMessage && items.length > 0">
     <li class="mc-product" *ngFor="let medicine of items">
       <div class="mc-product__media">
-        <img [src]="'https://localhost:7260/' + medicine.imagePath" [alt]="medicine.name" loading="lazy" />
+        <img [src]="medicine.imagePath | apiImage" [alt]="medicine.name" loading="lazy" />
       </div>
 
       <div class="mc-product__body">

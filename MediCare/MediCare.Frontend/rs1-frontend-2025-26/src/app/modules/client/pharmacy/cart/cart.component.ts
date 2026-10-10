@@ -74,8 +74,6 @@ checkout(): void {
     next: (res) => {
       this.checkoutResponse = res;
 
-       console.log('Checkout response:', res);
-
       this.toaster.success(`Order placed! Order ID: ${res.orderId}`);
       this.items = [];
       this.isCheckingOut = false;

@@ -110,7 +110,6 @@ export class MedicineComponent
   this.startLoading();
 
   const query = this.request.search?.trim() ?? '';
-  console.log('FRONT QUERY =', query); // DEBUG
 
   if (!query) {
     // No search – regular list from SQL
@@ -129,7 +128,6 @@ export class MedicineComponent
     this.api.searchMedicines(query, this.request.paging.page, this.request.paging.pageSize)
       .subscribe({
         next: (response) => {
-          console.log('SEARCH RESPONSE', response); // DEBUG
           this.items = response.results ?? response;
           this.stopLoading();
         },

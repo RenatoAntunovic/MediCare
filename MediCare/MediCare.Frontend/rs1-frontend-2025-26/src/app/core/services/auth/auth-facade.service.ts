@@ -181,7 +181,6 @@ export class AuthFacadeService {
       };
 
       this._currentUser.set(user);
-      console.log('Decoded user:', user);
     } catch (error) {
       console.error('Failed to decode JWT token:', error);
       this._currentUser.set(null);

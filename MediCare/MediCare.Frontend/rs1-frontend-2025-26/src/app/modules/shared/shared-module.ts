@@ -9,6 +9,7 @@ import {DialogHelperService} from './services/dialog-helper.service';
 import { FitLoadingBarComponent } from './components/fit-loading-bar/fit-loading-bar.component';
 import { FitTableSkeletonComponent } from './components/fit-table-skeleton/fit-table-skeleton.component';
 import { MatIconModule } from '@angular/material/icon';
+import { ApiImagePipe } from './pipes/api-image.pipe';
 
 
 
@@ -24,7 +25,8 @@ import { MatIconModule } from '@angular/material/icon';
     ReactiveFormsModule,
     FormsModule,
     TranslateModule,
-    ...materialModules
+    ...materialModules,
+    ApiImagePipe
   ],
   providers: [
     DialogHelperService
@@ -37,7 +39,8 @@ import { MatIconModule } from '@angular/material/icon';
     FormsModule,
     FitLoadingBarComponent,
     FitTableSkeletonComponent,
-    ...materialModules
+    ...materialModules,
+    ApiImagePipe
   ]
 })
 export class SharedModule { }

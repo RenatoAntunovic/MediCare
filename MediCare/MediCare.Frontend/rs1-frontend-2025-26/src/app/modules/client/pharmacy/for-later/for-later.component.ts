@@ -43,7 +43,6 @@ export class ForLaterComponent extends BaseListPagedComponent<ForLaterDto, any> 
     this.startLoading();
     this.api.getForLater().subscribe({
       next: (res: ForLaterDto[]) => {
-        console.log('For Later items from backend:', res);
         this.items = res;
         this.stopLoading();
       },

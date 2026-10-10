@@ -13,7 +13,6 @@ public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,
 
     public async Task<CheckoutOrderResponseDto> Handle(CheckoutOrderCommand command,CancellationToken cancellationToken)
     {
-        Console.WriteLine($"CHECKOUT command.UserId: {command.UserId}");
         // Get cart
         var cart = await _context.Carts
                .Include(c => c.CartItems)
@@ -36,11 +35,6 @@ public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,
             OrderDate = DateTime.Now,
             OrderStatusId = 1
         };
-
-        var user = await _context.Users.Include(x=>x.Role).
-            FirstOrDefaultAsync(x=>x.Id  == command.UserId,cancellationToken);
-
-        Console.WriteLine(user == null ? "Korisnik nije pronađen" : $"Korisnik pronađen: {user.Id}, RoleId: {user.RoleId}");
 
         foreach (var cartItem in cart.CartItems)
         {

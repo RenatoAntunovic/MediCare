@@ -8,17 +8,10 @@ public sealed class GetOrderByIdQueryHandler(IAppDbContext ctx, IAppCurrentUser 
     public async Task<GetOrderByIdQueryDto> Handle(GetOrderByIdQuery request, CancellationToken ct)
     {
 
-        Console.WriteLine($"GetOrderByIdQuery received with Id = {request.Id}");
         var order = ctx.Orders
-            .Include(o => o.User) // if User is needed
-            .Include(o => o.OrderItems) // if the items are needed
+            .Include(o => o.User)
+            .Include(o => o.OrderItems)
             .Where(o => o.Id == request.Id);
-
-        if (order == null)
-        {
-            Console.WriteLine($"Order with Id {request.Id} not found!");
-            throw new MediCareNotFoundException($"Order with Id {request.Id} not found");
-        }
 
         var currentUserEntity = await ctx.Users.Include(x => x.Role)
               .FirstOrDefaultAsync(u => u.Id == currentUser.UserId, ct);

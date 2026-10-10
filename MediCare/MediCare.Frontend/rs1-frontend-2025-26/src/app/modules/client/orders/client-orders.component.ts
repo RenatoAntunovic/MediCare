@@ -127,8 +127,6 @@ onStatusFilterChange(status: number | null): void {
     // stop the button click from reaching the <tr> and opening the dialog again
     event?.stopPropagation();
 
-    console.log('Order ID being sent to dialog:', order.id);
-
     const dialogRef = this.dialog.open(OrderDetailsClientDialogComponent, {
       width: '900px',
       maxWidth: '95vw',

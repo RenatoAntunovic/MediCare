@@ -63,12 +63,9 @@ export class LoginComponent extends BaseComponent {
       next: (loggedInUser: CurrentUserDto) => {
         this.stopLoading();
 
-         this.authApi.setCurrentUserId(loggedInUser.userId); // ← HERE
-
-    console.log('Logged in user ID:', loggedInUser.userId);
+         this.authApi.setCurrentUserId(loggedInUser.userId);
 
         const target = this.currentUser.getDefaultRoute();
-        console.log('DEFAULT ROUTE:', target);
         this.router.navigate([target]);
       },
       error: (err) => {
