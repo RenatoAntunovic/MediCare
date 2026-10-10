@@ -25,7 +25,15 @@ public class NotificationsController(
     public async Task<IActionResult> SendTest(CancellationToken ct)
     {
         await push.SendToUserAsync(currentUser.UserId!.Value,
-            "MediCare test", "Notifikacije rade! 🎉", ct);
+            "MediCare test", "Notifikacije rade!", ct);
+        return NoContent();
+    }
+
+    // DELETE api/notifications/token – turn push notifications off for the current user
+    [HttpDelete("token")]
+    public async Task<IActionResult> RemoveToken(CancellationToken ct)
+    {
+        await sender.Send(new RemoveFcmTokenCommand(), ct);
         return NoContent();
     }
 }

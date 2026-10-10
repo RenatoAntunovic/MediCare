@@ -1,0 +1,25 @@
+// "Notifications" card – tokens only (light + dark)
+.mc-notif__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--mc-radius-sm);
+  background: var(--mc-surface-muted);
+  color: var(--mc-text);
+  line-height: 1.45;
+
+  mat-icon { flex-shrink: 0; color: var(--mc-text-muted); }
+
+  &--warning {
+    border-left: 4px solid var(--mc-warning);
+    background: var(--mc-warning-tint);
+  }
+}
+
+.mc-notif__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}

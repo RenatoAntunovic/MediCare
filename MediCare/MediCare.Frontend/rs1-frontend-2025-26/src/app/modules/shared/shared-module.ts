@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ApiImagePipe } from './pipes/api-image.pipe';
 import { ProfileCardComponent } from './components/profile-card/profile-card.component';
 import { ChangePasswordCardComponent } from './components/change-password-card/change-password-card.component';
-
+import { NotificationsCardComponent } from './components/notifications-card/notifications-card.component';
 
 
 @NgModule({
@@ -30,7 +30,8 @@ import { ChangePasswordCardComponent } from './components/change-password-card/c
     ...materialModules,
     ApiImagePipe,
     ProfileCardComponent,
-    ChangePasswordCardComponent
+    ChangePasswordCardComponent,
+    NotificationsCardComponent
   ],
   providers: [
     DialogHelperService
@@ -46,7 +47,8 @@ import { ChangePasswordCardComponent } from './components/change-password-card/c
     ...materialModules,
     ApiImagePipe,
     ProfileCardComponent,
-    ChangePasswordCardComponent
+    ChangePasswordCardComponent,
+    NotificationsCardComponent
   ]
 })
 export class SharedModule { }
