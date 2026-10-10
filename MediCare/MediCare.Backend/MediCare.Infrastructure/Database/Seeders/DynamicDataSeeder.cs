@@ -13,9 +13,6 @@ public static class DynamicDataSeeder
 {
     public static async Task SeedAsync(DatabaseContext context)
     {
-        // Make sure the database exists (without migrations)
-        await context.Database.EnsureCreatedAsync();
-
         await SeedRolesAsync(context);
         await SeedUsersAsync(context);
         await SeedMedicineCategoriesAsync(context);
@@ -338,61 +335,6 @@ public static class DynamicDataSeeder
             Console.WriteLine("✅ Dynamic seed: order status added.");
         }
     }
-
-    public static async Task SeedOrderAndItemsAsync(DatabaseContext context)
-    {
-        if (await context.Orders.AnyAsync())
-            return; // seed has already run
-
-        // 1️⃣ Create orders with items
-        var orders = new List<Orders>
-        {
-            new Orders
-            {
-                UserId = 1, // must exist in Users
-                OrderDate = new DateTime(2025, 11, 5),
-                OrderStatusId = 1, // Pending
-                OrderItems = new List<OrderItems>
-                {
-                    new OrderItems { MedicineId = 1, Price = 21m, Quantity = 2 },   // line total = 10.5 x 2
-                    new OrderItems { MedicineId = 2, Price = 20m, Quantity = 1 }
-                }
-            },
-            new Orders
-            {
-                UserId = 2,
-                OrderDate = new DateTime(2025, 11, 6),
-                OrderStatusId = 2, // Completed
-                OrderItems = new List<OrderItems>
-                {
-                    new OrderItems { MedicineId = 2, Price = 45m, Quantity = 3 }   // line total = 15 x 3
-                }
-            },
-            new Orders
-            {
-                UserId = 1,
-                OrderDate = new DateTime(2025, 11, 7),
-                OrderStatusId = 1, // Pending
-                OrderItems = new List<OrderItems>
-                {
-                    new OrderItems { MedicineId = 1, Price = 10.5m, Quantity = 1 },
-                    new OrderItems { MedicineId = 2, Price = 60m, Quantity = 2 }   // line total = 30 x 2
-                }
-            },
-        };
-
-        // 2️⃣ Calculate TotalPrice for each order
-        foreach (var order in orders)
-        {
-            order.TotalPrice = order.OrderItems.Sum(i => i.Price * i.Quantity);
-        }
-
-        // 3️⃣ Add to the database
-        context.Orders.AddRange(orders);
-        await context.SaveChangesAsync();
-
-        Console.WriteLine("✅ Dynamic seed: orders and order items added.");
-    }
     private static async Task SeedPaymentStatusAsync(DatabaseContext context)
     {
         if(!await context.PaymentStatus.AnyAsync())
@@ -497,6 +439,10 @@ public static class DynamicDataSeeder
             }
         }
     }
+    /// <summary>
+    /// Two demo accounts: one admin (Id 1) and one regular user (Id 2).
+    /// The other seeds (cart, favourites, orders, reservations) use UserId 1 and 2.
+    /// </summary>
     private static async Task SeedUsersAsync(DatabaseContext context)
     {
         if (await context.Users.AnyAsync())
@@ -507,67 +453,38 @@ public static class DynamicDataSeeder
         var adminRole = await context.Roles.FirstAsync(r => r.Name == "Admin");
         var userRole = await context.Roles.FirstAsync(r => r.Name == "User");
 
-        var pass1 = "Admin";
-
         var admin = new Users
         {
             Email = "admin@market.com",
-            FirstName = "Renato",
-            LastName = "Antunovic",
-            UserName = "admin1",
+            FirstName = "admin",
+            LastName = "lastname",
+            UserName = "admin",
             PhoneNumber = "061-111-111",
-            Adress = "Adresa1",
-            City = "Grad1",
-            RoleId = 1,
+            Adress = "Adresa 1",
+            City = "Mostar",
             Role = adminRole,
-            PasswordHash = hasher.HashPassword(null!, pass1),
+            PasswordHash = hasher.HashPassword(null!, "Admin"),
             IsEnabled = true,
         };
 
         var user = new Users
         {
-            Email = "manager@market.local",
-            FirstName = "user1",
-            LastName = "user1",
-            UserName = "admin1",
+            Email = "client@gmail.com",
+            FirstName = "client",
+            LastName = "lastname",
+            UserName = "user",
             PhoneNumber = "062-222-222",
-            Adress = "Adresa2",
-            City = "Grad2",
-            RoleId = 1,
-            Role = adminRole,
-            PasswordHash = hasher.HashPassword(null!, "User123!"),
-            IsEnabled = true,
-        };
-
-        var dummyForSwagger = new Users
-        {
-            Email = "string",
-            FirstName = "user2",
-            LastName = "user2",
-            UserName = "admin2",
-            PhoneNumber = "063-333-333",
-            Adress = "Adresa3",
-            City = "Grad3",
-            RoleId = 1,
-            Role = adminRole,
-            PasswordHash = hasher.HashPassword(null!, "string"),
-            IsEnabled = true,
-        };
-        var dummyForTests = new Users
-        {
-            Email = "test",
-            FirstName = "user4",
-            LastName = "user4",
-            UserName = "user2",
-            PhoneNumber = "063-333-333",
-            Adress = "Adresa3",
-            City = "Grad3",
-            RoleId = 2,
+            Adress = "Adresa 2",
+            City = "Mostar",
             Role = userRole,
             PasswordHash = hasher.HashPassword(null!, "test123"),
             IsEnabled = true,
         };
-        context.Users.AddRange(admin, user, dummyForSwagger, dummyForTests);
+
+        // Added one by one so the Ids are guaranteed: admin = 1, user = 2
+        context.Users.Add(admin);
+        await context.SaveChangesAsync();
+        context.Users.Add(user);
         await context.SaveChangesAsync();
 
         Console.WriteLine("✅ Dynamic seed: demo users added.");
@@ -649,7 +566,7 @@ public static class DynamicDataSeeder
 
         // Get existing users
         var userAdmin = await context.Users.FirstAsync(u => u.Email == "admin@market.com");
-        var userManager = await context.Users.FirstAsync(u => u.Email == "manager@market.local");
+        var userManager = await context.Users.FirstAsync(u => u.Email == "client@gmail.com");
 
         // Get order statuses
         var statusPending = await context.OrderStatus.FirstAsync(s => s.StatusName == "DRAFT");
