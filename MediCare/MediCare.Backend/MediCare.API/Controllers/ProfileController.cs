@@ -1,4 +1,6 @@
-﻿using MediCare.Application.Modules.Profile;
+﻿using MediCare.Application.Modules.Profile.Commands.ChangePassword;
+using MediCare.Application.Modules.Profile.Commands.UpdateMyProfile;
+using MediCare.Application.Modules.Profile.Queries.GetMyProfile;
 
 namespace MediCare.API.Controllers;
 

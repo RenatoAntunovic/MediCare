@@ -1,4 +1,4 @@
-﻿namespace MediCare.Application.Modules.Notifications;
+﻿namespace MediCare.Application.Modules.Notifications.Commands.SaveFcmToken;
 
 public sealed class SaveFcmTokenCommandValidator : AbstractValidator<SaveFcmTokenCommand>
 {

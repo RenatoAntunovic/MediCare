@@ -11,6 +11,3 @@ public sealed class SetCartItemQuantityCommand : IRequest<SetCartItemQuantityRes
 
     public int Quantity { get; set; }
 }
-
-/// <summary>Updated values, so the UI can refresh the row without reloading the whole cart.</summary>
-public sealed record SetCartItemQuantityResultDto(int CartItemId, int Quantity, decimal Price);

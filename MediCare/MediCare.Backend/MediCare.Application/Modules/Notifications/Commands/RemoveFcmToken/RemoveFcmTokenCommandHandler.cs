@@ -1,9 +1,4 @@
-﻿namespace MediCare.Application.Modules.Notifications;
-
-/// <summary>
-/// Turns push notifications off for the logged-in user (removes the saved FCM token).
-/// </summary>
-public sealed class RemoveFcmTokenCommand : IRequest;
+﻿namespace MediCare.Application.Modules.Notifications.Commands.RemoveFcmToken;
 
 public sealed class RemoveFcmTokenCommandHandler(IAppDbContext db, IAppCurrentUser currentUser)
     : IRequestHandler<RemoveFcmTokenCommand>
