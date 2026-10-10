@@ -55,7 +55,7 @@ export class OrderDetailsDialogComponent {
   // === Status Helpers ===
 
 getStatusLabel(status: { id: number; name: string } | number): string {
-  // Ako je broj, možeš vratiti odgovarajući label ili koristiti statusName
+  // If it's a number, return the matching label or use statusName
   if (typeof status === 'number') {
     switch (status) {
       case 1: return 'ORDERS.STATUS.DRAFT';
@@ -66,7 +66,7 @@ getStatusLabel(status: { id: number; name: string } | number): string {
       default: return 'ORDERS.STATUS.UNKNOWN';
     }
   } else {
-    // status je objekat {id, name}
+    // status is an object {id, name}
     return status.name;
   }
 }

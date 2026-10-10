@@ -1,9 +1,9 @@
-import { AfterViewInit, Component, DestroyRef, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -37,7 +37,7 @@ type InlineEditForm = FormGroup<{
 })
 export class MedicineComponent
   extends BaseListPagedComponent<ListMedicineQueryDto, ListMedicineRequest>
-  implements OnInit, AfterViewInit {
+  implements OnInit {
 
   private api = inject(MedicineApiService);
   private categoriesApi = inject(MedicineCategoriesApiService);
@@ -88,10 +88,6 @@ export class MedicineComponent
         this.request.paging.page = 1;
         this.loadPagedData();
       });
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
   }
 
   // ==================== DATA ====================
@@ -261,7 +257,7 @@ export class MedicineComponent
           medicine.medicineCategoryName = category.name;
         }
 
-        // Refresh the table so sorting works with the new values
+                // Refresh the table with the edited values
         this.dataSource.data = [...this.items];
 
         this.isSaving = false;
@@ -331,5 +327,14 @@ export class MedicineComponent
       return err.error?.message || fallback;
     }
     return fallback;
+  }
+
+  
+  /** Column header clicked → sort ALL rows on the server and go back to page 1 */
+  onSortChange(sort: Sort): void {
+    this.request.sortBy = sort.direction ? sort.active : null;
+    this.request.sortDirection = sort.direction || null;
+    this.request.paging.page = 1;
+    this.loadPagedData();
   }
 }

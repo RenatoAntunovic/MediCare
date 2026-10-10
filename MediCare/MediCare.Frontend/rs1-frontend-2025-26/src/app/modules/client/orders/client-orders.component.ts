@@ -9,6 +9,7 @@ import {OrdersApiService} from '../../../api-services/orders/orders-api.service'
 import {ToasterService} from '../../../core/services/toaster.service';
 import {OrderStatusHelper} from '../../../api-services/orders/order-status.helper';
 import { OrderDetailsClientDialogComponent } from './client-order-details-dialog/order-details-dialog.component';
+import { MyOrdersReportDialogComponent } from './my-orders-report-dialog/my-orders-report-dialog.component';
 
 @Component({
   selector: 'app-client-orders',
@@ -123,10 +124,8 @@ onStatusFilterChange(status: number | null): void {
   // === Actions ===
 
   onViewDetails(order: ListOrdersQueryDto, event?: MouseEvent): void {
-    // spriječi da klik sa dugmeta ode na <tr> i ponovo otvori dialog
+    // stop the button click from reaching the <tr> and opening the dialog again
     event?.stopPropagation();
-
-    console.log('Order ID being sent to dialog:', order.id);
 
     const dialogRef = this.dialog.open(OrderDetailsClientDialogComponent, {
       width: '900px',
@@ -223,5 +222,14 @@ getStatusIcon(statusId: number): string {
     }
 
     return null;
+  }
+
+    /** Opens the "My orders" PDF report dialog */
+  openReportDialog(): void {
+    this.dialog.open(MyOrdersReportDialogComponent, {
+      width: '520px',
+      maxWidth: '95vw',
+      autoFocus: false
+    });
   }
 }

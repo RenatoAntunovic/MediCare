@@ -35,21 +35,21 @@ public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
-            // (opciono) obriši staru sliku
+            // (optional) delete the old image
             if (!string.IsNullOrWhiteSpace(entity.ImagePath))
             {
-                var oldPath = Path.Combine("wwwroot", entity.ImagePath);
+                var oldPath = Path.Combine("wwwroot", entity.ImagePath.TrimStart('/', '\\'));
                 if (File.Exists(oldPath))
                     File.Delete(oldPath);
             }
 
-            var uniqueFileName = $"{Guid.NewGuid()}_{request.ImageFile.FileName}";
+            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(request.ImageFile.FileName)}";
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using var stream = new FileStream(filePath, FileMode.Create);
             await request.ImageFile.CopyToAsync(stream, ct);
 
-            // ⬅️ JEDINO MJESTO gdje se postavlja ImagePath
+            // ⬅️ The ONLY place where ImagePath is set
             entity.ImagePath = $"images/{uniqueFileName}";
         }
 

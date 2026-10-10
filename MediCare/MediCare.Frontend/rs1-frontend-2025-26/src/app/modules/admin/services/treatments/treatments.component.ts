@@ -11,7 +11,7 @@ import { BaseListPagedComponent } from '../../../../core/components/base-classes
 import { ToasterService } from '../../../../core/services/toaster.service';
 import { DialogHelperService } from '../../../shared/services/dialog-helper.service';
 import { DialogButton } from '../../../shared/models/dialog-config.model';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
@@ -44,25 +44,27 @@ export class TreatmentComponent
   constructor() {
     super();
     this.request = new ListTreatmentsRequest();
-    console.log('ADMIN TREATMENT COMPONENT');
   }
 
-    ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-    } 
 
   ngOnInit(): void {
     this.initList();
   }
 
+  
+  /** Column header clicked → sort ALL rows on the server and go back to page 1 */
+  onSortChange(sort: Sort): void {
+    this.request.sortBy = sort.direction ? sort.active : null;
+    this.request.sortDirection = sort.direction || null;
+    this.request.paging.page = 1;
+    this.loadPagedData();
+  }
+
   protected loadPagedData(): void {
     this.startLoading();
 
-console.log(this.items);
-
-this.api.list(this.request).subscribe({
+  this.api.list(this.request).subscribe({
   next: (response) => {
-    console.log('Treatments:', response.items);
     this.items = response.items;
     this.dataSource.data = this.items;
     this.stopLoading();
@@ -71,7 +73,7 @@ this.api.list(this.request).subscribe({
     console.error('Load error:', err);
     this.stopLoading('Failed to load treatments');
   }
-});
+  });
   }
 
   // === UI Actions ===
@@ -111,7 +113,7 @@ onToggleStatus(treatment: ListTreatmentsQueryDto): void {
     error: (err) => {
       console.error('Toggle status error:', err);
       this.stopLoading();
-      this.toaster.error('Failed to update status'); // ili dialog ako želiš
+      this.toaster.error('Failed to update status'); // or a dialog if you prefer
     }
   });
 }

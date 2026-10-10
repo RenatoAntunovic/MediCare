@@ -73,7 +73,7 @@ export interface CreateMedicineCommand {
   description: string;
   price: number;
   categoryId: number;
-  ImageFile?: File; // IFormFile se mapira na File u JS/TS
+  ImageFile?: File; // IFormFile maps to File in JS/TS
   weight: number;
   isEnabled: boolean;
 }

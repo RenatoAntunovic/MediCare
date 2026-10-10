@@ -34,7 +34,7 @@
   <ul class="mc-grid mc-grid--wide" *ngIf="!isLoading && !errorMessage && items.length > 0">
     <li class="mc-product" *ngFor="let treatment of items">
       <div class="mc-product__media">
-        <img [src]="'https://localhost:7260/' + treatment.imagePath" [alt]="treatment.serviceName" loading="lazy" />
+        <img [src]="treatment.imagePath | apiImage" [alt]="treatment.serviceName" loading="lazy" />
       </div>
 
       <div class="mc-product__body">

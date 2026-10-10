@@ -1,7 +1,5 @@
 using MediatR;
-using MediCare.API.FCM;
 using MediCare.API.Reports;
-using MediCare.Application.Modules.FCM;
 using MediCare.Application.Modules.Sales.Orders.Commands.Create;
 using MediCare.Application.Modules.Sales.Orders.Commands.Status;
 using MediCare.Application.Modules.Sales.Orders.Commands.Update;
@@ -9,41 +7,34 @@ using MediCare.Application.Modules.Sales.Orders.Queries.GetById;
 using MediCare.Application.Modules.Sales.Orders.Queries.List;
 using MediCare.Application.Modules.Sales.Orders.Queries.ListWithItems;
 using MediCare.Application.Modules.Sales.Orders.Queries.Report;
+using MediCare.Application.Modules.Sales.Orders.Queries.MyReport;
 
 
 namespace Market.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class OrdersController : ControllerBase
 {
     private readonly ISender _sender;
-    private readonly IFcmService _fcmService;
 
-    public OrdersController(ISender sender, IFcmService fcmService)
+    public OrdersController(ISender sender)
     {
         _sender = sender;
-        _fcmService = fcmService;
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<int>> Create(CreateOrderCommand command, CancellationToken ct)
     {
         int id = await _sender.Send(command, ct);
-
-        if (SaveFcmTokenHandler.TryGetToken(command.UserId, out var fcmToken))
-        {
-            await _fcmService.SendNotificationAsync(
-                fcmToken,
-                "Nova narudžba",
-                $"Imate novu narudžbu #{id}"
-            );
-        }
 
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task Update(int id, UpdateOrderCommand command, CancellationToken ct)
     {
         command.Id = id;
@@ -86,6 +77,7 @@ public class OrdersController : ControllerBase
     // =========================================================
     [HttpGet("{id:int}/pdf")]
     [Authorize]
+    [EnableRateLimiting("reports")]
     public async Task<IActionResult> GeneratePdf(int id, CancellationToken ct)
     {
         var order = await _sender.Send(new GetOrderByIdQuery { Id = id }, ct);
@@ -100,11 +92,26 @@ public class OrdersController : ControllerBase
     // =========================================================
     [HttpGet("report/pdf")]
     [Authorize(Roles = "Admin")]
+    [EnableRateLimiting("reports")]
     public async Task<IActionResult> GenerateReportPdf([FromQuery] OrdersReportQuery query, CancellationToken ct)
     {
         var report = await _sender.Send(query, ct);
         var bytes = OrderPdfBuilder.BuildOrdersReportPdf(report);
 
         return File(bytes, "application/pdf", $"Izvjestaj_narudzbi_{DateTime.Now:yyyyMMdd_HHmm}.pdf");
+    }
+
+    // =========================================================
+    // PDF – client report of their own orders
+    // GET /Orders/my-report/pdf?from=2026-01-01&to=2026-01-31&statusId=4&includeItems=true
+    // =========================================================
+    [HttpGet("my-report/pdf")]
+    [EnableRateLimiting("reports")]
+    public async Task<IActionResult> GenerateMyReportPdf([FromQuery] MyOrdersReportQuery query, CancellationToken ct)
+    {
+        var report = await _sender.Send(query, ct);
+        var bytes = OrderPdfBuilder.BuildMyOrdersReportPdf(report);
+
+        return File(bytes, "application/pdf", $"Moje_narudzbe_{DateTime.Now:yyyyMMdd_HHmm}.pdf");
     }
 }

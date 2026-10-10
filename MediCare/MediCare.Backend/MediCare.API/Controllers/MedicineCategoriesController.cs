@@ -5,21 +5,19 @@ using MediCare.Application.Modules.Medicine.MedicineCategories.Commands.Create;
 using MediCare.Application.Modules.Medicine.MedicineCategories.Commands.Update;
 using MediCare.Application.Modules.Medicine.MedicineCategories.Queries.GetById;
 using MediCare.Application.Modules.Medicine.MedicineCategories.Queries.List;
-using MediCare.API.FCM;
 
 namespace MediCare.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize(Roles = "Admin")]
 public class MedicineCategoriesController : ControllerBase
 {
     private readonly ISender _sender;
-    private readonly IFcmService _fcmService;
 
-    public MedicineCategoriesController(ISender sender, IFcmService fcmService)
+    public MedicineCategoriesController(ISender sender)
     {
         _sender = sender;
-        _fcmService = fcmService;
     }
     [HttpPost]
     public async Task<ActionResult<int>> CreateMedicineCategory(CreateMedicineCategoryCommand command, CancellationToken ct)
@@ -46,6 +44,7 @@ public class MedicineCategoriesController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<GetMedicineCategoryByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         var category = await _sender.Send(new GetMedicineCategoryByIdQuery { Id = id }, ct);
@@ -53,6 +52,7 @@ public class MedicineCategoriesController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<PageResult<ListMedicineCategoriesQueryDto>> List([FromQuery] ListMedicineCategoriesQuery query, CancellationToken ct)
     {
         var result = await _sender.Send(query, ct);

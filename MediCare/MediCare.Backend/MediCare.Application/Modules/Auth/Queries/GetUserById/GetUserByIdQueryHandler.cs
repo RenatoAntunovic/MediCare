@@ -24,13 +24,13 @@
                     UserName = u.UserName,
                     Email = u.Email,
                     PhoneNumber = u.PhoneNumber,
-                    Role = u.Role.Name  // ime role, npr. "User" ili "Admin"
+                    Role = u.Role.Name  // role name, e.g. "User" or "Admin"
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null)
             {
-                throw new Exception($"User with Id {request.Id} not found."); // ili custom NotFoundException
+                throw new MediCareNotFoundException($"User with Id {request.Id} not found.");
             }
 
             return user;

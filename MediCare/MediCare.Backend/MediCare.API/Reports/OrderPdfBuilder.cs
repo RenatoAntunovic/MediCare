@@ -11,7 +11,7 @@ namespace MediCare.API.Reports;
 ///   2) Arial from Windows / macOS, or DejaVu on Linux
 ///   3) Helvetica (č/ć/đ will not be rendered in that case)
 /// </summary>
-public static class OrderPdfBuilder
+public static partial class OrderPdfBuilder
 {
     // Element.ALIGN_* values from iTextSharp (as constants so they can be used as default parameters)
     private const int AlignLeft = 0;    // Element.ALIGN_LEFT

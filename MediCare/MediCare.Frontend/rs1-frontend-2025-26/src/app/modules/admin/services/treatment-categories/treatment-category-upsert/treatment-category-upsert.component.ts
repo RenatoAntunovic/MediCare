@@ -50,14 +50,14 @@ private loadCategory(id: number): void {
 
   this.api.getById(id).subscribe({
     next: (category) => {
-      // Mapiramo name → categoryName za formu
+      // Map name → categoryName for the form
       const mappedCategory = {
         id: category.id,
         isEnabled: category.isEnabled,
         categoryName: (category as any).name ?? category.categoryName
       };
 
-      // Popunjavamo formu
+      // Fill the form
       this.form = this.formService.createCategoryForm(mappedCategory);
 
       this.isLoading = false;

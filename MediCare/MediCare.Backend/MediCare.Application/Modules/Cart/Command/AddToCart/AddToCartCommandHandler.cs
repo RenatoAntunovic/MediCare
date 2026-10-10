@@ -28,7 +28,7 @@ namespace MediCare.Application.Modules.Cart.Command.AddToCart
             int userId = _currentUser.UserId.Value;
 
 
-            // 1️⃣ Nađi ili kreiraj cart
+            // 1️⃣ Find or create the cart
             var cart = await _context.Carts
                 .FirstOrDefaultAsync(x => x.UserId == userId && !x.IsDeleted, cancellationToken);
 
@@ -39,11 +39,16 @@ namespace MediCare.Application.Modules.Cart.Command.AddToCart
                 await _context.SaveChangesAsync(cancellationToken);
             }
 
-            // 2️⃣ Nađi medicine
+            // 2️⃣ Find the medicine
+            // 2) Find the medicine: missing → 404, disabled → 409
             var medicine = await _context.Medicine
-                .FirstAsync(x => x.Id == request.MedicineId, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.MedicineId, cancellationToken)
+                ?? throw new MediCareNotFoundException($"Medicine with Id {request.MedicineId} not found.");
 
-            // 3️⃣ Provjeri postoji li već item
+            if (!medicine.isEnabled)
+                throw new MediCareBusinessRuleException("medicine.disabled", "This medicine is currently unavailable.");
+
+            // 3️⃣ Check whether the item already exists
             var cartItem = await _context.CartItems
                 .FirstOrDefaultAsync(x =>
                     x.CartId == cart.Id &&

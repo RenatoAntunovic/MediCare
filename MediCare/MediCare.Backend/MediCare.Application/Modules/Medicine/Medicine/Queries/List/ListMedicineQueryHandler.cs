@@ -19,7 +19,18 @@ public sealed class ListMedicineQueryHandler(IAppDbContext ctx)
         if (request.CategoryId.HasValue) 
             q = q.Where(x => x.MedicineCategoryId == request.CategoryId.Value);
 
-        var projectedQuery = q.OrderBy(x => x.Name)
+        // Sort ALL rows on the server before paging (the table sends sortBy + sortDirection)
+        var desc = request.IsSortDescending();
+        var ordered = (request.SortBy ?? "").ToLowerInvariant() switch
+        {
+            "price" => desc ? q.OrderByDescending(x => x.Price) : q.OrderBy(x => x.Price),
+            "weight" => desc ? q.OrderByDescending(x => x.Weight) : q.OrderBy(x => x.Weight),
+            "medicinecategoryname" => desc ? q.OrderByDescending(x => x.MedicineCategory.Name) : q.OrderBy(x => x.MedicineCategory.Name),
+            "isenabled" => desc ? q.OrderByDescending(x => x.isEnabled) : q.OrderBy(x => x.isEnabled),
+            _ => desc ? q.OrderByDescending(x => x.Name) : q.OrderBy(x => x.Name)
+        };
+
+        var projectedQuery = ordered.ThenBy(x => x.Id) // stable order between pages
             .Select(x => new ListMedicineQueryDto
             {
                 Id = x.Id,

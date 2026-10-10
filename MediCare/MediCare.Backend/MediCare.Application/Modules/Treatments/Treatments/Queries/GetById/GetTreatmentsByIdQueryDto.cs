@@ -13,7 +13,7 @@ namespace MediCare.Application.Modules.Catalog.Treatments.Queries.GetById
         public required decimal Price { get; set; }
         public required string Description { get; set; }
         public required int TreatmentsCategoryId { get; set; }
-        public required string TreatmentsCategoryName { get; set; } //ovdje sam stavio samo ime kategorije zato sto baca error jer nije preporucljiuvo staviti cijeli entitet u dto
+        public required string TreatmentsCategoryName { get; set; } //only the category name is used here, because putting the whole entity in the DTO throws an error and is not recommended
         public required string ImagePath { get; set; }  
         public required bool isEnabled { get; set; }
     }

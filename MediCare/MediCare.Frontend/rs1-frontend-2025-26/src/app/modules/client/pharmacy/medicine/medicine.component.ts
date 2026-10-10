@@ -105,15 +105,14 @@ export class MedicineComponent
   onDelete(medicine: any) {}
   onToggleStatus(medicine: any) {}
 
-  // Glavno učitavanje: bez query -> SQL lista, sa query -> Elasticsearch
+  // Main loading: without a query -> SQL list, with a query -> full-text search
   protected loadPagedData(): void {
   this.startLoading();
 
   const query = this.request.search?.trim() ?? '';
-  console.log('FRONT QUERY =', query); // DEBUG
 
   if (!query) {
-    // Bez pretrage – klasična lista iz SQL-a
+    // No search – regular list from SQL
     this.api.list(this.request).subscribe({
       next: (response) => {
         this.items = response.items;
@@ -125,11 +124,10 @@ export class MedicineComponent
       }
     });
   } else {
-    // Sa pretragom – Elasticsearch (ime + opis + kategorija)
+    // With search – full-text search (name + description + category)
     this.api.searchMedicines(query, this.request.paging.page, this.request.paging.pageSize)
       .subscribe({
         next: (response) => {
-          console.log('SEARCH RESPONSE', response); // DEBUG
           this.items = response.results ?? response;
           this.stopLoading();
         },
@@ -144,21 +142,21 @@ export class MedicineComponent
 
   // Enter search
   private lastSearchTime: number = 0;
-private searchCooldownMs: number = 500; // 500ms između search-eva
+private searchCooldownMs: number = 500; // 500ms between searches
 
 onSearch(): void {
   const now = Date.now();
   const timeSinceLastSearch = now - this.lastSearchTime;
 
   if (timeSinceLastSearch < this.searchCooldownMs) {
-    // Previše zahtjeva - prikaži poruku
+    // Too many requests - show a message
     this.toaster.error('Molim vas, sacekajte malo prije nego sto ponovo pretrazujete');
     return;
   }
 
   this.lastSearchTime = now;
   this.request.paging.page = 1;
-  this.loadPagedData(); // ← Direktno pozovi loadPagedData(), bez searchSubject
+  this.loadPagedData(); // ← Call loadPagedData() directly, without searchSubject
 }
 
 

@@ -27,7 +27,7 @@ using Microsoft.EntityFrameworkCore;
 
             int userId = _currentUser.UserId.Value;
 
-            // 🔎 Provjeri da li je već u favourites
+            // 🔎 Check whether it is already in favourites
             var existing = await _context.Favourites
                 .FirstOrDefaultAsync(x =>
                     x.UserId == userId &&
@@ -37,11 +37,11 @@ using Microsoft.EntityFrameworkCore;
 
             if (existing != null)
             {
-                // već postoji → samo vrati ID
+                // already exists → just return the ID
                 return existing.Id;
             }
 
-            // ➕ Dodaj novi favourite
+            // ➕ Add a new favourite
             var favourite = new Favourites
             {
                 UserId = userId,

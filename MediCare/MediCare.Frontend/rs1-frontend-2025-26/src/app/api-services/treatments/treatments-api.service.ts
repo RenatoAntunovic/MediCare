@@ -15,7 +15,7 @@ import { buildHttpParams } from '../../core/models/build-http-params';
   providedIn: 'root'
 })
 export class TreatmentsApiService {
-  private readonly baseUrl = 'https://localhost:7260/api/Treatments';
+  private readonly baseUrl = `${environment.apiUrl}/api/Treatments`;
   private http = inject(HttpClient);
 
   /**

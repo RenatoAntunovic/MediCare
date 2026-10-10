@@ -177,9 +177,10 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MedicineId");
+                    b.HasIndex("MedicineId")
+                        .IsUnique();
 
-                    b.ToTable("Inventories");
+                    b.ToTable("Inventories", (string)null);
                 });
 
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Medicine", b =>
@@ -195,7 +196,8 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
@@ -212,7 +214,8 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
@@ -228,7 +231,7 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.HasIndex("MedicineCategoryId");
 
-                    b.ToTable("Medicine");
+                    b.ToTable("Medicine", (string)null);
                 });
 
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.MedicineCategories", b =>
@@ -253,11 +256,12 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("MedicineCategories");
+                    b.ToTable("MedicineCategories", (string)null);
                 });
 
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.MedicineReviews", b =>
@@ -331,7 +335,7 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("MedicineSuppliers");
+                    b.ToTable("MedicineSuppliers", (string)null);
                 });
 
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.OrderItems", b =>
@@ -548,7 +552,7 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.HasIndex("ReceivingId");
 
-                    b.ToTable("ReceivingItems");
+                    b.ToTable("ReceivingItems", (string)null);
                 });
 
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Receivings", b =>
@@ -578,7 +582,7 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("Receivings");
+                    b.ToTable("Receivings", (string)null);
                 });
 
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.ReservationReviews", b =>
@@ -872,7 +876,8 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("FcmToken")
                         .HasColumnType("nvarchar(max)");
@@ -885,7 +890,9 @@ namespace MediCare.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -893,10 +900,6 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -910,7 +913,9 @@ namespace MediCare.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("TokenVersion")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -918,9 +923,12 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("MediCare.Domain.Entities.Identity.RefreshTokenEntity", b =>
@@ -938,13 +946,16 @@ namespace MediCare.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Fingerprint")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsRevoked")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
@@ -954,16 +965,17 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.Property<string>("TokenHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "TokenHash")
+                        .IsUnique();
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.CartItems", b =>
@@ -1037,8 +1049,8 @@ namespace MediCare.Infrastructure.Migrations
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Inventories", b =>
                 {
                     b.HasOne("MediCare.Domain.Entities.HospitalRecords.Medicine", "Medicine")
-                        .WithMany()
-                        .HasForeignKey("MedicineId")
+                        .WithOne()
+                        .HasForeignKey("MediCare.Domain.Entities.HospitalRecords.Inventories", "MedicineId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

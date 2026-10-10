@@ -9,7 +9,8 @@ import {
   AddFromFavouritesDto,
   AddFromForLaterDto,
   DeleteCartItemCommand,
-  CheckoutOrderResponseDto
+  CheckoutOrderResponseDto,
+  SetCartItemQuantityResultDto
 } from './carts-api.model';
 import { AuthApiService } from '../auth/auth-api.service';
 
@@ -17,13 +18,13 @@ import { AuthApiService } from '../auth/auth-api.service';
   providedIn: 'root',
 })
 export class CartsApiService {
-  private readonly baseUrl = `${environment.apiUrl}/api/Cart`; // endpoint za cart
+  private readonly baseUrl = `${environment.apiUrl}/api/Cart`; // cart endpoint
   private http = inject(HttpClient);
   private authService = inject(AuthApiService);
 
   /**
    * GET /Cart
-   * Dohvati cijelu korpu trenutnog korisnika
+   * Get the whole cart of the current user
    */
   getUserCart(): Observable<UserCartDto> {
     return this.http.get<UserCartDto>(this.baseUrl);
@@ -31,7 +32,7 @@ export class CartsApiService {
 
   /**
    * POST /Cart
-   * Dodaj stavku u korpu
+   * Add an item to the cart
    */
   addToCart(command: AddToCartCommand): Observable<{ cartItemId: number }> {
     return this.http.post<{ cartItemId: number }>(`${this.baseUrl}/items`, command);
@@ -47,15 +48,22 @@ export class CartsApiService {
 
   /**
    * DELETE /Cart/{id}
-   * Ukloni stavku iz korpe
+   * Remove an item from the cart
    */
   deleteCartItem(id: number): Observable<void> {
   return this.http.delete<void>(`${this.baseUrl}/items/${id}`);
   }
 
+    /**
+   * PUT /Cart/items/{id} – set the quantity of one item (not add to it)
+   */
+  setQuantity(cartItemId: number, quantity: number): Observable<SetCartItemQuantityResultDto> {
+    return this.http.put<SetCartItemQuantityResultDto>(`${this.baseUrl}/items/${cartItemId}`, { quantity });
+  }
+
 checkout() {
   return this.http.post<CheckoutOrderResponseDto>(
-    `${this.baseUrl}/checkout`, {}); // ← Koristi baseUrl kao ostale metode
+    `${this.baseUrl}/checkout`, {}); // ← Uses baseUrl like the other methods
 }
 
 }

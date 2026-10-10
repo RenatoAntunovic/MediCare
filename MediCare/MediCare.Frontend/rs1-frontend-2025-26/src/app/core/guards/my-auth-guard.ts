@@ -10,20 +10,20 @@ export const myAuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   // Routes declare their rules with myAuthData(...), which stores them under data['auth'].
   // (Reading data['requireAuth'] directly always gave undefined, so the guard let everybody in.)
   const rules = (route.data['auth'] ?? route.data) as MyAuthRouteData;
-  const requireAuth = rules.requireAuth === true;
   const requireAdmin = rules.requireAdmin === true;
   const requireManager = rules.requireManager === true;
   const requireEmployee = rules.requireEmployee === true;
-
+  const requireAuth = rules.requireAuth === true || requireAdmin || requireManager || requireEmployee;
+  
   const isAuth = currentUser.isAuthenticated();
 
-  // 1) ako ruta traži auth, a user nije logiran → login
+  // 1) route requires auth but the user is not logged in → login
   if (requireAuth && !isAuth) {
     router.navigate(['/auth/login']);
     return false;
   }
 
-  // Ako ne traži auth → pusti (javne rute)
+  // Route doesn't require auth → allow (public routes)
   if (!requireAuth) {
     return true;
   }

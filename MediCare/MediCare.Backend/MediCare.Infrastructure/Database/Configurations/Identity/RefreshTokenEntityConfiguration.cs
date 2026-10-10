@@ -23,8 +23,8 @@ public sealed class RefreshTokenEntityConfiguration : IEntityTypeConfiguration<R
         b.Property(x => x.Fingerprint)
             .HasMaxLength(200);
 
-        b.HasOne(x => x.User)          // RefreshToken ima jednog korisnika
-    .WithMany(u => u.RefreshTokens) // Korisnik može imati više refresh tokena
+        b.HasOne(x => x.User)          // A refresh token belongs to one user
+    .WithMany(u => u.RefreshTokens) // A user can have many refresh tokens
     .HasForeignKey(x => x.UserId)
     .IsRequired();
     }

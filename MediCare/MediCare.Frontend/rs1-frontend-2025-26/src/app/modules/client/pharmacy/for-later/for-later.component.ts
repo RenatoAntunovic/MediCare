@@ -32,7 +32,7 @@ export class ForLaterComponent extends BaseListPagedComponent<ForLaterDto, any> 
 
   constructor() {
     super();
-    this.request = {}; // nema filtera
+    this.request = {}; // no filters
   }
 
   ngOnInit(): void {
@@ -43,7 +43,6 @@ export class ForLaterComponent extends BaseListPagedComponent<ForLaterDto, any> 
     this.startLoading();
     this.api.getForLater().subscribe({
       next: (res: ForLaterDto[]) => {
-        console.log('For Later items from backend:', res);
         this.items = res;
         this.stopLoading();
       },

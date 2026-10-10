@@ -14,6 +14,7 @@ public sealed class UpdateTreatmentsCommandValidator
             .MaximumLength(Medicine.Constraints.NameMaxLength)
             .WithMessage($"Name can be at most {Medicine.Constraints.NameMaxLength} characters long.");
 
-        
+        RuleFor(x => x.ImageFile).MustBeValidImage();
+
     }
 }

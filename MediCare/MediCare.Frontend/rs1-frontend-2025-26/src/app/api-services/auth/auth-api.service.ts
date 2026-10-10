@@ -37,14 +37,13 @@ export class AuthApiService {
 
   setCurrentUserId(id: number) {
     this.currentUserId = id;
-    localStorage.setItem('currentUserId', id.toString()); // opcionalno za reload
-    console.log('User logged in, currentUserId set to:', id);
+    localStorage.setItem('currentUserId', id.toString()); // optional, for reload
   }
 
-  // dohvat userId za checkout
+  // get the userId for checkout
   getCurrentUserId(): number {
     if (this.currentUserId === null) {
-      // pokušaj dohvatiti iz localStorage
+      // try to read it from localStorage
       const stored = localStorage.getItem('currentUserId');
       if (stored) {
         this.currentUserId = parseInt(stored, 10);

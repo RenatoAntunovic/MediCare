@@ -1,4 +1,5 @@
 using MediCare.Application.Modules.MedicineSearch;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace MediCare.API.Controllers;
 
@@ -8,6 +9,7 @@ namespace MediCare.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [AllowAnonymous]
+[EnableRateLimiting("search")]
 public class SearchController(ISender sender) : ControllerBase
 {
     // GET /api/search?query=bru&page=1&pageSize=10

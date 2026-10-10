@@ -19,12 +19,28 @@
     <ul class="mc-list">
       <li class="mc-list__item" *ngFor="let item of items">
         <a class="mc-list__thumb" [routerLink]="['/client/medicine', item.medicineId]" tabindex="-1" aria-hidden="true">
-          <img [src]="'https://localhost:7260/' + item.imagePath" [alt]="item.medicineName" loading="lazy" />
+          <img [src]="item.imagePath | apiImage" [alt]="item.medicineName" loading="lazy" />
         </a>
 
-        <div>
+                <div class="mc-cart-item__info">
           <a class="mc-list__name" [routerLink]="['/client/medicine', item.medicineId]">{{ item.medicineName }}</a>
-          <span class="mc-list__meta">{{ 'CART.TABLE.QUANTITY' | translate }}: {{ item.quantity }}</span>
+          <span class="mc-list__meta">{{ item.price / item.quantity | number : '1.2-2' }} KM / kom.</span>
+
+          <div class="mc-qty" role="group"
+               [class.is-busy]="updatingItemId === item.cartItemId"
+               [attr.aria-label]="'CART.TABLE.QUANTITY' | translate">
+            <button type="button" class="mc-qty__btn" aria-label="Smanji količinu"
+                    [disabled]="item.quantity <= 1 || updatingItemId === item.cartItemId"
+                    (click)="changeQuantity(item, -1)">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="mc-qty__value" aria-live="polite">{{ item.quantity }}</span>
+            <button type="button" class="mc-qty__btn" aria-label="Povećaj količinu"
+                    [disabled]="item.quantity >= 100 || updatingItemId === item.cartItemId"
+                    (click)="changeQuantity(item, 1)">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
         </div>
 
         <span class="mc-price">{{ item.price | number : '1.2-2' }} KM</span>

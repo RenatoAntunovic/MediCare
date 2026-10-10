@@ -8,6 +8,7 @@ import { FavouritesService } from '../../../../api-services/favourites/favourite
 import { ForLaterApiService } from '../../../../api-services/for-later/for-later-api.service';
 import { ToasterService } from '../../../../core/services/toaster.service';
 import { environment } from '../../../../../environments/environment';
+import { FormControl, Validators } from '@angular/forms';
 
 /** How much the image is magnified on click. */
 const ZOOM_LEVEL = 2.5;
@@ -35,7 +36,11 @@ export class MedicineDetailComponent implements OnInit {
   selectedPackage = '';
   errorMessage = '';
   isLoading = true;
-  quantity = 1;
+  /** Quantity to add to the cart (Reactive Forms: required, 1–100, same rule as the backend) */
+  quantityControl = new FormControl(1, {
+    nonNullable: true,
+    validators: [Validators.required, Validators.min(1), Validators.max(100)]
+  });
 
   medicine: GetMedicineByIdQueryDto = {
     id: 0,
@@ -109,13 +114,20 @@ export class MedicineDetailComponent implements OnInit {
   // ==================== CART / FAVOURITES / FOR LATER ====================
 
   addToCart(): void {
-    if (!this.medicine || !this.quantity || this.quantity < 1) {
-      this.toaster.error('Količina mora biti najmanje 1');
+    if (!this.medicine) return;
+
+    if (this.quantityControl.invalid) {
+      this.quantityControl.markAsTouched(); // shows the error under the field
       return;
     }
 
-    this.cartApi.addToCart({ medicineId: this.medicine.id, quantity: this.quantity }).subscribe({
-      next: () => this.toaster.success('Dodano u korpu'),
+    const quantity = this.quantityControl.value;
+
+    this.cartApi.addToCart({ medicineId: this.medicine.id, quantity }).subscribe({
+      next: () => {
+        this.toaster.success('Dodano u korpu');
+        this.quantityControl.reset(1); // back to 1 for the next add
+      },
       error: (err) => {
         console.error(err);
         this.toaster.error('Greška pri dodavanju u korpu');

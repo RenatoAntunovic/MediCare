@@ -30,11 +30,12 @@ export class CartComponent extends BaseListPagedComponent<CartItemDto, any> impl
     'actions'
   ];
 
-  quantities: { [medicineId: number]: number } = {};
+    /** Cart item whose quantity is being saved (its buttons are disabled meanwhile) */
+  updatingItemId: number | null = null;
 
   constructor() {
     super();
-    this.request = {}; // nema filtera za korpu
+    this.request = {}; // no filters for the cart
   }
 
   ngOnInit(): void {
@@ -45,13 +46,7 @@ export class CartComponent extends BaseListPagedComponent<CartItemDto, any> impl
     this.startLoading();
     this.api.getUserCart().subscribe({
       next: (res: UserCartDto) => {
-         console.log('Cart items from backend:', res.items);
         this.items = res.items;
-
-        // inicijalizacija količina
-        this.items.forEach(item => {
-          this.quantities[item.medicineId] = item.quantity;
-        });
 
         this.stopLoading();
       },
@@ -79,12 +74,8 @@ checkout(): void {
     next: (res) => {
       this.checkoutResponse = res;
 
-       console.log('Checkout response:', res);
-      console.log('FCM token (test):', res.FcmToken);
-
       this.toaster.success(`Order placed! Order ID: ${res.orderId}`);
       this.items = [];
-      this.quantities = {};
       this.isCheckingOut = false;
     },
     error: (err) => {
@@ -94,25 +85,8 @@ checkout(): void {
   });
 }
 
-
-
-
-  updateQuantity(cartItem: CartItemDto, newQuantity: number): void {
-    if (newQuantity <= 0) return;
-    this.quantities[cartItem.medicineId] = newQuantity;
-    // opcionalno: update backenda odmah
-    const command: AddToCartCommand = {
-      medicineId: cartItem.medicineId,
-      quantity: newQuantity
-    };
-    this.api.addToCart(command).subscribe({
-      next: () => this.toaster.success('Quantity updated'),
-      error: () => this.toaster.error('Failed to update quantity')
-    });
-  }
-
 removeItem(cartItem: any): void {
-  const command: DeleteCartItemCommand = { id: cartItem.cartItemId }; // <--- koristimo cartItemId
+  const command: DeleteCartItemCommand = { id: cartItem.cartItemId }; // <--- use cartItemId
   this.api.deleteCartItem(command.id).subscribe({
     next: () => {
       this.items = this.items.filter(i => i.cartItemId !== cartItem.cartItemId);
@@ -122,7 +96,25 @@ removeItem(cartItem: any): void {
   });
 }
 
-  getTotal(cartItem: CartItemDto): number {
-    return (this.quantities[cartItem.medicineId] || cartItem.quantity) * cartItem.price;
+  /** − / + buttons: change the quantity by one and update the row with the server's result */
+  changeQuantity(item: CartItemDto, delta: number): void {
+    const newQuantity = item.quantity + delta;
+    if (newQuantity < 1 || newQuantity > 100 || this.updatingItemId !== null) return;
+
+    this.updatingItemId = item.cartItemId;
+
+    this.api.setQuantity(item.cartItemId, newQuantity).subscribe({
+      next: result => {
+        item.quantity = result.quantity;
+        item.price = result.price;
+        this.updatingItemId = null;
+      },
+      error: err => {
+        this.updatingItemId = null;
+        if (err.status === 429) return; // message already shown by the rate-limit interceptor
+        this.toaster.error(err.error?.message || 'Greška pri promjeni količine');
+      }
+    });
   }
+
 }

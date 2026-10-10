@@ -13,7 +13,7 @@ const routes: Routes = [
         path: '',
         component: SearchMedicineComponent
       },
-      // kasnije može i ovako:
+      // later it can also be done like this:
       // { path: 'about', component: AboutComponent },
       // { path: 'contact', component: ContactComponent },
 

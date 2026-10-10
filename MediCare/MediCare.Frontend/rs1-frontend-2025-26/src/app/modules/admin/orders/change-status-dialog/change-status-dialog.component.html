@@ -51,7 +51,7 @@
 
       <mat-radio-group
         *ngIf="availableStatuses.length > 0"
-        [(ngModel)]="selectedStatusId"
+        [formControl]="statusControl"
         class="cs__options"
         aria-labelledby="cs-new-status"
       >
@@ -80,7 +80,7 @@
       </mat-radio-group>
     </div>
 
-    <div class="cs__warning" *ngIf="selectedStatusId === 5" role="alert">
+       <div class="cs__warning" *ngIf="statusControl.value === CANCELLED" role="alert">
       <mat-icon aria-hidden="true">warning</mat-icon>
       <p>{{ 'ORDERS.CHANGE_STATUS.CANCEL_WARNING' | translate }}</p>
     </div>

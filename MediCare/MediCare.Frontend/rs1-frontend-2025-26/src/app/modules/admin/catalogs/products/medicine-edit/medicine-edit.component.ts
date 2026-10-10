@@ -13,6 +13,7 @@ import {
   ListMedicineCategoriesQueryDto
 } from '../../../../../api-services/medicine-categories/medicine-categories-api.model';
 import {largePaging} from '../../../../../core/models/paging/paging-utils';
+import { apiImageUrl } from '../../../../../core/utils/api-image-url';
 
 
 @Component({
@@ -53,7 +54,7 @@ export class MedicineEditComponent
 
 get currentImageSrc(): string | null {
   if (this.model && this.model.imagePath) {
-    return `https://localhost:7260/${this.model.imagePath}`;
+        return apiImageUrl(this.model.imagePath);
   }
   return null;
 }
@@ -103,10 +104,10 @@ protected save(): void {
 if (this.selectedFile) {
   formData.append('ImageFile', this.selectedFile);
 } else if (this.originalImageFile) {
-  // šalje originalnu sliku ako korisnik nije promijenio
+  // sends the original image if the user didn't change it
   formData.append('ImageFile', this.originalImageFile);
 } else {
-  // ako backend dopušta, pošalji prazno polje
+  // if the backend allows it, send an empty field
   formData.append('ImageFile', '');
 }
 

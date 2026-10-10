@@ -8,17 +8,10 @@ public sealed class GetOrderByIdQueryHandler(IAppDbContext ctx, IAppCurrentUser 
     public async Task<GetOrderByIdQueryDto> Handle(GetOrderByIdQuery request, CancellationToken ct)
     {
 
-        Console.WriteLine($"GetOrderByIdQuery received with Id = {request.Id}");
         var order = ctx.Orders
-            .Include(o => o.User) // ako treba User
-            .Include(o => o.OrderItems) // ako treba stavke
+            .Include(o => o.User)
+            .Include(o => o.OrderItems)
             .Where(o => o.Id == request.Id);
-
-        if (order == null)
-        {
-            Console.WriteLine($"Order with Id {request.Id} not found!");
-            throw new MediCareNotFoundException($"Order with Id {request.Id} not found");
-        }
 
         var currentUserEntity = await ctx.Users.Include(x => x.Role)
               .FirstOrDefaultAsync(u => u.Id == currentUser.UserId, ct);
@@ -26,7 +19,7 @@ public sealed class GetOrderByIdQueryHandler(IAppDbContext ctx, IAppCurrentUser 
         if (currentUserEntity == null)
             throw new Exception("Current user not found");
 
-        // Ako nije admin, filtriraj po korisniku
+        // If not admin, filter by user
         if (!string.Equals(currentUserEntity.Role.Name, "Admin", StringComparison.OrdinalIgnoreCase))
         {
             order = order.Where(x => x.UserId == currentUser.UserId);
@@ -46,7 +39,7 @@ public sealed class GetOrderByIdQueryHandler(IAppDbContext ctx, IAppCurrentUser 
                 OrderDate = x.OrderDate,
                 StatusId = x.OrderStatusId,
                 StatusName = x.OrderStatus.StatusName,
-                //"x.Items" ili "ctx.OrderItems.Where(x => x.OrderId == x.Id)"
+                //"x.Items" or "ctx.OrderItems.Where(x => x.OrderId == x.Id)"
                 Items = x.OrderItems.Select(i => new GetByIdOrderQueryDtoItems
                 {
                     OrderId = i.Id,
