@@ -10,6 +10,8 @@ import { FitLoadingBarComponent } from './components/fit-loading-bar/fit-loading
 import { FitTableSkeletonComponent } from './components/fit-table-skeleton/fit-table-skeleton.component';
 import { MatIconModule } from '@angular/material/icon';
 import { ApiImagePipe } from './pipes/api-image.pipe';
+import { ProfileCardComponent } from './components/profile-card/profile-card.component';
+import { ChangePasswordCardComponent } from './components/change-password-card/change-password-card.component';
 
 
 
@@ -26,7 +28,9 @@ import { ApiImagePipe } from './pipes/api-image.pipe';
     FormsModule,
     TranslateModule,
     ...materialModules,
-    ApiImagePipe
+    ApiImagePipe,
+    ProfileCardComponent,
+    ChangePasswordCardComponent
   ],
   providers: [
     DialogHelperService
@@ -40,7 +44,9 @@ import { ApiImagePipe } from './pipes/api-image.pipe';
     FitLoadingBarComponent,
     FitTableSkeletonComponent,
     ...materialModules,
-    ApiImagePipe
+    ApiImagePipe,
+    ProfileCardComponent,
+    ChangePasswordCardComponent
   ]
 })
 export class SharedModule { }

@@ -25,6 +25,12 @@ export interface UpdateMyProfileCommand {
   dateOfBirth: string; // "yyyy-MM-dd"
 }
 
+/** Corresponds to: ChangePasswordCommand.cs */
+export interface ChangePasswordCommand {
+  currentPassword: string;
+  newPassword: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProfileApiService {
   private readonly baseUrl = `${environment.apiUrl}/api/Profile`;
@@ -38,5 +44,10 @@ export class ProfileApiService {
   /** PUT /api/Profile – save the logged-in user's data */
   update(command: UpdateMyProfileCommand): Observable<MyProfileDto> {
     return this.http.put<MyProfileDto>(this.baseUrl, command);
+  }
+
+    /** POST /api/Profile/change-password – signs the user out on all devices */
+  changePassword(command: ChangePasswordCommand): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/change-password`, command);
   }
 }

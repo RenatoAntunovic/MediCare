@@ -17,4 +17,13 @@ public class ProfileController(ISender sender) : ControllerBase
     [HttpPut]
     public async Task<MyProfileDto> Update([FromBody] UpdateMyProfileCommand command, CancellationToken ct)
         => await sender.Send(command, ct);
+
+    // POST api/profile/change-password
+    [HttpPost("change-password")]
+    [EnableRateLimiting("login")] // 5 attempts per minute – no guessing the current password
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command, CancellationToken ct)
+    {
+        await sender.Send(command, ct);
+        return NoContent();
+    }
 }
