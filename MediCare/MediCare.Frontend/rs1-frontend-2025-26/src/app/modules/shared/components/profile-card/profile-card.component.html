@@ -1,0 +1,82 @@
+<section class="mc-card" aria-labelledby="settings-profile">
+  <h2 class="mc-card__title" id="settings-profile">Moj profil</h2>
+
+  <!-- Loading / error -->
+  <div *ngIf="isLoading" class="mc-profile__state" role="status">
+    <mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
+    <span>Učitavanje…</span>
+  </div>
+
+  <div *ngIf="!isLoading && loadError" class="mc-profile__state mc-profile__state--error" role="alert">
+    <span>{{ loadError }}</span>
+    <button mat-stroked-button type="button" (click)="load()">
+      <mat-icon>refresh</mat-icon>
+      Pokušaj ponovo
+    </button>
+  </div>
+
+  <form *ngIf="!isLoading && !loadError" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <!-- Read-only account data -->
+    <p class="mc-profile__readonly">
+      <mat-icon aria-hidden="true">alternate_email</mat-icon>
+      <span>{{ profile?.email }}</span>
+      <span class="mc-profile__muted">· {{ profile?.userName }}</span>
+    </p>
+
+    <div class="mc-profile__grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Ime</mat-label>
+        <input matInput formControlName="firstName" autocomplete="given-name" />
+        <mat-error *ngIf="form.controls.firstName.hasError('required')">Unesite ime</mat-error>
+        <mat-error *ngIf="form.controls.firstName.hasError('maxlength')">Najviše 50 znakova</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Prezime</mat-label>
+        <input matInput formControlName="lastName" autocomplete="family-name" />
+        <mat-error *ngIf="form.controls.lastName.hasError('required')">Unesite prezime</mat-error>
+        <mat-error *ngIf="form.controls.lastName.hasError('maxlength')">Najviše 50 znakova</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Telefon</mat-label>
+        <input matInput formControlName="phoneNumber" type="tel" autocomplete="tel" />
+        <mat-hint>npr. 061 222 333</mat-hint>
+        <mat-error *ngIf="form.controls.phoneNumber.hasError('required')">Unesite broj telefona</mat-error>
+        <mat-error *ngIf="form.controls.phoneNumber.hasError('pattern')">Neispravan broj telefona</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Datum rođenja</mat-label>
+        <input matInput [matDatepicker]="birthPicker" formControlName="dateOfBirth" [max]="maxBirthDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="birthPicker"></mat-datepicker-toggle>
+        <mat-datepicker #birthPicker startView="multi-year"></mat-datepicker>
+        <mat-error *ngIf="form.controls.dateOfBirth.hasError('required')">Unesite datum rođenja</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Adresa</mat-label>
+        <input matInput formControlName="address" autocomplete="street-address" />
+        <mat-error *ngIf="form.controls.address.hasError('required')">Unesite adresu</mat-error>
+        <mat-error *ngIf="form.controls.address.hasError('maxlength')">Najviše 100 znakova</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Grad</mat-label>
+        <input matInput formControlName="city" autocomplete="address-level2" />
+        <mat-error *ngIf="form.controls.city.hasError('required')">Unesite grad</mat-error>
+        <mat-error *ngIf="form.controls.city.hasError('maxlength')">Najviše 50 znakova</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="mc-profile__actions">
+      <button mat-button type="button" (click)="cancel()" [disabled]="form.pristine || isSaving">
+        Poništi
+      </button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="form.pristine || isSaving">
+        <mat-icon>save</mat-icon>
+        {{ isSaving ? 'Čuvam…' : 'Sačuvaj promjene' }}
+      </button>
+    </div>
+  </form>
+</section>
