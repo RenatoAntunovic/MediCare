@@ -9,6 +9,7 @@ import { MedicineCategoriesComponent } from './catalogs/product-categories/medic
 import { TreatmentCategoriesComponent } from './services/treatment-categories/treatment-categories.component';
 import {AdminOrdersComponent} from './orders/admin-orders.component';
 import {AdminSettingsComponent} from './admin-settings/admin-settings.component';
+import { AdminStatisticsComponent } from './statistics/admin-statistics.component';
 import { TreatmentComponent } from './services/treatments/treatments.component';
 import { TreatmentsAddComponent } from './services/treatments/treatments-add/treatments-add.component';
 import { TreatmentsEditComponent } from './services/treatments/treatments-edit/treatments-edit.component';
@@ -57,6 +58,10 @@ const routes: Routes = [
       {
         path: 'orders',
         component: AdminOrdersComponent,
+      },
+      {
+        path: 'statistics',
+        component: AdminStatisticsComponent,
       },
       {
         path: 'settings',

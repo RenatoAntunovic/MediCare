@@ -37,6 +37,7 @@
       "ORDERS": "Pregled narudžbi",
       "SYSTEM": "Sistem",
       "SETTINGS": "Postavke",
+      "STATISTICS": "Statistika",
       "LOGOUT": "Odjava"
     }
   },
@@ -541,5 +542,58 @@
     "CONFLICT": "Ova akcija je u konfliktu sa postojećim podacima.",
     "VALIDATION": "Provjerite formu za greške.",
     "UNKNOWN": "Nepoznata greška."
+  },
+  "STATISTICS": {
+    "TITLE": "Statistika",
+    "SUMMARY": "Sažetak",
+    "LOAD_ERROR": "Statistiku nije moguće učitati.",
+    "NO_DATA": "Nema narudžbi ni rezervacija u odabranom periodu.",
+    "SHOW_TABLE": "Prikaži kao tabelu",
+    "PERIOD": {
+      "LABEL": "Period",
+      "ALL": "Sve",
+      "LAST_30_DAYS": "Zadnjih 30 dana",
+      "LAST_3_MONTHS": "Zadnja 3 mjeseca",
+      "LAST_12_MONTHS": "Zadnjih 12 mjeseci",
+      "THIS_YEAR": "Ova godina"
+    },
+    "TILES": {
+      "REVENUE": "Ukupan prihod",
+      "ORDERS": "Narudžbe",
+      "RESERVATIONS": "Rezervacije",
+      "NEW_USERS": "Novi korisnici",
+      "LOW_STOCK": "Niske zalihe",
+      "NEEDS_RESTOCK": "Potrebna nabavka"
+    },
+    "SERIES": {
+      "MEDICINES": "Lijekovi",
+      "TREATMENTS": "Tretmani",
+      "ORDERS": "Narudžbe",
+      "RESERVATIONS": "Rezervacije",
+      "SOLD_QUANTITY": "Prodana količina"
+    },
+    "CHARTS": {
+      "REVENUE_BY_MONTH": "Prihod po mjesecima",
+      "REVENUE_BY_MONTH_SUB": "Bez nacrta i otkazanih narudžbi i rezervacija",
+      "ACTIVITY_BY_MONTH": "Narudžbe i rezervacije po mjesecima",
+      "ORDERS_BY_STATUS": "Narudžbe po statusu",
+      "TOP_MEDICINES": "Najprodavaniji lijekovi",
+      "RESERVATIONS_BY_TREATMENT": "Rezervacije po tretmanu",
+      "RESERVATIONS_BY_WEEKDAY": "Rezervacije po danu u sedmici"
+    },
+    "WEEKDAYS": {
+      "MONDAY": "Ponedjeljak",
+      "TUESDAY": "Utorak",
+      "WEDNESDAY": "Srijeda",
+      "THURSDAY": "Četvrtak",
+      "FRIDAY": "Petak"
+    },
+    "LOW_STOCK": {
+      "TITLE": "Lijekovi s niskim zalihama",
+      "SUB": "Trenutno stanje skladišta (10 komada ili manje)",
+      "ALL_GOOD": "Svi lijekovi imaju dovoljno zaliha",
+      "OUT_OF_STOCK": "Nema na stanju",
+      "PIECES": "{{count}} kom."
+    }
   }
 }

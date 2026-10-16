@@ -37,6 +37,7 @@
       "ORDERS": "Orders overview",
       "SYSTEM": "System",
       "SETTINGS": "Settings",
+      "STATISTICS": "Statistics",
       "LOGOUT": "Logout"
     }
   },
@@ -540,5 +541,58 @@
     "CONFLICT": "This action conflicts with existing data.",
     "VALIDATION": "Please check the form for errors.",
     "UNKNOWN": "Unknown error occurred."
+  },
+  "STATISTICS": {
+    "TITLE": "Statistics",
+    "SUMMARY": "Summary",
+    "LOAD_ERROR": "Statistics could not be loaded.",
+    "NO_DATA": "No orders or reservations in the selected period.",
+    "SHOW_TABLE": "Show as table",
+    "PERIOD": {
+      "LABEL": "Period",
+      "ALL": "All",
+      "LAST_30_DAYS": "Last 30 days",
+      "LAST_3_MONTHS": "Last 3 months",
+      "LAST_12_MONTHS": "Last 12 months",
+      "THIS_YEAR": "This year"
+    },
+    "TILES": {
+      "REVENUE": "Total revenue",
+      "ORDERS": "Orders",
+      "RESERVATIONS": "Reservations",
+      "NEW_USERS": "New users",
+      "LOW_STOCK": "Low stock",
+      "NEEDS_RESTOCK": "Restock needed"
+    },
+    "SERIES": {
+      "MEDICINES": "Medicines",
+      "TREATMENTS": "Treatments",
+      "ORDERS": "Orders",
+      "RESERVATIONS": "Reservations",
+      "SOLD_QUANTITY": "Quantity sold"
+    },
+    "CHARTS": {
+      "REVENUE_BY_MONTH": "Revenue by month",
+      "REVENUE_BY_MONTH_SUB": "Excludes draft and cancelled orders and reservations",
+      "ACTIVITY_BY_MONTH": "Orders and reservations by month",
+      "ORDERS_BY_STATUS": "Orders by status",
+      "TOP_MEDICINES": "Best-selling medicines",
+      "RESERVATIONS_BY_TREATMENT": "Reservations by treatment",
+      "RESERVATIONS_BY_WEEKDAY": "Reservations by weekday"
+    },
+    "WEEKDAYS": {
+      "MONDAY": "Monday",
+      "TUESDAY": "Tuesday",
+      "WEDNESDAY": "Wednesday",
+      "THURSDAY": "Thursday",
+      "FRIDAY": "Friday"
+    },
+    "LOW_STOCK": {
+      "TITLE": "Medicines with low stock",
+      "SUB": "Current warehouse state (10 pieces or fewer)",
+      "ALL_GOOD": "All medicines have enough stock",
+      "OUT_OF_STOCK": "Out of stock",
+      "PIECES": "{{count}} pcs"
+    }
   }
 }

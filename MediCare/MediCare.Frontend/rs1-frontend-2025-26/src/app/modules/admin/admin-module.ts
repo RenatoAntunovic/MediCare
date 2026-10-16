@@ -19,6 +19,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { TreatmentComponent } from './services/treatments/treatments.component';
 import { TreatmentsAddComponent } from './services/treatments/treatments-add/treatments-add.component';
 import { TreatmentsEditComponent } from './services/treatments/treatments-edit/treatments-edit.component';
+import { AdminStatisticsComponent } from './statistics/admin-statistics.component';
+import { McChartComponent } from '../shared/components/mc-chart/mc-chart.component';
 
 @NgModule({
   declarations: [
@@ -37,11 +39,13 @@ import { TreatmentsEditComponent } from './services/treatments/treatments-edit/t
     AdminSettingsComponent,
     OrderDetailsDialogComponent,
     ChangeStatusDialogComponent,
+    AdminStatisticsComponent,
   ],
   imports: [
     AdminRoutingModule,
     SharedModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    McChartComponent
   ]
 })
 export class AdminModule { }
