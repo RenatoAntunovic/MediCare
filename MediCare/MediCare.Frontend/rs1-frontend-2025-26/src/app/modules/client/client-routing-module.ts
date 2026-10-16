@@ -11,6 +11,7 @@ import { FavouritesComponent } from './pharmacy/favourites/favourites.component'
 import { ForLaterComponent } from './pharmacy/for-later/for-later.component';
 import { OrderDetailsClientDialogComponent } from './orders/client-order-details-dialog/order-details-dialog.component';
 import { ClientOrdersComponent } from './orders/client-orders.component';
+import { ClientAssistantComponent } from './assistant/client-assistant.component';
 
 const routes: Routes = [
   {
@@ -46,6 +47,10 @@ const routes: Routes = [
             {
         path: 'orders',
         component: ClientOrdersComponent,
+      },
+      {
+        path: 'assistant',
+        component: ClientAssistantComponent,
       },
       {
         path: 'settings',

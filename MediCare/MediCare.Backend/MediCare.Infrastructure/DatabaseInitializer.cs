@@ -29,6 +29,8 @@ public static class DatabaseInitializer
         if (env.IsDevelopment())
         {
             await DynamicDataSeeder.SeedAsync(ctx);
+            // Demo patients, orders and reservations for the statistics page (added once, skipped afterwards)
+            await DemoDataSeeder.SeedAsync(ctx);
         }
     }
 }

@@ -1,0 +1,184 @@
+<div class="mc-page">
+  <header class="mc-page-header">
+    <h1 class="mc-page-header__title">{{ 'STATISTICS.TITLE' | translate }}</h1>
+  </header>
+
+  <!-- Period filter -->
+  <div class="mc-toolbar">
+    <mat-button-toggle-group
+      class="mc-stats__period"
+      [value]="period()"
+      (change)="onPeriodChange($event.value)"
+      [attr.aria-label]="'STATISTICS.PERIOD.LABEL' | translate"
+    >
+      @for (p of periods; track p.value) {
+        <mat-button-toggle [value]="p.value">{{ p.label | translate }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+    @if (isLoading() && data()) {
+      <mat-spinner diameter="24" [attr.aria-label]="'COMMON.LOADING' | translate"></mat-spinner>
+    }
+  </div>
+
+  @if (errorMessage(); as error) {
+    <div class="mc-alert mc-alert--danger" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      <span>{{ error }}</span>
+      <span class="mc-toolbar__spacer"></span>
+      <button mat-stroked-button type="button" (click)="load()">{{ 'COMMON.RETRY' | translate }}</button>
+    </div>
+  }
+
+  @if (isLoading() && !data()) {
+    <div class="mc-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>{{ 'COMMON.LOADING' | translate }}</span>
+    </div>
+  }
+
+  @if (data(); as d) {
+    <!-- Summary tiles -->
+    <section class="mc-stats__tiles" [attr.aria-label]="'STATISTICS.SUMMARY' | translate">
+      <div class="mc-stats__tile">
+        <span class="mc-stats__tile-label">{{ 'STATISTICS.TILES.REVENUE' | translate }}</span>
+        <span class="mc-stats__tile-value">{{ formatMoney(totalRevenue()) }}</span>
+        <span class="mc-stats__tile-sub">
+          {{ 'STATISTICS.SERIES.MEDICINES' | translate }} {{ formatMoney(d.ordersRevenue) }} ·
+          {{ 'STATISTICS.SERIES.TREATMENTS' | translate }} {{ formatMoney(d.reservationsRevenue) }}
+        </span>
+      </div>
+      <div class="mc-stats__tile">
+        <span class="mc-stats__tile-label">{{ 'STATISTICS.TILES.ORDERS' | translate }}</span>
+        <span class="mc-stats__tile-value">{{ d.ordersCount }}</span>
+      </div>
+      <div class="mc-stats__tile">
+        <span class="mc-stats__tile-label">{{ 'STATISTICS.TILES.RESERVATIONS' | translate }}</span>
+        <span class="mc-stats__tile-value">{{ d.reservationsCount }}</span>
+      </div>
+      <div class="mc-stats__tile">
+        <span class="mc-stats__tile-label">{{ 'STATISTICS.TILES.NEW_USERS' | translate }}</span>
+        <span class="mc-stats__tile-value">{{ d.newUsersCount }}</span>
+      </div>
+      <div class="mc-stats__tile">
+        <span class="mc-stats__tile-label">{{ 'STATISTICS.TILES.LOW_STOCK' | translate }}</span>
+        <span class="mc-stats__tile-value">{{ d.lowStockCount }}</span>
+        @if (d.lowStockCount > 0) {
+          <span class="mc-badge mc-badge--warning">
+            <mat-icon aria-hidden="true">warning</mat-icon>
+            {{ 'STATISTICS.TILES.NEEDS_RESTOCK' | translate }}
+          </span>
+        }
+      </div>
+    </section>
+
+    @if (d.ordersCount === 0 && d.reservationsCount === 0) {
+      <div class="mc-state">
+        <mat-icon class="mc-state__icon" aria-hidden="true">query_stats</mat-icon>
+        <span>{{ 'STATISTICS.NO_DATA' | translate }}</span>
+      </div>
+    }
+
+    <div class="mc-stats__grid">
+      @if (hasMonthlyData()) {
+        <section class="mc-card mc-stats__card mc-stats__card--wide">
+          <h2 class="mc-card__title">{{ 'STATISTICS.CHARTS.REVENUE_BY_MONTH' | translate }}</h2>
+          <p class="mc-card__sub">{{ 'STATISTICS.CHARTS.REVENUE_BY_MONTH_SUB' | translate }}</p>
+          <app-mc-chart
+            type="line"
+            [labels]="revenueChart().labels"
+            [series]="revenueChart().series"
+            [money]="true"
+            [ariaLabel]="'STATISTICS.CHARTS.REVENUE_BY_MONTH' | translate"
+          ></app-mc-chart>
+        </section>
+
+        <section class="mc-card mc-stats__card mc-stats__card--wide">
+          <h2 class="mc-card__title">{{ 'STATISTICS.CHARTS.ACTIVITY_BY_MONTH' | translate }}</h2>
+          <app-mc-chart
+            type="bar"
+            [labels]="activityChart().labels"
+            [series]="activityChart().series"
+            [ariaLabel]="'STATISTICS.CHARTS.ACTIVITY_BY_MONTH' | translate"
+          ></app-mc-chart>
+        </section>
+      }
+
+      @if (d.ordersCount > 0) {
+        <section class="mc-card mc-stats__card">
+          <h2 class="mc-card__title">{{ 'STATISTICS.CHARTS.ORDERS_BY_STATUS' | translate }}</h2>
+          <app-mc-chart
+            [horizontal]="true"
+            [labels]="ordersByStatusChart().labels"
+            [series]="ordersByStatusChart().series"
+            [ariaLabel]="'STATISTICS.CHARTS.ORDERS_BY_STATUS' | translate"
+          ></app-mc-chart>
+        </section>
+      }
+
+      @if (d.topMedicines.length > 0) {
+        <section class="mc-card mc-stats__card">
+          <h2 class="mc-card__title">{{ 'STATISTICS.CHARTS.TOP_MEDICINES' | translate }}</h2>
+          <app-mc-chart
+            [horizontal]="true"
+            [labels]="topMedicinesChart().labels"
+            [series]="topMedicinesChart().series"
+            [ariaLabel]="'STATISTICS.CHARTS.TOP_MEDICINES' | translate"
+          ></app-mc-chart>
+        </section>
+      }
+
+      @if (hasReservations()) {
+        <section class="mc-card mc-stats__card">
+          <h2 class="mc-card__title">{{ 'STATISTICS.CHARTS.RESERVATIONS_BY_TREATMENT' | translate }}</h2>
+          <app-mc-chart
+            [horizontal]="true"
+            [labels]="reservationsByTreatmentChart().labels"
+            [series]="reservationsByTreatmentChart().series"
+            [ariaLabel]="'STATISTICS.CHARTS.RESERVATIONS_BY_TREATMENT' | translate"
+          ></app-mc-chart>
+        </section>
+
+        <section class="mc-card mc-stats__card">
+          <h2 class="mc-card__title">{{ 'STATISTICS.CHARTS.RESERVATIONS_BY_WEEKDAY' | translate }}</h2>
+          <app-mc-chart
+            type="bar"
+            [labels]="reservationsByWeekdayChart().labels"
+            [series]="reservationsByWeekdayChart().series"
+            [ariaLabel]="'STATISTICS.CHARTS.RESERVATIONS_BY_WEEKDAY' | translate"
+          ></app-mc-chart>
+        </section>
+      }
+
+      <!-- Stock is the current state, so it is shown for every period -->
+      <section class="mc-card mc-stats__card mc-stats__card--wide">
+        <h2 class="mc-card__title">{{ 'STATISTICS.LOW_STOCK.TITLE' | translate }}</h2>
+        <p class="mc-card__sub">{{ 'STATISTICS.LOW_STOCK.SUB' | translate }}</p>
+        @if (d.lowStock.length === 0) {
+          <span class="mc-badge mc-badge--success">
+            <mat-icon aria-hidden="true">check_circle</mat-icon>
+            {{ 'STATISTICS.LOW_STOCK.ALL_GOOD' | translate }}
+          </span>
+        } @else {
+          <ul class="mc-stats__stock">
+            @for (item of d.lowStock; track item.name) {
+              <li>
+                <span>{{ item.name }}</span>
+                @if (item.quantityInStock === 0) {
+                  <span class="mc-badge mc-badge--danger">
+                    <mat-icon aria-hidden="true">error</mat-icon>
+                    {{ 'STATISTICS.LOW_STOCK.OUT_OF_STOCK' | translate }}
+                  </span>
+                } @else {
+                  <span class="mc-badge mc-badge--warning">
+                    <mat-icon aria-hidden="true">warning</mat-icon>
+                    {{ 'STATISTICS.LOW_STOCK.PIECES' | translate: { count: item.quantityInStock } }}
+                  </span>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+  }
+</div>

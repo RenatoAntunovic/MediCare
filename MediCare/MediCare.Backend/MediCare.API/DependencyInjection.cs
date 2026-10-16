@@ -4,7 +4,10 @@ using MediCare.Shared.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 using System.Text;
+using MediCare.Application.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Market.API;
 
@@ -60,6 +63,32 @@ public static class DependencyInjection
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)),
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
+            };
+
+            // A valid signature is not enough: after a password change TokenVersion is increased,
+            // so every access token issued before it ("ver" claim) is rejected immediately (401),
+            // not only when it expires. A disabled or deleted user is rejected the same way.
+            o.Events = new JwtBearerEvents
+            {
+                OnTokenValidated = async ctx =>
+                {
+                    var principal = ctx.Principal;
+                    if (!int.TryParse(principal?.FindFirstValue(ClaimTypes.NameIdentifier), out var userId) ||
+                        !int.TryParse(principal?.FindFirstValue("ver"), out var tokenVersion))
+                    {
+                        ctx.Fail("Token is missing the user id or version.");
+                        return;
+                    }
+
+                    var db = ctx.HttpContext.RequestServices.GetRequiredService<IAppDbContext>();
+                    var currentVersion = await db.Users.AsNoTracking()
+                        .Where(u => u.Id == userId && u.IsEnabled)
+                        .Select(u => (int?)u.TokenVersion)
+                        .FirstOrDefaultAsync(ctx.HttpContext.RequestAborted);
+
+                    if (currentVersion != tokenVersion)
+                        ctx.Fail("Token is no longer valid.");
+                }
             };
         });
 

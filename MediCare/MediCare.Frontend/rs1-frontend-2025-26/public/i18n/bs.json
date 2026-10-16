@@ -37,6 +37,8 @@
       "ORDERS": "Pregled narudžbi",
       "SYSTEM": "Sistem",
       "SETTINGS": "Postavke",
+      "STATISTICS": "Statistika",
+      "ASSISTANT": "AI asistent",
       "LOGOUT": "Odjava"
     }
   },
@@ -60,6 +62,7 @@
       "ORDERS": "Pregled narudžbi",
       "SYSTEM": "Sistem",
       "SETTINGS": "Postavke",
+      "ASSISTANT": "AI asistent",
       "LOGOUT": "Odjava"
     }
   },
@@ -541,5 +544,91 @@
     "CONFLICT": "Ova akcija je u konfliktu sa postojećim podacima.",
     "VALIDATION": "Provjerite formu za greške.",
     "UNKNOWN": "Nepoznata greška."
+  },
+  "STATISTICS": {
+    "TITLE": "Statistika",
+    "SUMMARY": "Sažetak",
+    "LOAD_ERROR": "Statistiku nije moguće učitati.",
+    "NO_DATA": "Nema narudžbi ni rezervacija u odabranom periodu.",
+    "SHOW_TABLE": "Prikaži kao tabelu",
+    "PERIOD": {
+      "LABEL": "Period",
+      "ALL": "Sve",
+      "LAST_30_DAYS": "Zadnjih 30 dana",
+      "LAST_3_MONTHS": "Zadnja 3 mjeseca",
+      "LAST_12_MONTHS": "Zadnjih 12 mjeseci",
+      "THIS_YEAR": "Ova godina"
+    },
+    "TILES": {
+      "REVENUE": "Ukupan prihod",
+      "ORDERS": "Narudžbe",
+      "RESERVATIONS": "Rezervacije",
+      "NEW_USERS": "Novi korisnici",
+      "LOW_STOCK": "Niske zalihe",
+      "NEEDS_RESTOCK": "Potrebna nabavka"
+    },
+    "SERIES": {
+      "MEDICINES": "Lijekovi",
+      "TREATMENTS": "Tretmani",
+      "ORDERS": "Narudžbe",
+      "RESERVATIONS": "Rezervacije",
+      "SOLD_QUANTITY": "Prodana količina"
+    },
+    "CHARTS": {
+      "REVENUE_BY_MONTH": "Prihod po mjesecima",
+      "REVENUE_BY_MONTH_SUB": "Bez nacrta i otkazanih narudžbi i rezervacija",
+      "ACTIVITY_BY_MONTH": "Narudžbe i rezervacije po mjesecima",
+      "ORDERS_BY_STATUS": "Narudžbe po statusu",
+      "TOP_MEDICINES": "Najprodavaniji lijekovi",
+      "RESERVATIONS_BY_TREATMENT": "Rezervacije po tretmanu",
+      "RESERVATIONS_BY_WEEKDAY": "Rezervacije po danu u sedmici"
+    },
+    "WEEKDAYS": {
+      "MONDAY": "Ponedjeljak",
+      "TUESDAY": "Utorak",
+      "WEDNESDAY": "Srijeda",
+      "THURSDAY": "Četvrtak",
+      "FRIDAY": "Petak"
+    },
+    "LOW_STOCK": {
+      "TITLE": "Lijekovi s niskim zalihama",
+      "SUB": "Trenutno stanje skladišta (10 komada ili manje)",
+      "ALL_GOOD": "Svi lijekovi imaju dovoljno zaliha",
+      "OUT_OF_STOCK": "Nema na stanju",
+      "PIECES": "{{count}} kom."
+    }
+  },
+  "ASSISTANT": {
+    "TITLE": "AI asistent",
+    "SUBTITLE_PATIENT": "Pitajte o lijekovima, tretmanima i slobodnim terminima",
+    "SUBTITLE_ADMIN": "Pitajte o rezervacijama, narudžbama, zalihama i statistici",
+    "INTRO_PATIENT": "Zdravo! Opišite tegobe ili pitajte za lijek ili termin – predložit ću nešto iz naše ponude.",
+    "INTRO_ADMIN": "Zdravo! Pitajte me ko je bukiran, kakvo je stanje narudžbi ili zaliha. Podatke samo čitam, ništa ne mijenjam.",
+    "NEW_CHAT": "Novi razgovor",
+    "PLACEHOLDER": "Napišite pitanje…",
+    "INPUT_LABEL": "Vaše pitanje",
+    "SEND": "Pošalji",
+    "THINKING": "Asistent piše odgovor…",
+    "BOOK": "Rezerviši",
+    "DETAILS": "Detalji lijeka",
+    "OUT_OF_STOCK": "Nema na stanju",
+    "ADDED_TO_CART": "{{name}} je dodan u korpu",
+    "DISCLAIMER": "AI asistent može pogriješiti i ne zamjenjuje pregled kod ljekara. U hitnim slučajevima zovite 124 ili 112.",
+    "EXAMPLES": {
+      "PATIENT_HEADACHE": "Boli me glava od jutros, šta mi preporučuješ?",
+      "PATIENT_BACK": "Imam bolove u leđima, kod koga da zakažem pregled?",
+      "PATIENT_SLOTS": "Kad ima slobodan termin za opšti pregled ove sedmice?",
+      "PATIENT_MY_BOOKINGS": "Koje termine imam zakazane?",
+      "ADMIN_TODAY": "Ko je bukiran danas i sutra?",
+      "ADMIN_ORDERS": "Kakvo je stanje narudžbi – koliko ih čeka obradu?",
+      "ADMIN_STOCK": "Kojih lijekova ima malo na stanju?",
+      "ADMIN_MONTH": "Koliki je prihod bio prošlog mjeseca?"
+    },
+    "ERRORS": {
+      "OFFLINE": "Server nije dostupan. Provjerite da li je API pokrenut.",
+      "TOO_MANY": "Previše pitanja u kratkom vremenu. Sačekajte minutu.",
+      "GENERIC": "Asistent trenutno ne može odgovoriti. Pokušajte ponovo.",
+      "CART": "Lijek nije dodan u korpu. Pokušajte ponovo."
+    }
   }
 }

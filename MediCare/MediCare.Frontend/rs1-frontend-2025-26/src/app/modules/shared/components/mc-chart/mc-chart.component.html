@@ -1,0 +1,31 @@
+<span #probe class="mc-chart__probe" aria-hidden="true"></span>
+
+<div class="mc-chart__canvas" [style.height.px]="height()">
+  <canvas #canvas role="img" [attr.aria-label]="ariaLabel()"></canvas>
+</div>
+
+<details class="mc-chart__table">
+  <summary>{{ 'STATISTICS.SHOW_TABLE' | translate }}</summary>
+  <div class="mc-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          @for (s of series(); track s.label) {
+            <th scope="col">{{ s.label }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (label of labels(); track $index; let i = $index) {
+          <tr>
+            <th scope="row">{{ label }}</th>
+            @for (s of series(); track s.label) {
+              <td>{{ format(s.data[i]) }}</td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</details>

@@ -104,13 +104,15 @@ public partial class Program
                         QueueLimit = 0
                     }));
 
-                // Register: 3 new accounts per 10 minutes per IP address (fake account spam)
+                // Register: 5 attempts per minute per IP address (fake account spam).
+                // Failed attempts (e.g. a wrong phone format) count too, so the window is short –
+                // a user who mistypes waits at most 60 s, not 10 minutes.
                 options.AddPolicy("register", ctx =>
                     RateLimitPartition.GetFixedWindowLimiter(ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                         _ => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = 3,
-                            Window = TimeSpan.FromMinutes(10),
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(1),
                             QueueLimit = 0
                         }));
 
@@ -122,6 +124,9 @@ public partial class Program
 
                 // Test notifications: 5 per minute per user
                 options.AddPolicy("notifications", ctx => PerClient(ctx, 5, TimeSpan.FromMinutes(1)));
+
+                // AI assistant: 10 questions per minute per user (each one can be several calls to Groq's free plan)
+                options.AddPolicy("assistant", ctx => PerClient(ctx, 10, TimeSpan.FromMinutes(1)));
 
                 // Tell the client how long to wait and return a readable message
                 options.OnRejected = async (context, ct) =>

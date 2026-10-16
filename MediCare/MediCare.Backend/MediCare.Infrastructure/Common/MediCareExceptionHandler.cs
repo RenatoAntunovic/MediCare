@@ -43,6 +43,7 @@ public sealed class MediCareExceptionHandler(
             MediCareNotFoundException => StatusCodes.Status404NotFound,
             MediCareConflictException or MediCareBusinessRuleException => StatusCodes.Status409Conflict,
             ValidationException => StatusCodes.Status400BadRequest,
+            MediCareServiceUnavailableException => StatusCodes.Status503ServiceUnavailable,
             KeyNotFoundException => StatusCodes.Status404NotFound,
             UnauthorizedAccessException => StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status500InternalServerError
@@ -65,6 +66,11 @@ public sealed class MediCareExceptionHandler(
             case MediCareConflictException:
             case MediCareBusinessRuleException:
                 code = "entity.error";
+                message = ex.Message;
+                break;
+
+            case MediCareServiceUnavailableException:
+                code = "service.unavailable";
                 message = ex.Message;
                 break;
 

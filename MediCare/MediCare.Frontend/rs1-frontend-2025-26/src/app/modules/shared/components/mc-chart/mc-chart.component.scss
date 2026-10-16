@@ -1,0 +1,62 @@
+:host {
+  display: block;
+
+  // Chart series colors (validated for color-blind separation and 3:1 contrast in both themes)
+  --mc-chart-1: light-dark(#2a78d6, #3987e5); // blue – medicines / default
+  --mc-chart-2: light-dark(#eb6834, #d95926); // orange – treatments
+}
+
+.mc-chart__probe {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.mc-chart__canvas {
+  position: relative;
+  width: 100%;
+}
+
+.mc-chart__table {
+  margin-top: 12px;
+  color: var(--mc-text-muted);
+  font-size: 0.9375rem;
+
+  summary {
+    cursor: pointer;
+    width: fit-content;
+    padding: 4px 0;
+
+    &:focus-visible {
+      outline: 2px solid var(--mc-focus);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+  }
+
+  table {
+    width: 100%;
+    margin-top: 8px;
+    border-collapse: collapse;
+    color: var(--mc-text);
+  }
+
+  th,
+  td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--mc-border);
+    text-align: left;
+    font-weight: 400;
+  }
+
+  thead th {
+    color: var(--mc-text-muted);
+    font-weight: 600;
+  }
+
+  td {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}

@@ -58,13 +58,16 @@ addToCart(item: any) {
 
   this.cartService.addFromForLater({ forLaterId, quantity: 1 }).subscribe({
     next: (res: { message: string }) => {
+      // The server removed it from "for later" – remove it here too
+      this.items = this.items.filter(i => i.id !== forLaterId);
       this.snackbar.open(res.message, '', {
         duration: 2000,
         panelClass: ['custom-snackbar']
       });
     },
-    error: () => {
-      this.snackbar.open('Greška prilikom dodavanja', '', {
+    error: (err) => {
+      // 409 carries the reason (medicine unavailable, cart limit of 100) – show it
+      this.snackbar.open(err?.error?.message || 'Greška prilikom dodavanja', '', {
         duration: 2000,
         panelClass: ['custom-snackbar']
       });

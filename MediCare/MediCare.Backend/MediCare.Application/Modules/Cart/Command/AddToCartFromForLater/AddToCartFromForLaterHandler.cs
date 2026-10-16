@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MediCare.Application.Modules.Cart.Common;
 using MediCare.Application.Modules.Cart.Command.AddToCartFromForLater;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,39 +19,13 @@ public class AddToCartFromForLaterHandler : IRequestHandler<AddToCartFromForLate
             .FirstOrDefaultAsync(f => f.Id == request.ForLaterId && f.UserId == request.UserId, cancellationToken);
 
         if (forLater == null || forLater.Medicine == null)
-            return false; 
+            return false;
 
-        var cart = await _context.Carts
-            .Include(c => c.CartItems)
-            .FirstOrDefaultAsync(c => c.UserId == request.UserId, cancellationToken);
+        // Same rules as everywhere else: disabled medicine and the cart limit → 409
+        await CartRules.AddAsync(_context, request.UserId, forLater.Medicine, request.Quantity, cancellationToken);
 
-        if (cart == null)
-        {
-            cart = new Carts { UserId = request.UserId };
-            await _context.Carts.AddAsync(cart, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken); 
-        }
-
-        // 3️⃣ Check whether the item is already in the cart
-        var existingItem = cart.CartItems.FirstOrDefault(ci => ci.MedicineId == forLater.MedicineId);
-
-        if (existingItem != null)
-        {
-            existingItem.Quantity += request.Quantity;
-            existingItem.SetPriceFromMedicine();
-        }
-        else
-        {
-            var cartItem = new CartItems
-            {
-                CartId = cart.Id,
-                MedicineId = forLater.MedicineId,
-                Quantity = request.Quantity,
-                Medicine = forLater.Medicine
-            };
-            cartItem.SetPriceFromMedicine();
-            cart.CartItems.Add(cartItem);
-        }
+        // "For later" means "not yet" – once it's in the cart it leaves the list (soft delete)
+        _context.ForLater.Remove(forLater);
 
         await _context.SaveChangesAsync(cancellationToken);
         return true;
