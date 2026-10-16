@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Same mark as .mc-logo (src/styles/_system.scss): rounded square, blue→teal at 140°, white cross -->
+  <defs>
+    <linearGradient id="g" x1="0.047" y1="-0.04" x2="0.953" y2="1.04">
+      <stop offset="0" stop-color="#2b8fd6"/>
+      <stop offset="1" stop-color="#0a7478"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="19.2" fill="url(#g)"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="18.7" fill="none" stroke="#ffffff" stroke-opacity="0.22"/>
+  <rect x="15.36" y="27.2" width="33.28" height="9.6" rx="3.84" fill="#ffffff"/>
+  <rect x="27.2" y="15.36" width="9.6" height="33.28" rx="3.84" fill="#ffffff"/>
+</svg>
