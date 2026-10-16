@@ -51,6 +51,11 @@
         <span>{{ 'ADMIN_PANEL.MENU.STATISTICS' | translate }}</span>
       </a>
 
+      <a class="mc-nav-link" routerLink="/admin/assistant" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
+        <mat-icon aria-hidden="true">smart_toy</mat-icon>
+        <span>{{ 'ADMIN_PANEL.MENU.ASSISTANT' | translate }}</span>
+      </a>
+
       <a class="mc-nav-link" routerLink="/admin/settings" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
         <mat-icon aria-hidden="true">settings</mat-icon>
         <span>{{ 'ADMIN_PANEL.MENU.SETTINGS' | translate }}</span>

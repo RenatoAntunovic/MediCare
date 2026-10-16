@@ -1,0 +1,130 @@
+<section class="mc-chat">
+  <header class="mc-chat__header">
+    <span class="mc-chat__avatar" aria-hidden="true"><mat-icon>smart_toy</mat-icon></span>
+    <div class="mc-chat__heading">
+      <h1 class="mc-chat__title">{{ 'ASSISTANT.TITLE' | translate }}</h1>
+      <p class="mc-chat__sub">
+        {{ (mode() === 'admin' ? 'ASSISTANT.SUBTITLE_ADMIN' : 'ASSISTANT.SUBTITLE_PATIENT') | translate }}
+      </p>
+    </div>
+    @if (session.entries().length > 0) {
+      <button mat-stroked-button type="button" (click)="newConversation()" [disabled]="isSending()">
+        <mat-icon>add_comment</mat-icon>
+        {{ 'ASSISTANT.NEW_CHAT' | translate }}
+      </button>
+    }
+  </header>
+
+  <div #scroller class="mc-chat__log" role="log" aria-live="polite" [attr.aria-busy]="isSending()">
+    @if (session.entries().length === 0) {
+      <div class="mc-chat__empty">
+        <p>{{ (mode() === 'admin' ? 'ASSISTANT.INTRO_ADMIN' : 'ASSISTANT.INTRO_PATIENT') | translate }}</p>
+        <div class="mc-chat__examples">
+          @for (key of examples(); track key) {
+            <button type="button" class="mc-chat__example" (click)="sendExample(key)">
+              {{ key | translate }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @for (entry of session.entries(); track $index) {
+      <div class="mc-chat__row" [class.mc-chat__row--user]="entry.role === 'user'">
+        @if (entry.role === 'user') {
+          <div class="mc-chat__bubble mc-chat__bubble--user">{{ entry.content }}</div>
+        } @else {
+          <div class="mc-chat__bubble" [class.mc-chat__bubble--error]="entry.isError">
+            @if (entry.isError) {
+              <p class="mc-chat__error"><mat-icon aria-hidden="true">error</mat-icon>{{ entry.content }}</p>
+            } @else {
+              <div class="mc-chat__text" [innerHTML]="toHtml(entry.content)"></div>
+            }
+
+            @if (hasSuggestions(entry.suggestions)) {
+              <div class="mc-chat__actions">
+                @for (slot of entry.suggestions!.slots; track slot.treatmentId + slot.date + slot.time) {
+                  <button mat-flat-button type="button" class="mc-chat__action" (click)="bookSlot.emit(slot)">
+                    <mat-icon>event_available</mat-icon>
+                    {{ slot.treatmentName }} · {{ formatDate(slot.date) }} {{ slot.time }}
+                  </button>
+                }
+                @for (t of entry.suggestions!.treatments; track t.id) {
+                  <button mat-stroked-button type="button" class="mc-chat__action" (click)="bookTreatment.emit(t)">
+                    <mat-icon>calendar_month</mat-icon>
+                    {{ 'ASSISTANT.BOOK' | translate }}: {{ t.name }}
+                  </button>
+                }
+                @for (m of entry.suggestions!.medicines; track m.id) {
+                  <span class="mc-chat__medicine">
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      class="mc-chat__action"
+                      [disabled]="!m.inStock"
+                      (click)="addToCart.emit(m)"
+                    >
+                      <mat-icon>add_shopping_cart</mat-icon>
+                      {{ m.name }} · {{ formatPrice(m.price) }}
+                    </button>
+                    <button
+                      mat-icon-button
+                      type="button"
+                      (click)="openMedicine.emit(m)"
+                      [attr.aria-label]="('ASSISTANT.DETAILS' | translate) + ': ' + m.name"
+                      [matTooltip]="'ASSISTANT.DETAILS' | translate"
+                    >
+                      <mat-icon>info</mat-icon>
+                    </button>
+                    @if (!m.inStock) {
+                      <span class="mc-badge mc-badge--warning">{{ 'ASSISTANT.OUT_OF_STOCK' | translate }}</span>
+                    }
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (isSending()) {
+      <div class="mc-chat__row">
+        <div class="mc-chat__bubble mc-chat__typing">
+          <span class="mc-chat__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="mc-chat__sr">{{ 'ASSISTANT.THINKING' | translate }}</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <form class="mc-chat__composer" (ngSubmit)="send()">
+    <label class="mc-chat__sr" for="assistant-input">{{ 'ASSISTANT.INPUT_LABEL' | translate }}</label>
+    <textarea
+      #inputBox
+      id="assistant-input"
+      name="draft"
+      rows="1"
+      [(ngModel)]="draft"
+      [maxlength]="maxLength"
+      [placeholder]="'ASSISTANT.PLACEHOLDER' | translate"
+      (keydown)="onKeydown($event)"
+    ></textarea>
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      [disabled]="!draft.trim() || isSending()"
+      [attr.aria-label]="'ASSISTANT.SEND' | translate"
+    >
+      <mat-icon>send</mat-icon>
+    </button>
+  </form>
+
+  @if (mode() === 'patient') {
+    <p class="mc-chat__disclaimer">
+      <mat-icon aria-hidden="true">info</mat-icon>
+      {{ 'ASSISTANT.DISCLAIMER' | translate }}
+    </p>
+  }
+</section>

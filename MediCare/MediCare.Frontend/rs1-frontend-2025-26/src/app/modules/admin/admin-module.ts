@@ -21,6 +21,8 @@ import { TreatmentsAddComponent } from './services/treatments/treatments-add/tre
 import { TreatmentsEditComponent } from './services/treatments/treatments-edit/treatments-edit.component';
 import { AdminStatisticsComponent } from './statistics/admin-statistics.component';
 import { McChartComponent } from '../shared/components/mc-chart/mc-chart.component';
+import { AdminAssistantComponent } from './assistant/admin-assistant.component';
+import { AssistantChatComponent } from '../shared/components/assistant-chat/assistant-chat.component';
 
 @NgModule({
   declarations: [
@@ -40,12 +42,14 @@ import { McChartComponent } from '../shared/components/mc-chart/mc-chart.compone
     OrderDetailsDialogComponent,
     ChangeStatusDialogComponent,
     AdminStatisticsComponent,
+    AdminAssistantComponent,
   ],
   imports: [
     AdminRoutingModule,
     SharedModule,
     ReactiveFormsModule,
-    McChartComponent
+    McChartComponent,
+    AssistantChatComponent
   ]
 })
 export class AdminModule { }

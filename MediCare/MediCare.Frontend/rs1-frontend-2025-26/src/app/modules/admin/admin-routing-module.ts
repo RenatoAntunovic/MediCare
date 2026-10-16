@@ -10,6 +10,7 @@ import { TreatmentCategoriesComponent } from './services/treatment-categories/tr
 import {AdminOrdersComponent} from './orders/admin-orders.component';
 import {AdminSettingsComponent} from './admin-settings/admin-settings.component';
 import { AdminStatisticsComponent } from './statistics/admin-statistics.component';
+import { AdminAssistantComponent } from './assistant/admin-assistant.component';
 import { TreatmentComponent } from './services/treatments/treatments.component';
 import { TreatmentsAddComponent } from './services/treatments/treatments-add/treatments-add.component';
 import { TreatmentsEditComponent } from './services/treatments/treatments-edit/treatments-edit.component';
@@ -62,6 +63,10 @@ const routes: Routes = [
       {
         path: 'statistics',
         component: AdminStatisticsComponent,
+      },
+      {
+        path: 'assistant',
+        component: AdminAssistantComponent,
       },
       {
         path: 'settings',

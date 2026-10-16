@@ -22,6 +22,12 @@ interface TreatmentData {
   price: number;
 }
 
+/** Optional: open the calendar with a date/time already chosen (e.g. a slot suggested by the AI assistant). */
+export interface BookTreatmentPreselect {
+  date: string; // yyyy-MM-dd
+  time: string; // HH:mm
+}
+
 export interface BookTreatmentResult {
   reservationId: number;
   date: string;
@@ -76,10 +82,12 @@ export class BookTreatmentComponent {
   errorMessage = '';
 
   private slotsSubscription?: Subscription;
+  /** Time to select once the taken slots for the preselected date are loaded */
+  private pendingTime: string | null = null;
 
   constructor(
     public dialogRef: MatDialogRef<BookTreatmentComponent, BookTreatmentResult>,
-    @Inject(MAT_DIALOG_DATA) public data: { treatment: TreatmentData }
+    @Inject(MAT_DIALOG_DATA) public data: { treatment: TreatmentData; preselect?: BookTreatmentPreselect }
   ) {
     // On every date change, load the taken slots for that day
     this.bookingForm.controls.date.valueChanges
@@ -90,6 +98,16 @@ export class BookTreatmentComponent {
         if (date) this.loadTakenSlots(date);
         else this.takenSlots.clear();
       });
+
+    const preselect = data.preselect;
+    if (preselect) {
+      const [y, m, d] = preselect.date.split('-').map(Number);
+      const date = new Date(y, m - 1, d);
+      if (this.dateFilter(date)) {
+        this.pendingTime = preselect.time;
+        this.bookingForm.controls.date.setValue(date);
+      }
+    }
   }
 
   // ==================== CALENDAR ====================
@@ -147,6 +165,10 @@ export class BookTreatmentComponent {
         next: slots => {
           this.takenSlots = new Set(slots);
           this.isLoadingSlots = false;
+          if (this.pendingTime && this.timeSlots.includes(this.pendingTime)) {
+            this.selectSlot(this.pendingTime); // ignored if it was taken in the meantime
+          }
+          this.pendingTime = null;
         },
         error: () => {
           this.isLoadingSlots = false;

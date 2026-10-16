@@ -38,6 +38,7 @@
       "SYSTEM": "System",
       "SETTINGS": "Settings",
       "STATISTICS": "Statistics",
+      "ASSISTANT": "AI assistant",
       "LOGOUT": "Logout"
     }
   },
@@ -61,6 +62,7 @@
       "ORDERS": "Orders overview",
       "SYSTEM": "System",
       "SETTINGS": "Settings",
+      "ASSISTANT": "AI assistant",
       "LOGOUT": "Logout"
     }
   },
@@ -593,6 +595,39 @@
       "ALL_GOOD": "All medicines have enough stock",
       "OUT_OF_STOCK": "Out of stock",
       "PIECES": "{{count}} pcs"
+    }
+  },
+  "ASSISTANT": {
+    "TITLE": "AI assistant",
+    "SUBTITLE_PATIENT": "Ask about medicines, treatments and free appointments",
+    "SUBTITLE_ADMIN": "Ask about bookings, orders, stock and statistics",
+    "INTRO_PATIENT": "Hi! Describe your symptoms or ask about a medicine or an appointment – I will suggest something we offer.",
+    "INTRO_ADMIN": "Hi! Ask me who is booked, how orders or stock look. I only read data, I never change anything.",
+    "NEW_CHAT": "New conversation",
+    "PLACEHOLDER": "Type your question…",
+    "INPUT_LABEL": "Your question",
+    "SEND": "Send",
+    "THINKING": "The assistant is typing…",
+    "BOOK": "Book",
+    "DETAILS": "Medicine details",
+    "OUT_OF_STOCK": "Out of stock",
+    "ADDED_TO_CART": "{{name}} was added to the cart",
+    "DISCLAIMER": "The AI assistant can make mistakes and does not replace a doctor. In an emergency call 124 or 112.",
+    "EXAMPLES": {
+      "PATIENT_HEADACHE": "I have had a headache since this morning, what do you recommend?",
+      "PATIENT_BACK": "My back hurts, which appointment should I book?",
+      "PATIENT_SLOTS": "When is there a free general check-up this week?",
+      "PATIENT_MY_BOOKINGS": "Which appointments do I have booked?",
+      "ADMIN_TODAY": "Who is booked today and tomorrow?",
+      "ADMIN_ORDERS": "How do orders look – how many are waiting to be processed?",
+      "ADMIN_STOCK": "Which medicines are low on stock?",
+      "ADMIN_MONTH": "What was the revenue last month?"
+    },
+    "ERRORS": {
+      "OFFLINE": "The server is not reachable. Check that the API is running.",
+      "TOO_MANY": "Too many questions in a short time. Please wait a minute.",
+      "GENERIC": "The assistant cannot answer right now. Please try again.",
+      "CART": "The medicine was not added to the cart. Please try again."
     }
   }
 }

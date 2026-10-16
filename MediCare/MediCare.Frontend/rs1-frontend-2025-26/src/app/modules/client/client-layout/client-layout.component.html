@@ -49,6 +49,11 @@
         <span>{{ 'CLIENT_PANEL.MENU.TREATMENT' | translate }}</span>
       </a>
 
+      <a class="mc-nav-link" routerLink="/client/assistant" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
+        <mat-icon aria-hidden="true">smart_toy</mat-icon>
+        <span>{{ 'CLIENT_PANEL.MENU.ASSISTANT' | translate }}</span>
+      </a>
+
       <p class="mc-nav__section">{{ 'CLIENT_PANEL.MENU.SYSTEM' | translate }}</p>
 
       <a class="mc-nav-link" routerLink="/client/settings" routerLinkActive="active" (click)="isMobile() && sidenav.close()">

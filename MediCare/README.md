@@ -20,3 +20,17 @@ dotnet run
 | Admin (osnovni seed) | `admin@market.com` | `Admin` |
 | Korisnik (osnovni seed) | `client@gmail.com` | `test123` |
 | Demo pacijenti (12) | npr. `amra.hodzic@demo.medicare.com` | `demo123!` |
+
+## AI asistent (Groq)
+
+Stranica **AI asistent** (pacijent i admin) koristi [Groq](https://console.groq.com) – besplatni plan je dovoljan.
+Svako postavi svoj API ključ lokalno (user-secrets, ne commituje se):
+
+```bash
+cd MediCare.Backend/MediCare.API
+dotnet user-secrets set "Groq:ApiKey" "gsk_..."
+```
+
+- Model se mijenja preko `Groq:Model` (zadano `openai/gpt-oss-120b`).
+- Bez ključa aplikacija radi normalno, samo asistent javlja da nije podešen.
+- Asistent samo čita podatke i predlaže; rezervaciju i dodavanje u korpu korisnik potvrđuje sam.

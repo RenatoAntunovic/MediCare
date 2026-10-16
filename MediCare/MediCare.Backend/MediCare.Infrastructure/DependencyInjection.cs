@@ -1,6 +1,7 @@
 ﻿using MediCare.Application.Abstractions;
 using MediCare.Infrastructure.Common;
 using MediCare.Infrastructure.Database;
+using MediCare.Infrastructure.Services;
 using MediCare.Shared.Constants;
 using MediCare.Shared.Options;
 using Microsoft.Extensions.Configuration;
@@ -52,6 +53,11 @@ public static class DependencyInjection
 
         // TimeProvider (if used in handlers/services)
         services.AddSingleton<TimeProvider>(TimeProvider.System);
+
+        // AI assistant (Groq). No ValidateOnStart: the app must run without a key, only the assistant is disabled.
+        services.AddOptions<GroqOptions>()
+            .Bind(configuration.GetSection(GroqOptions.SectionName));
+        services.AddHttpClient<IAiChatClient, GroqChatClient>(c => c.Timeout = TimeSpan.FromSeconds(60));
 
         return services;
     }

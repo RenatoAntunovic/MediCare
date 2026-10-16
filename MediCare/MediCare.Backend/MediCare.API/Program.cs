@@ -123,6 +123,9 @@ public partial class Program
                 // Test notifications: 5 per minute per user
                 options.AddPolicy("notifications", ctx => PerClient(ctx, 5, TimeSpan.FromMinutes(1)));
 
+                // AI assistant: 10 questions per minute per user (each one can be several calls to Groq's free plan)
+                options.AddPolicy("assistant", ctx => PerClient(ctx, 10, TimeSpan.FromMinutes(1)));
+
                 // Tell the client how long to wait and return a readable message
                 options.OnRejected = async (context, ct) =>
                 {
