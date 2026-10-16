@@ -69,7 +69,12 @@ export class LoginComponent extends BaseComponent {
         this.router.navigate([target]);
       },
       error: (err) => {
-        this.stopLoading('Pogrešan email ili lozinka. Pokušajte ponovo.');
+        // status 0 = the request never reached the API (server not running, wrong URL, untrusted certificate)
+        this.stopLoading(
+          err?.status === 0
+            ? 'Server nije dostupan. Provjerite da li je API pokrenut.'
+            : 'Pogrešan email ili lozinka. Pokušajte ponovo.'
+        );
         console.error('Login error:', err);
       },
     });
