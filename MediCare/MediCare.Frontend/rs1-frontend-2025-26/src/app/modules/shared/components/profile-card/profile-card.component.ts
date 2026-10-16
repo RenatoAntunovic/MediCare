@@ -12,6 +12,7 @@ import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/cor
 import { MyProfileDto, ProfileApiService } from '../../../../api-services/profile/profile-api.service';
 import { ToasterService } from '../../../../core/services/toaster.service';
 import { startOfToday, toLocalDateString } from '../../../../core/utils/date-utils';
+import { notBlank, PHONE_PATTERN } from '../../../../core/utils/form-validators';
 
 /**
  * "My profile" card on the Settings page: shows and edits the logged-in user's personal data.
@@ -53,11 +54,11 @@ export class ProfileCardComponent implements OnInit {
 
   // Same rules as UpdateMyProfileCommandValidator on the backend
   form = this.fb.nonNullable.group({
-    firstName: ['', [Validators.required, Validators.maxLength(50)]],
-    lastName: ['', [Validators.required, Validators.maxLength(50)]],
-    phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[\d\s\-/]{9,20}$/)]],
-    address: ['', [Validators.required, Validators.maxLength(100)]],
-    city: ['', [Validators.required, Validators.maxLength(50)]],
+    firstName: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
+    lastName: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
+    phoneNumber: ['', [Validators.required, Validators.pattern(PHONE_PATTERN)]],
+    address: ['', [Validators.required, notBlank, Validators.maxLength(100)]],
+    city: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
     dateOfBirth: this.fb.control<Date | null>(null, Validators.required)
   });
 

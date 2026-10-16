@@ -11,6 +11,8 @@ import { ProfileApiService } from '../../../../api-services/profile/profile-api.
 import { AuthFacadeService } from '../../../../core/services/auth/auth-facade.service';
 import { ToasterService } from '../../../../core/services/toaster.service';
 
+import { differentFrom } from '../../../../core/utils/form-validators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 /** "New password" and "Confirm" must match (error is set on the form group) */
 function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   const newPassword = group.get('newPassword')?.value;
@@ -52,11 +54,18 @@ export class ChangePasswordCardComponent {
   form = this.fb.nonNullable.group(
     {
       currentPassword: ['', Validators.required],
-      newPassword: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
+      newPassword: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100), differentFrom('currentPassword')]],
       confirmPassword: ['', Validators.required]
     },
     { validators: passwordsMatch }
   );
+
+  constructor() {
+    // "Must differ from the current password" depends on the other field – re-check when it changes
+    this.form.controls.currentPassword.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.form.controls.newPassword.updateValueAndValidity({ emitEvent: false }));
+  }
 
   submit(): void {
     if (this.form.invalid) {
