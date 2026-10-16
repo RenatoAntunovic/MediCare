@@ -68,8 +68,9 @@ addToCart(item: any) {
         panelClass: ['custom-snackbar']
       });
     },
-    error: () => {
-      this.snackbar.open('Greška prilikom dodavanja', '', {
+    error: (err) => {
+      // 409 carries the reason (medicine unavailable, cart limit of 100) – show it
+      this.snackbar.open(err?.error?.message || 'Greška prilikom dodavanja', '', {
         duration: 2000,
         panelClass: ['custom-snackbar']
       });

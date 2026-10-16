@@ -52,7 +52,7 @@ export class ClientAssistantComponent {
   onAddToCart(medicine: AssistantMedicineSuggestion): void {
     this.cartApi.addToCart({ medicineId: medicine.id, quantity: 1 }).subscribe({
       next: () => this.toaster.success(this.translate.instant('ASSISTANT.ADDED_TO_CART', { name: medicine.name })),
-      error: () => this.toaster.error(this.translate.instant('ASSISTANT.ERRORS.CART')),
+      error: err => this.toaster.error(err?.error?.message || this.translate.instant('ASSISTANT.ERRORS.CART')),
     });
   }
 

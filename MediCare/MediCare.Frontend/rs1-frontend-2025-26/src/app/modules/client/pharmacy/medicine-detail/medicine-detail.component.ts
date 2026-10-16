@@ -130,7 +130,7 @@ export class MedicineDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        this.toaster.error('Greška pri dodavanju u korpu');
+        this.toaster.error(err?.error?.message || 'Greška pri dodavanju u korpu');
       }
     });
   }
