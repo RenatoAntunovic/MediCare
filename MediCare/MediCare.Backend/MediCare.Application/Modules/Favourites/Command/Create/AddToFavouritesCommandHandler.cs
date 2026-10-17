@@ -27,8 +27,14 @@ using Microsoft.EntityFrameworkCore;
 
             int userId = _currentUser.UserId.Value;
 
-            // 🔎 Check whether it is already in favourites
-            var existing = await _context.Favourites
+        var medicineExists = await _context.Medicine
+            .AnyAsync(m => m.Id == request.MedicineId, cancellationToken);
+
+        if (!medicineExists)
+            throw new MediCareNotFoundException($"Lijek sa Id {request.MedicineId} ne postoji.");
+
+        // 🔎 Check whether it is already in favourites
+        var existing = await _context.Favourites
                 .FirstOrDefaultAsync(x =>
                     x.UserId == userId &&
                     x.MedicineId == request.MedicineId &&
