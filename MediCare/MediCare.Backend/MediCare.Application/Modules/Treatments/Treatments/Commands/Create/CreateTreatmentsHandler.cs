@@ -20,6 +20,12 @@ public class CreateTreatmentsCommandHandler(IAppDbContext context)
             throw new MediCareConflictException("Name already exists.");
         }
 
+        var categoryExists = await context.TreatmentCategories
+            .AnyAsync(c => c.Id == request.TreatmentCategoryId, cancellationToken);
+
+        if (!categoryExists)
+            throw new MediCareNotFoundException("Odabrana kategorija ne postoji.");
+
         var treatment = new Treatments
         {
             ServiceName = request.ServiceName!.Trim(),

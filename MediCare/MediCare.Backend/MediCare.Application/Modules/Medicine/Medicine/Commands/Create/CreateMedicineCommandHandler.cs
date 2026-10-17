@@ -14,6 +14,12 @@ public class CreateMedicineCommandHandler(IAppDbContext context, IMedicineSearch
         if (exists)
             throw new MediCareConflictException("Lijek s tim nazivom već postoji.");
 
+        var categoryExists = await context.MedicineCategories
+            .AnyAsync(c => c.Id == request.MedicineCategoryId, cancellationToken);
+
+        if (!categoryExists)
+            throw new MediCareNotFoundException("Odabrana kategorija ne postoji.");
+
         var medicine = new Medicine
         {
             Name = normalized,

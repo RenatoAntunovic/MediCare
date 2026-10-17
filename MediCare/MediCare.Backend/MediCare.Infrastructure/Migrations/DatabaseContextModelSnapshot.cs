@@ -671,9 +671,12 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.HasIndex("OrderStatusId");
 
-                    b.HasIndex("TreatmentId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("TreatmentId", "ReservationDate", "ReservationTime")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Reservations_Slot")
+                        .HasFilter("[OrderStatusId] <> 5 AND [IsDeleted] = 0");
 
                     b.ToTable("Reservations");
                 });

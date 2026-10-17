@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace MediCare.API.Controllers;
 
 /// <summary>
-/// Public full-text medicine search (Elasticsearch or SQL fallback, depending on configuration).
+/// Public full-text medicine search (Lucene or SQL fallback, depending on configuration).
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]

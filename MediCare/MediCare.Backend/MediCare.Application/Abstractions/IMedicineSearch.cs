@@ -1,7 +1,7 @@
 namespace MediCare.Application.Abstractions;
 
 /// <summary>
-/// A single medicine search result (same shape for Elasticsearch and SQL search).
+/// A single medicine search result (same shape for Lucene and SQL search).
 /// </summary>
 public sealed class MedicineSearchItemDto
 {
@@ -30,7 +30,7 @@ public sealed class MedicineSearchResultDto
 }
 
 /// <summary>
-/// Medicine search. Implemented by Elasticsearch (if enabled) or the SQL fallback.
+/// Medicine search. Implemented by Lucene (if enabled) or the SQL fallback.
 /// </summary>
 public interface IMedicineSearchService
 {

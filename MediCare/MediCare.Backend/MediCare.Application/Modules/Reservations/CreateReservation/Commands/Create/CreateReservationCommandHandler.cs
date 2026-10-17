@@ -50,6 +50,16 @@ public sealed class CreateReservationCommandHandler(IAppDbContext ctx)
         };
 
         ctx.Reservations.Add(reservation);
+
+        try
+        {
+            await ctx.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("IX_Reservations_Slot") == true)
+        {
+            // Someone booked the same slot a moment earlier
+            throw new MediCareConflictException("Ovaj termin je upravo zauzet. Odaberite drugi termin.");
+        }
         await ctx.SaveChangesAsync(ct);
 
         return reservation.Id;
