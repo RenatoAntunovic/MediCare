@@ -131,7 +131,7 @@ export class TreatmentCategoriesComponent
         console.error('Delete category error:', err);
         this.dialogHelper.showError(
           'DIALOGS.TITLES.ERROR',
-          'PRODUCT_CATEGORIES.DIALOGS.ERROR_DELETE'
+           err?.error?.message || 'TREATMENT_CATEGORIES.DIALOGS.ERROR_DELETE'
         ).subscribe();
       },
     });

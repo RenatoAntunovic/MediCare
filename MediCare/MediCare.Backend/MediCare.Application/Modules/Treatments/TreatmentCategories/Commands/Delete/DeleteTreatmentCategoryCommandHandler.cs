@@ -6,13 +6,21 @@ public class DeleteTreatmentCategoryCommandHandler(IAppDbContext context, IAppCu
     public async Task<Unit> Handle(DeleteTreatmentCategoryCommand request, CancellationToken cancellationToken)
     {
         if (appCurrentUser.UserId is null)
-            throw new MediCareBusinessRuleException("123", "Korisnik nije autentifikovan.");
+            throw new MediCareBusinessRuleException("123", "Usere isn't autentificated.");
 
         var category = await context.TreatmentCategories
             .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
         if (category is null)
-            throw new MediCareNotFoundException("Kategorija nije pronađena.");
+            throw new MediCareNotFoundException("Category not found.");
+
+        var hasTreatments = await context.Treatments
+    .AnyAsync(t => t.TreatmentCategoryId == category.Id, cancellationToken);
+
+        if (hasTreatments)
+            throw new MediCareBusinessRuleException(
+                "category.notEmpty",
+               "Category can't be deleted because it contains medicine. First move them to another category or delete.");
 
         category.IsDeleted = true; // Soft delete
         category.isEnabled = false;
