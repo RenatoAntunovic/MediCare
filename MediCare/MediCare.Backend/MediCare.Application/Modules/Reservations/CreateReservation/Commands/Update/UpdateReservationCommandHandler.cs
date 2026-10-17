@@ -52,7 +52,14 @@ namespace MediCare.Application.Modules.Reservations.Commands.Update
             reservation.ReservationTime = request.ReservationTime;
             reservation.Price = treatment.Price;
 
-            await _context.SaveChangesAsync(cancellationToken);
+            try
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("IX_Reservations_Slot") == true)
+            {
+                throw new MediCareConflictException("Odabrani termin je zauzet. Odaberite drugi termin.");
+            }
 
             return new UpdateReservationResponse
             {
