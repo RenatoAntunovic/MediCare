@@ -12,11 +12,11 @@ public sealed class LoginCommandHandler(
 
         var user = await ctx.Users.Include(x => x.Role)
             .FirstOrDefaultAsync(x => x.Email.ToLower() == email && x.IsEnabled && !x.IsDeleted, ct)
-            ?? throw new MediCareNotFoundException("The user is not found or is disabled.");
+            ??  throw new MediCareConflictException("Wrong email or password.");
 
         var verify = hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (verify == PasswordVerificationResult.Failed)
-            throw new MediCareConflictException("Wrong credentials.");
+            throw new MediCareConflictException("Wrong email or password.");
 
         var tokens = jwt.IssueTokens(user);
 
