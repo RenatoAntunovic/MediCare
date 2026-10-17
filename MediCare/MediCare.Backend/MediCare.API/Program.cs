@@ -1,5 +1,3 @@
-using Elastic.Clients.Elasticsearch;
-using Elastic.Transport;
 using Market.API;
 using Market.API.Middlewares;
 using Market.Application;
@@ -181,11 +179,8 @@ public partial class Program
             // FULL-TEXT SEARCH – Search:Provider in appsettings.json
             //   "Lucene"        → Lucene.Net, runs inside the API (default, no extra server needed)
             //   "Sql"           → plain SQL LIKE search (always works, simplest)
-            //   "Elasticsearch" → external Elasticsearch server (must be running)
-            // For backward compatibility, Elasticsearch:Enabled = true still selects Elasticsearch.
             // ---------------------------------------------------------
-            var searchProvider = (builder.Configuration["Search:Provider"]
-                    ?? (builder.Configuration.GetValue<bool>("Elasticsearch:Enabled") ? "Elasticsearch" : "Lucene"))
+            var searchProvider = (builder.Configuration["Search:Provider"] ?? "Lucene")
                 .Trim()
                 .ToLowerInvariant();
 
@@ -201,25 +196,10 @@ public partial class Program
                     builder.Services.AddScoped<IMedicineSearchService, SqlMedicineSearchService>();
                     builder.Services.AddSingleton<IMedicineSearchIndex, NoOpMedicineSearchIndex>();
                     break;
-
-                case "elasticsearch":
-                {
-                    var esUri = builder.Configuration["Elasticsearch:Uri"] ?? "https://localhost:9200";
-                    var esUsername = builder.Configuration["Elasticsearch:Username"] ?? "elastic";
-                    var esPassword = builder.Configuration["Elasticsearch:Password"] ?? string.Empty;
-                    var settings = new ElasticsearchClientSettings(new Uri(esUri))
-                        .Authentication(new BasicAuthentication(esUsername, esPassword))
-                        .ServerCertificateValidationCallback((o, certificate, chain, errors) => true); // local development only
-                    builder.Services.AddSingleton(new ElasticsearchClient(settings));
-                    builder.Services.AddSingleton<ElasticsearchService>();
-                    builder.Services.AddSingleton<IMedicineSearchService>(sp => sp.GetRequiredService<ElasticsearchService>());
-                    builder.Services.AddSingleton<IMedicineSearchIndex>(sp => sp.GetRequiredService<ElasticsearchService>());
-                    break;
-                }
-
+       
                 default:
                     throw new InvalidOperationException(
-                        $"Unknown Search:Provider '{searchProvider}'. Allowed values: Lucene, Sql, Elasticsearch.");
+                        $"Unknown Search:Provider '{searchProvider}'. Allowed values: Lucene, Sql.");
             }
 
             var app = builder.Build();
@@ -266,7 +246,7 @@ public partial class Program
             // ===== SEARCH INDEX: build it from the database on startup =====
             // Lucene keeps its index in memory, so it must be rebuilt on every start.
             // If the index cannot be built (e.g. Elasticsearch is down), the application still starts.
-            if (searchProvider is "lucene" or "elasticsearch")
+            if (searchProvider == "lucene")
             {
                 try
                 {

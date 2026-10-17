@@ -5,7 +5,7 @@ MediCare is a **full-stack** healtcare managment project consisting of:
 - **Backend:** ASP.NET Core Web API (.NET 8)
 - **Frontend:** Angular application
 
-The goal of the project is to practice building a real-world style application (API + client) with layered architecture, authentication, CRUD modules and integrations (Swagger, logging, optional Elasticsearch.
+The goal of the project is to practice building a real-world style application (API + client) with layered architecture, authentication, CRUD modules and integrations (Swagger, logging).
 
 > ⚠️ **Project status:** This project is still **in development**. Some modules are functional, while other parts are incomplete or planned.
 
@@ -17,7 +17,7 @@ The goal of the project is to practice building a real-world style application (
 - Entity Framework Core
 - Swagger (OpenAPI)
 - Serilog (logging)
-- Elasticsearch (optional module) (you can enable elasticsearch by removing comment lines on Program.cs that are related to it, you need to have running elasticsearch 8.9.3 version before starting the backend)
+- Lucene.Net (full-text search, runs inside the API) 
 
 ### Frontend
 - Angular
@@ -55,7 +55,7 @@ Reservations
 - Reserve medicines
 
 Search
-- Search functionality using Elasticsearch (optional module)
+- Full-text medicine search (Lucene.Net)
 
 Sync
 - Synchronization endpoints for updating search indexes

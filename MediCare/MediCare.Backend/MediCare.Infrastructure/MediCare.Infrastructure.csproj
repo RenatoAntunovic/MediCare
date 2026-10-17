@@ -8,7 +8,6 @@
 
   <ItemGroup>
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	<PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.2.2" />
 	<PackageReference Include="Lucene.Net" Version="4.8.0-beta00018" />
 	<PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00018" />
 	<PackageReference Include="MediatR" Version="12.5.0" />
@@ -34,6 +33,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

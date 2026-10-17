@@ -3,7 +3,7 @@ using MediCare.Application.Modules.MedicineSearch;
 namespace MediCare.API.Controllers;
 
 /// <summary>
-/// Manual rebuild of the search index (e.g. after Elasticsearch is started later).
+/// Manual rebuild of the search index (e.g. after bulk data changes).
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
