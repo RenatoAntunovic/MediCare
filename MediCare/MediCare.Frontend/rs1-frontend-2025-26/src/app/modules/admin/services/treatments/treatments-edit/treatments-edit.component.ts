@@ -97,14 +97,9 @@ formData.append('TreatmentCategoryId',(formValue.categoryId ?? this.model?.treat
 formData.append('isEnabled','true');
 
 
+// Only a newly chosen image is sent – without one the backend keeps the existing image
 if (this.selectedFile) {
   formData.append('ImageFile', this.selectedFile);
-} else if (this.originalImageFile) {
-  // sends the original image if the user didn't change it
-  formData.append('ImageFile', this.originalImageFile);
-} else {
-  // if the backend allows it, send an empty field
-  formData.append('ImageFile', '');
 }
 
   this.api.updateFormData(this.treatmentId, formData).subscribe({

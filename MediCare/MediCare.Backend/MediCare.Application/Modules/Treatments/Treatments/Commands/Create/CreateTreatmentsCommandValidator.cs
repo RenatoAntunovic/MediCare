@@ -13,5 +13,11 @@ public sealed class CreateTreatmentsCommandValidator
         RuleFor(x => x.ImageFile)
            .NotNull().WithMessage("Image is required.")
            .MustBeValidImage();
+
+        RuleFor(x => x.Price)
+    .GreaterThan(0).WithMessage("Cijena mora biti veća od 0.");
+
+        RuleFor(x => x.TreatmentCategoryId)
+            .GreaterThan(0).WithMessage("Kategorija mora biti odabrana.");
     }
 }

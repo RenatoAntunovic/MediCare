@@ -63,7 +63,7 @@ createFormData(formData: FormData) {
    * Update an existing product.
    */
   update(id: number, data: FormData) {
-  return this.http.put(`/api/Medicine/${id}`, data);
+    return this.http.put(`${this.baseUrl}/${id}`, data);
 }
 
 updateFormData(id: number, formData: FormData): Observable<void> {

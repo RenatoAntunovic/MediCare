@@ -13,17 +13,24 @@ public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
 
         if (entity is null)
             throw new MediCareNotFoundException($"Treatment (ID={request.Id}) not found.");
-    
+
+        var normalizedName = request.ServiceName.Trim();
+
         // Check for duplicate name (case-insensitive, except for the same ID)
         var exists = await ctx.Treatments
-            .AnyAsync(x => x.Id != request.Id && x.ServiceName.ToLower() == request.ServiceName.ToLower(), ct);
+            .AnyAsync(x => x.Id != request.Id && x.ServiceName.ToLower() == normalizedName.ToLower(), ct);
 
         if (exists)
-        {
-            throw new MediCareConflictException("Name already exists.");
-        }
+            throw new MediCareConflictException("Tretman s tim nazivom već postoji.");
 
-        entity.ServiceName = request.ServiceName;
+        var categoryExists = await ctx.TreatmentCategories
+            .AnyAsync(c => c.Id == request.TreatmentCategoryId, ct);
+
+        if (!categoryExists)
+            throw new MediCareNotFoundException("Odabrana kategorija ne postoji.");
+
+        // isEnabled is NOT changed here – status is changed only via the Enable/Disable endpoints
+        entity.ServiceName = normalizedName;
         entity.Price = request.Price;
         entity.TreatmentCategoryId = request.TreatmentCategoryId;
         entity.Description = request.Description;
@@ -56,46 +63,5 @@ public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
         await ctx.SaveChangesAsync(ct);
 
         return Unit.Value;
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //if (!string.IsNullOrWhiteSpace(request.Name))
-        //{
-        //    // Check for duplicate
-        //    var exists = await ctx.Medicine
-        //        .AnyAsync(x => x.Id != request.Id && x.Name.ToLower() == request.Name.ToLower(), ct);
-
-        //    if (exists)
-        //        throw new MarketConflictException("Name already exists.");
-
-        //    entity.Name = request.Name.Trim();
-        //}
-
-        //if (!string.IsNullOrWhiteSpace(request.Description))
-        //    entity.Description = request.Description;
-
-        //if (request.Price.HasValue)
-        //    entity.Price = request.Price.Value;
-
-        //if (request.Weight.HasValue)
-        //    entity.Weight = request.Weight.Value;
-
-        //if (!string.IsNullOrWhiteSpace(request.ImagePath))
-        //    entity.ImagePath = request.ImagePath;
-
-        //if (request.MedicineCategoryId.HasValue)
-        //{
-        //    entity.MedicineCategoryId = request.MedicineCategoryId.Value;
-        //}
     }
 }
