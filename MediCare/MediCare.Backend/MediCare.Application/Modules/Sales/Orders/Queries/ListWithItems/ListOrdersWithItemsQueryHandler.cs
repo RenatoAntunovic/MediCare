@@ -14,6 +14,15 @@ public sealed class ListOrdersWithItemsQueryHandler(IAppDbContext ctx, IAppCurre
         }
         var searchTerm = request.Search?.Trim().ToLower() ?? string.Empty;
 
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            q = q.Where(x =>
+                x.User.FirstName.ToLower().Contains(searchTerm) ||
+                x.User.LastName.ToLower().Contains(searchTerm) ||
+                x.User.City.ToLower().Contains(searchTerm) ||
+                x.Id.ToString().Contains(searchTerm));
+        }
+
         var projectedQuery = q.OrderBy(x => x.OrderDate)
             .Select(x => new ListOrdersWithItemsQueryDto
             {
