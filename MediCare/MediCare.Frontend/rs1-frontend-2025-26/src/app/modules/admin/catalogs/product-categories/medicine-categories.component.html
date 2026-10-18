@@ -115,9 +115,9 @@
       <tr class="mat-mdc-no-data-row" *matNoDataRow>
         <td class="mat-mdc-cell" [attr.colspan]="displayedColumns.length">
           <ng-container *ngIf="request.search; else noDataDefault">
-            {{ 'PRODUCT_CATEGORIES.NO_DATA_FILTER' | translate }}
+            {{ 'MEDICINE_CATEGORIES.NO_DATA_FILTER' | translate }}
           </ng-container>
-          <ng-template #noDataDefault>{{ 'PRODUCT_CATEGORIES.NO_DATA' | translate }}</ng-template>
+          <ng-template #noDataDefault>{{ 'MEDICINE_CATEGORIES.NO_DATA' | translate }}</ng-template>
         </td>
       </tr>
     </table>
