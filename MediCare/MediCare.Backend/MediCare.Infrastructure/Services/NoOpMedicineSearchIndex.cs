@@ -3,7 +3,7 @@ using MediCare.Application.Abstractions;
 namespace MediCare.Infrastructure.Services;
 
 /// <summary>
-/// Used when Elasticsearch is NOT enabled – SQL search always reads fresh data,
+/// Used with the SQL search provider – SQL search always reads fresh data,
 /// so there is no index to maintain.
 /// </summary>
 public sealed class NoOpMedicineSearchIndex : IMedicineSearchIndex
