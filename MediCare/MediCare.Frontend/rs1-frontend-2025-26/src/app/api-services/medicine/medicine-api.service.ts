@@ -90,7 +90,7 @@ updateFormData(id: number, formData: FormData): Observable<void> {
   }
 
     /**
-   * ELASTICSEARCH SEARCH
+   * FULL-TEXT SEARCH (Lucene)
    */
   searchMedicines(query: string, page: number = 1, pageSize: number = 10): Observable<any> {
     const params = buildHttpParams({

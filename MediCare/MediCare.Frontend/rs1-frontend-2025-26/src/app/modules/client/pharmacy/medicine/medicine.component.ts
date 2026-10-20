@@ -127,12 +127,29 @@ export class MedicineComponent
     // With search – full-text search (name + description + category)
     this.api.searchMedicines(query, this.request.paging.page, this.request.paging.pageSize)
       .subscribe({
-        next: (response) => {
-          this.items = response.results ?? response;
+               next: (response) => {
+          // Search results have a different shape than the list (category instead of medicineCategoryName,
+          // no isEnabled – the index holds only active medicines), so map them to the list shape
+          const selectedCategory = this.categories.find(c => c.id === this.categoryFilter)?.name;
+
+          this.items = (response.results ?? [])
+            .map((r: any) => ({
+              id: r.id,
+              name: r.name,
+              description: r.description,
+              price: r.price,
+              weight: r.weight,
+              imagePath: r.imagePath,
+              medicineCategoryName: r.category,
+              isEnabled: true
+            }))
+            // The search endpoint has no category filter, so apply the selected one here
+            .filter((m: any) => !selectedCategory || m.medicineCategoryName === selectedCategory);
+
           this.stopLoading();
         },
         error: (err) => {
-          console.error('Load error (ES):', err);
+          console.error('Load error (search):', err);
           this.stopLoading('Failed to load medicines');
         }
       });
