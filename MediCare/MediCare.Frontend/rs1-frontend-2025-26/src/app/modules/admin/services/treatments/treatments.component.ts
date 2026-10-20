@@ -130,10 +130,10 @@ onToggleStatus(treatment: ListTreatmentsQueryDto): void {
       error: (err) => {
         this.stopLoading();
 
-        this.dialogHelper.showError(
-          'DIALOGS.TITLES.ERROR',
-          'TREATMENTS.DIALOGS.ERROR_DELETE'
-        ).subscribe();
+    this.dialogHelper.showError(
+      'DIALOGS.TITLES.ERROR',
+      err?.error?.message || 'TREATMENTS.DIALOGS.ERROR_DELETE'
+      ).subscribe();
 
         console.error('Delete treatment error:', err);
       }

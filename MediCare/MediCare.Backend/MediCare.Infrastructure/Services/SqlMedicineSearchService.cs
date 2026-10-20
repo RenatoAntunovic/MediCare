@@ -4,7 +4,7 @@ using MediCare.Application.Modules.MedicineSearch;
 namespace MediCare.Infrastructure.Services;
 
 /// <summary>
-/// SQL-based fallback search used when Elasticsearch is not enabled.
+/// SQL-based fallback search (Search:Provider = "Sql").
 /// Every word of the query must appear in the name, description or category (AND between words).
 /// Results whose name STARTS with the first word are ranked first.
 /// </summary>

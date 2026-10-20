@@ -68,6 +68,7 @@
   },
 "CART":{
   "TITLE":"Košara",
+   "ACTIONS": { "REMOVE_TOOLTIP": "Ukloni iz korpe" },
 "TABLE": {
       "QUANTITY": "Količina",
       "PRICE": "Cijena (KM)",
@@ -79,6 +80,7 @@
 },
 "FAVOURITES":{
   "TITLE":"Favoriti",
+   "ACTIONS": { "REMOVE_TOOLTIP": "Ukloni iz favorita" },
 "TABLE": {
       "PRICE": "Cijena (KM)",
       "ACTIONS": "Akcije"
@@ -88,6 +90,7 @@
 },
 "FOR_LATER":{
   "TITLE":"Za kasnije",
+   "ACTIONS": { "REMOVE_TOOLTIP": "Ukloni iz liste" },
 "TABLE": {
       "PRICE": "Cijena (KM)",
       "ACTIONS": "Akcije"

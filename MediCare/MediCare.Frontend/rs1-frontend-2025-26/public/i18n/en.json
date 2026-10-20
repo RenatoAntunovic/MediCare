@@ -68,6 +68,7 @@
   },
   "CART":{
     "TITLE":"Cart",
+    "ACTIONS": { "REMOVE_TOOLTIP": "Remove from cart" },
 "TABLE": {
       "QUANTITY": "Quantity",
       "PRICE": "Price (KM)",
@@ -79,6 +80,7 @@
 },
 "FAVOURITES":{
     "TITLE":"Favourites",
+    "ACTIONS": { "REMOVE_TOOLTIP": "Remove from favourites" },
 "TABLE": {
       "PRICE": "Price (KM)",
       "ACTIONS": "Action"
@@ -88,6 +90,7 @@
 },
 "FOR_LATER":{
     "TITLE":"For later",
+    "ACTIONS": { "REMOVE_TOOLTIP": "Remove from list" },
 "TABLE": {
       "PRICE": "Price (KM)",
       "ACTIONS": "Action"
@@ -301,7 +304,8 @@
       "STOCK_PLACEHOLDER": "0",
       "CANCEL": "Cancel",
       "SAVE": "Save",
-      "UPDATE": "Update"
+      "UPDATE": "Update",
+      "STATUS": "Status"
     },
     "DIALOGS": {
       "DELETE_TITLE": "Delete treatment",

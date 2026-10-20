@@ -161,7 +161,7 @@ export class MedicineComponent
       error: (err) => {
         this.isSaving = false;
         console.error('Delete medicine error:', err);
-        this.dialogHelper.showError('DIALOGS.TITLES.ERROR', 'MEDICINE.DIALOGS.ERROR_DELETE').subscribe();
+        this.dialogHelper.showError('DIALOGS.TITLES.ERROR', err?.error?.message || 'MEDICINE.DIALOGS.ERROR_DELETE').subscribe();
       }
     });
   }

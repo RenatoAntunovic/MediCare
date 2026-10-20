@@ -245,7 +245,7 @@ public partial class Program
 
             // ===== SEARCH INDEX: build it from the database on startup =====
             // Lucene keeps its index in memory, so it must be rebuilt on every start.
-            // If the index cannot be built (e.g. Elasticsearch is down), the application still starts.
+            // If the index cannot be built (e.g. a database error), the application still starts.
             if (searchProvider == "lucene")
             {
                 try
