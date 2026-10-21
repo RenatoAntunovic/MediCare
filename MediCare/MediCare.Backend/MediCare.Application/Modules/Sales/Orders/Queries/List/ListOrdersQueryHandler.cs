@@ -30,7 +30,7 @@ public sealed class ListOrdersQueryHandler(IAppDbContext ctx, IAppCurrentUser cu
                 x.Id.ToString().Contains(searchTerm));
         }
 
-        var projectedQuery = q.OrderBy(x => x.OrderDate)
+        var projectedQuery = q.OrderByDescending(x => x.OrderDate).ThenByDescending(x => x.Id)
             .Select(x => new ListOrdersQueryDto
             {
                 Id = x.Id,

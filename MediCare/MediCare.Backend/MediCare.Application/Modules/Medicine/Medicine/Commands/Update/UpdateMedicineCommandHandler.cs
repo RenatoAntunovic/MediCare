@@ -43,9 +43,18 @@ public sealed class UpdateMedicineCommandHandler(IAppDbContext ctx, IMedicineSea
 
             if (!string.IsNullOrWhiteSpace(entity.ImagePath))
             {
+                // The same file can be shared (the seed uses one image for several items),
+                // so it is deleted only if no other medicine or treatment still points to it.
+                var relative = entity.ImagePath.TrimStart('/', '\\');
+                var withSlash = "/" + relative;
+
+                var usedElsewhere =
+                    await ctx.Medicine.AnyAsync(m => m.Id != entity.Id && (m.ImagePath == relative || m.ImagePath == withSlash), ct) ||
+                    await ctx.Treatments.AnyAsync(t => t.ImagePath == relative || t.ImagePath == withSlash, ct);
+
                 // TrimStart: seed paths start with "/", so Path.Combine would return an absolute path
-                var oldPath = Path.Combine("wwwroot", entity.ImagePath.TrimStart('/', '\\'));
-                if (File.Exists(oldPath))
+                var oldPath = Path.Combine("wwwroot", relative);
+                if (!usedElsewhere && File.Exists(oldPath))
                     File.Delete(oldPath);
             }
 

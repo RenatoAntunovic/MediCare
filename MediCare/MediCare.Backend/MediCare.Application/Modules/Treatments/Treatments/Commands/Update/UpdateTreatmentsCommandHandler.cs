@@ -43,10 +43,18 @@ public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
                 Directory.CreateDirectory(uploadsFolder);
 
             // (optional) delete the old image
+            // Delete the old image only if no other treatment or medicine still uses it
             if (!string.IsNullOrWhiteSpace(entity.ImagePath))
             {
-                var oldPath = Path.Combine("wwwroot", entity.ImagePath.TrimStart('/', '\\'));
-                if (File.Exists(oldPath))
+                var relative = entity.ImagePath.TrimStart('/', '\\');
+                var withSlash = "/" + relative;
+
+                var usedElsewhere =
+                    await ctx.Treatments.AnyAsync(t => t.Id != entity.Id && (t.ImagePath == relative || t.ImagePath == withSlash), ct) ||
+                    await ctx.Medicine.AnyAsync(m => m.ImagePath == relative || m.ImagePath == withSlash, ct);
+
+                var oldPath = Path.Combine("wwwroot", relative);
+                if (!usedElsewhere && File.Exists(oldPath))
                     File.Delete(oldPath);
             }
 

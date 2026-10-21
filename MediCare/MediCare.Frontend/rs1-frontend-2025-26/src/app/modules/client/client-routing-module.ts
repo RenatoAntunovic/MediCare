@@ -56,12 +56,6 @@ const routes: Routes = [
         path: 'settings',
         component: ClientSettingsComponent,
       },
-
-      {
-        path: '',
-        redirectTo: 'hospital',
-        pathMatch: 'full',
-      },
     ]
   },
 ];
