@@ -39,7 +39,7 @@ public class DeleteForLaterCommandHandler : IRequestHandler<DeleteForLaterComman
             throw new KeyNotFoundException($"Medicine for later with Id {request.Id} not found.");
         }
 
-        // Obriši stavku iz baze
+        // Delete the item from the database
         _context.ForLater.Remove(forLater);
         await _context.SaveChangesAsync(cancellationToken);
 

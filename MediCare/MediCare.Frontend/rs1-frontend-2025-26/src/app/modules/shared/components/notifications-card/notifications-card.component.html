@@ -1,0 +1,37 @@
+<section class="mc-card" aria-labelledby="settings-notifications">
+  <h2 class="mc-card__title" id="settings-notifications">Obavještenja</h2>
+
+  <div class="mc-setting-row">
+    <span class="mc-setting-row__label" id="settings-push-label">
+      Push obavještenja na ovom uređaju
+      <span class="mc-setting-row__hint">
+        Obavijest kad je narudžba zaprimljena i kad se promijeni status narudžbe ili rezervacije.
+      </span>
+    </span>
+    <mat-slide-toggle
+      color="primary"
+      [checked]="isOn()"
+      [disabled]="isLocked() || isBusy"
+      (change)="onToggle($event.checked)"
+      aria-labelledby="settings-push-label"
+    ></mat-slide-toggle>
+  </div>
+
+  <!-- Explanations for the states where the switch can't be used -->
+  <p *ngIf="status() === 'blocked'" class="mc-notif__note mc-notif__note--warning" role="status">
+    <mat-icon aria-hidden="true">block</mat-icon>
+    Obavještenja su blokirana u pregledniku. Kliknite ikonu lijevo od adrese stranice → Obavještenja → Dozvoli,
+    pa osvježite stranicu.
+  </p>
+  <p *ngIf="status() === 'unsupported'" class="mc-notif__note" role="status">
+    <mat-icon aria-hidden="true">info</mat-icon>
+    Ovaj preglednik ne podržava push obavještenja.
+  </p>
+
+  <div *ngIf="isOn()" class="mc-notif__actions">
+    <button mat-stroked-button type="button" (click)="sendTest()" [disabled]="isSendingTest">
+      <mat-icon>notifications_active</mat-icon>
+      {{ isSendingTest ? 'Šaljem…' : 'Pošalji test obavještenje' }}
+    </button>
+  </div>
+</section>

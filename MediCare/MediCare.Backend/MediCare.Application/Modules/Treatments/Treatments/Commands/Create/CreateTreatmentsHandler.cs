@@ -20,6 +20,12 @@ public class CreateTreatmentsCommandHandler(IAppDbContext context)
             throw new MediCareConflictException("Name already exists.");
         }
 
+        var categoryExists = await context.TreatmentCategories
+            .AnyAsync(c => c.Id == request.TreatmentCategoryId, cancellationToken);
+
+        if (!categoryExists)
+            throw new MediCareNotFoundException("Odabrana kategorija ne postoji.");
+
         var treatment = new Treatments
         {
             ServiceName = request.ServiceName!.Trim(),
@@ -32,19 +38,18 @@ public class CreateTreatmentsCommandHandler(IAppDbContext context)
 
         if (request.ImageFile != null && request.ImageFile.Length > 0)
         {
-            var uploadsFolder = Path.Combine("wwwroot", "images"); // folder za slike
+            var uploadsFolder = Path.Combine("wwwroot", "images"); // images folder
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
-            var uniqueFileName = Guid.NewGuid().ToString() + "_" + request.ImageFile.FileName;
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(request.ImageFile.FileName)}"; var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await request.ImageFile.CopyToAsync(fileStream, cancellationToken);
             }
 
-            // Spremi relativnu putanju u bazu
+            // Save the relative path to the database
             treatment.ImagePath = "images/" + uniqueFileName;
         }
 

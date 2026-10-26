@@ -10,6 +10,5 @@ namespace MediCare.Application.Modules.Cart.Command.Checkout
     {
         public int OrderId { get; set; }
         public decimal TotalPrice { get; set; }
-        public string UserFcmToken { get; set; }
     }
 }

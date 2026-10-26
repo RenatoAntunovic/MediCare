@@ -1,4 +1,4 @@
-﻿namespace MediCare.Application.Modules.Reservations.Queries.GetById
+namespace MediCare.Application.Modules.Reservations.Queries.GetById
 {
     public class ReservationDetailDto
     {
@@ -11,5 +11,6 @@
         public TimeSpan ReservationTime { get; set; }
         public string OrderStatus { get; set; }
         public decimal Price { get; set; }
+        public string? Notes { get; set; }
     }
 }

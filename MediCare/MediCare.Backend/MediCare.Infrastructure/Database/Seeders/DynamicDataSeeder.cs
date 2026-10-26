@@ -5,17 +5,14 @@ using System.Runtime.CompilerServices;
 namespace MediCare.Infrastructure.Database.Seeders;
 
 /// <summary>
-/// Dynamic seeder koji se pokreće u runtime-u,
-/// obično pri startu aplikacije (npr. u Program.cs).
-/// Koristi se za unos demo/test podataka koji nisu dio migracije.
+/// Dynamic seeder that runs at runtime,
+/// usually when the application starts (e.g. in Program.cs).
+/// Used to insert demo/test data that is not part of the migrations.
 /// </summary>
 public static class DynamicDataSeeder
 {
     public static async Task SeedAsync(DatabaseContext context)
     {
-        // Osiguraj da baza postoji (bez migracija)
-        await context.Database.EnsureCreatedAsync();
-
         await SeedRolesAsync(context);
         await SeedUsersAsync(context);
         await SeedMedicineCategoriesAsync(context);
@@ -338,61 +335,6 @@ public static class DynamicDataSeeder
             Console.WriteLine("✅ Dynamic seed: order status added.");
         }
     }
-
-    public static async Task SeedOrderAndItemsAsync(DatabaseContext context)
-    {
-        if (await context.Orders.AnyAsync())
-            return; // seed je već pokrenut
-
-        // 1️⃣ Kreiramo ordere s itemima
-        var orders = new List<Orders>
-        {
-            new Orders
-            {
-                UserId = 1, // mora postojati u Users
-                OrderDate = new DateTime(2025, 11, 5),
-                OrderStatusId = 1, // Pending
-                OrderItems = new List<OrderItems>
-                {
-                    new OrderItems { MedicineId = 1, Price = 10.5m, Quantity = 2 },
-                    new OrderItems { MedicineId = 2, Price = 20m, Quantity = 1 }
-                }
-            },
-            new Orders
-            {
-                UserId = 2,
-                OrderDate = new DateTime(2025, 11, 6),
-                OrderStatusId = 2, // Completed
-                OrderItems = new List<OrderItems>
-                {
-                    new OrderItems { MedicineId = 2, Price = 15m, Quantity = 3 }
-                }
-            },
-            new Orders
-            {
-                UserId = 1,
-                OrderDate = new DateTime(2025, 11, 7),
-                OrderStatusId = 1, // Pending
-                OrderItems = new List<OrderItems>
-                {
-                    new OrderItems { MedicineId = 1, Price = 10.5m, Quantity = 1 },
-                    new OrderItems { MedicineId = 2, Price = 30m, Quantity = 2 }
-                }
-            },
-        };
-
-        // 2️⃣ Automatski računamo TotalPrice za svaki order
-        foreach (var order in orders)
-        {
-            order.TotalPrice = order.OrderItems.Sum(i => i.Price * i.Quantity);
-        }
-
-        // 3️⃣ Dodajemo u bazu
-        context.Orders.AddRange(orders);
-        await context.SaveChangesAsync();
-
-        Console.WriteLine("✅ Dynamic seed: orders and order items added.");
-    }
     private static async Task SeedPaymentStatusAsync(DatabaseContext context)
     {
         if(!await context.PaymentStatus.AnyAsync())
@@ -497,6 +439,10 @@ public static class DynamicDataSeeder
             }
         }
     }
+    /// <summary>
+    /// Two demo accounts: one admin (Id 1) and one regular user (Id 2).
+    /// The other seeds (cart, favourites, orders, reservations) use UserId 1 and 2.
+    /// </summary>
     private static async Task SeedUsersAsync(DatabaseContext context)
     {
         if (await context.Users.AnyAsync())
@@ -507,71 +453,38 @@ public static class DynamicDataSeeder
         var adminRole = await context.Roles.FirstAsync(r => r.Name == "Admin");
         var userRole = await context.Roles.FirstAsync(r => r.Name == "User");
 
-        var pass1 = "Admin";
-
         var admin = new Users
         {
             Email = "admin@market.com",
-            FirstName = "Renato",
-            LastName = "Antunovic",
-            UserName = "admin1",
+            FirstName = "admin",
+            LastName = "lastname",
+            UserName = "admin",
             PhoneNumber = "061-111-111",
-            Password = pass1,
-            Adress = "Adresa1",
-            City = "Grad1",
-            RoleId = 1,
+            Adress = "Adresa 1",
+            City = "Mostar",
             Role = adminRole,
-            PasswordHash = hasher.HashPassword(null!, pass1),
+            PasswordHash = hasher.HashPassword(null!, "Admin"),
             IsEnabled = true,
         };
 
         var user = new Users
         {
-            Email = "manager@market.local",
-            FirstName = "user1",
-            LastName = "user1",
-            UserName = "admin1",
+            Email = "client@gmail.com",
+            FirstName = "client",
+            LastName = "lastname",
+            UserName = "user",
             PhoneNumber = "062-222-222",
-            Password = "user1",
-            Adress = "Adresa2",
-            City = "Grad2",
-            RoleId = 1,
-            Role = adminRole,
-            PasswordHash = hasher.HashPassword(null!, "User123!"),
-            IsEnabled = true,
-        };
-
-        var dummyForSwagger = new Users
-        {
-            Email = "string",
-            FirstName = "user2",
-            LastName = "user2",
-            UserName = "admin2",
-            PhoneNumber = "063-333-333",
-            Password = "Admin3",
-            Adress = "Adresa3",
-            City = "Grad3",
-            RoleId = 1,
-            Role = adminRole,
-            PasswordHash = hasher.HashPassword(null!, "string"),
-            IsEnabled = true,
-        };
-        var dummyForTests = new Users
-        {
-            Email = "test",
-            FirstName = "user4",
-            LastName = "user4",
-            UserName = "user2",
-            PhoneNumber = "063-333-333",
-            Password = "Admin3",
-            Adress = "Adresa3",
-            City = "Grad3",
-            RoleId = 2,
+            Adress = "Adresa 2",
+            City = "Mostar",
             Role = userRole,
             PasswordHash = hasher.HashPassword(null!, "test123"),
             IsEnabled = true,
         };
-        context.Users.AddRange(admin, user, dummyForSwagger, dummyForTests);
+
+        // Added one by one so the Ids are guaranteed: admin = 1, user = 2
+        context.Users.Add(admin);
+        await context.SaveChangesAsync();
+        context.Users.Add(user);
         await context.SaveChangesAsync();
 
         Console.WriteLine("✅ Dynamic seed: demo users added.");
@@ -587,7 +500,7 @@ public static class DynamicDataSeeder
                     Price = 50.00m,
                     Description = "Dijabetes i zljezde.",
                     ImagePath = "/images/Endokrinologija.jpg",
-                    TreatmentCategoryId = 1, // pretpostavljamo da postoji kategorija sa Id = 1
+                    TreatmentCategoryId = 1, // assumes a category with Id = 1 exists
                     isEnabled = true
                 },
                 new Treatments
@@ -596,7 +509,7 @@ public static class DynamicDataSeeder
                     Price = 80.00m,
                     Description = "Zenski reproduktivni organi",
                     ImagePath = "/images/Ginekologija.jfif",
-                    TreatmentCategoryId = 2, // pretpostavljamo da postoji kategorija sa Id = 2
+                    TreatmentCategoryId = 2, // assumes a category with Id = 2 exists
                     isEnabled = true
                 }
             );
@@ -615,7 +528,7 @@ public static class DynamicDataSeeder
                     Name = "Brufen",
                     Price = 5.50m,
                     Description = "Pain reliever and anti-inflammatory medication.",
-                    MedicineCategoryId = 1, // pretpostavljamo da postoji kategorija sa Id = 1
+                    MedicineCategoryId = 1, // assumes a category with Id = 1 exists
                     ImagePath = "/images/Brufen.png",
                     Weight = 200, // mg
                     isEnabled = true
@@ -651,20 +564,19 @@ public static class DynamicDataSeeder
         if (await context.Orders.AnyAsync())
             return;
 
-        // Dohvati korisnike koji postoje
+        // Get existing users
         var userAdmin = await context.Users.FirstAsync(u => u.Email == "admin@market.com");
-        var userManager = await context.Users.FirstAsync(u => u.Email == "manager@market.local");
+        var userManager = await context.Users.FirstAsync(u => u.Email == "client@gmail.com");
 
-        // Dohvati statuse narudžbi
-        var statusPending = await context.OrderStatus.FirstAsync(s => s.StatusName == "Pending");
-        var statusProcessing = await context.OrderStatus.FirstAsync(s => s.StatusName == "Processing");
-
-        // Dohvati lijekove
+        // Get order statuses
+        var statusPending = await context.OrderStatus.FirstAsync(s => s.StatusName == "DRAFT");
+        var statusProcessing = await context.OrderStatus.FirstAsync(s => s.StatusName == "CONFIRMED");
+        // Get medicines
         var medBrufen = await context.Medicine.FirstAsync(m => m.Name == "Brufen");
         var medAspirin = await context.Medicine.FirstAsync(m => m.Name == "Aspirin");
         var medParacetamol = await context.Medicine.FirstAsync(m => m.Name == "Paracetamol");
 
-        // Kreiraj narudžbe
+        // Create orders
         var orders = new List<Orders>
     {
         new Orders
@@ -674,8 +586,8 @@ public static class DynamicDataSeeder
             OrderDate = new DateTime(2025, 11, 5),
             OrderItems = new List<OrderItems>
             {
-                new OrderItems { MedicineId = medBrufen.Id, Quantity = 2, Price = 10.5m },
-                new OrderItems { MedicineId = medAspirin.Id, Quantity = 1, Price = 20m }
+                new OrderItems { MedicineId = medBrufen.Id, Quantity = 2, Price = medBrufen.Price * 2 },
+                new OrderItems { MedicineId = medAspirin.Id, Quantity = 1, Price = medAspirin.Price * 1 }
             }
         },
         new Orders
@@ -685,18 +597,18 @@ public static class DynamicDataSeeder
             OrderDate = new DateTime(2025, 11, 6),
             OrderItems = new List<OrderItems>
             {
-                new OrderItems { MedicineId = medParacetamol.Id, Quantity = 3, Price = 15m }
+                new OrderItems { MedicineId = medParacetamol.Id, Quantity = 3, Price = medParacetamol.Price * 3 }
             }
         }
     };
 
-        // Izračunaj ukupnu cijenu za svaku narudžbu
+        // Calculate the total price for each order
         foreach (var order in orders)
         {
-            order.TotalPrice = order.OrderItems.Sum(i => i.Quantity * i.Price);
+            order.TotalPrice = order.OrderItems.Sum(i => i.Price);
         }
 
-        // Dodaj u kontekst i snimi
+        // Add to the context and save
         context.Orders.AddRange(orders);
         await context.SaveChangesAsync();
 

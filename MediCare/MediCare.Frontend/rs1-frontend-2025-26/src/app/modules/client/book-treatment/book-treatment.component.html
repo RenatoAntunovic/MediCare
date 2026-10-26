@@ -1,60 +1,101 @@
 <h2 mat-dialog-title class="dialog-title">
-  <mat-icon>book_online</mat-icon>
+  <mat-icon>event_available</mat-icon>
   Rezervacija: {{ data.treatment.serviceName }}
 </h2>
 
 <div mat-dialog-content class="dialog-content">
-  <form [formGroup]="bookingForm" class="booking-form">
+  <form [formGroup]="bookingForm" class="booking-form" (ngSubmit)="saveBooking()">
 
-    <!-- DATUM + VRIJEME dropdown -->
-    <div class="datetime-row">
-      <!-- DATUM PICKER -->
-      <mat-form-field appearance="outline" class="half-width">
-        <mat-label>Datum</mat-label>
-        <input
-          matInput
-          [matDatepicker]="datePicker"
-          formControlName="date"
-          [matDatepickerFilter]="dateFilter"
-          >
-        <mat-datepicker-toggle matIconSuffix [for]="datePicker"></mat-datepicker-toggle>
-        <mat-datepicker
-          #datePicker
-          [dateClass]="dateClass"
-          panelClass="workday-calendar">
-        </mat-datepicker>
-      </mat-form-field>
+    <!-- 1. CALENDAR (inline – always visible) -->
+    <section class="step">
+      <h3 class="step-title">Odaberite dan</h3>
+      <div class="calendar-card">
+        <mat-calendar
+          class="workday-calendar"
+          [selected]="selectedDate"
+          (selectedChange)="bookingForm.controls.date.setValue($event)"
+          [minDate]="minDate"
+          [dateFilter]="dateFilter"
+          [dateClass]="dateClass">
+        </mat-calendar>
+      </div>
+      <p class="field-hint">Termini su dostupni radnim danima, najranije od sutra.</p>
+    </section>
 
-      <!-- TIME DROPDOWN -->
-      <mat-form-field appearance="outline" class="half-width">
-        <mat-label>Vrijeme</mat-label>
-        <mat-select formControlName="time">
-          <mat-option *ngFor="let slot of timeSlots" [value]="slot">
+    <!-- 2. TIME SLOTS -->
+    <section class="step" *ngIf="selectedDate">
+      <h3 class="step-title">
+        Odaberite termin – {{ selectedDateLabel }}
+      </h3>
+
+      <div *ngIf="isLoadingSlots" class="slots-loading">
+        <mat-progress-spinner mode="indeterminate" diameter="22"></mat-progress-spinner>
+        <span>Provjera slobodnih termina…</span>
+      </div>
+
+      <p *ngIf="slotsError" class="slots-warning" role="status">{{ slotsError }}</p>
+
+      <ng-container *ngIf="!isLoadingSlots">
+        <div class="slots-grid" role="listbox" aria-label="Termini">
+          <button
+            *ngFor="let slot of timeSlots"
+            type="button"
+            class="slot"
+            role="option"
+            [class.slot-taken]="isTaken(slot)"
+            [class.slot-selected]="isSelected(slot)"
+            [disabled]="isTaken(slot)"
+            [attr.aria-selected]="isSelected(slot)"
+            [attr.aria-label]="slot + (isTaken(slot) ? ' – zauzeto' : '')"
+            (click)="selectSlot(slot)">
             {{ slot }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
+          </button>
+        </div>
 
-    <!-- OPIS -->
+        <div class="legend">
+          <span><i class="dot dot-free"></i> slobodno ({{ freeSlotsCount }})</span>
+          <span><i class="dot dot-taken"></i> zauzeto</span>
+          <span><i class="dot dot-selected"></i> odabrano</span>
+        </div>
+
+        <p *ngIf="freeSlotsCount === 0" class="slots-warning">
+          Za ovaj dan nema slobodnih termina. Odaberite drugi dan.
+        </p>
+      </ng-container>
+
+      <mat-error *ngIf="bookingForm.controls.time.touched && bookingForm.controls.time.invalid">
+        Odaberite termin.
+      </mat-error>
+    </section>
+
+    <!-- 3. DESCRIPTION -->
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Opis problema</mat-label>
-      <textarea matInput formControlName="description" rows="4"></textarea>
+      <mat-label>Opis problema (nije obavezno)</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        rows="3"
+        [maxlength]="notesMaxLength">
+      </textarea>
+      <mat-hint align="end">{{ bookingForm.controls.description.value?.length || 0 }} / {{ notesMaxLength }}</mat-hint>
     </mat-form-field>
+
+    <p *ngIf="errorMessage" class="form-error" role="alert">{{ errorMessage }}</p>
   </form>
 </div>
 
 <div mat-dialog-actions align="end" class="dialog-actions">
   <div class="total-text">
-    UKUPNO: {{ data.treatment.price }} KM
+    Cijena: {{ data.treatment.price | number: '1.2-2' }} KM
   </div>
   <span class="flex-spacer"></span>
-  <button mat-button mat-dialog-close>Otkaži</button>
+  <button mat-button type="button" mat-dialog-close [disabled]="isSaving">Otkaži</button>
   <button
-    mat-raised-button
+    mat-flat-button
     color="primary"
-    [disabled]="bookingForm.invalid"
+    type="button"
+    [disabled]="bookingForm.invalid || isSaving || isLoadingSlots"
     (click)="saveBooking()">
-    Potvrdi rezervaciju
+    {{ isSaving ? 'Rezervišem…' : 'Potvrdi rezervaciju' }}
   </button>
 </div>

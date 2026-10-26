@@ -17,13 +17,9 @@ namespace MediCare.Infrastructure.Database
 
             var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
 
-            optionsBuilder.UseSqlServer(
-          "Data Source=DESKTOP-O6GMT7T;" +
-          "Initial Catalog=MediCareDb;" +
-          "Integrated Security=True;" +
-          "TrustServerCertificate=True;" +
-          "MultipleActiveResultSets=True"
-      );
+            var connectionString = configuration.GetConnectionString("Main");
+
+            optionsBuilder.UseSqlServer(connectionString);
 
             return new DatabaseContext(
                 optionsBuilder.Options,

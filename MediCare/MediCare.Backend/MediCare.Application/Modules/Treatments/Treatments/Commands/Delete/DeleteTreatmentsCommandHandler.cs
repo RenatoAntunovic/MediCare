@@ -12,7 +12,15 @@ public class DeleteTreatmentsCommandHandler(IAppDbContext context, IAppCurrentUs
             .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
         if (treatments is null)
-            throw new MediCareNotFoundException("Kategorija nije pronađena.");
+            throw new MediCareNotFoundException("Tretman nije pronađen.");
+
+        var hasReservations = await context.Reservations
+            .AnyAsync(r => r.TreatmentId == treatments.Id, cancellationToken);
+
+        if (hasReservations)
+            throw new MediCareBusinessRuleException(
+                "treatment.delete.hasReservations",
+                "Tretman se ne može obrisati jer ima rezervacije. Umjesto brisanja ga deaktivirajte.");
 
         treatments.IsDeleted = true; // Soft delete
         treatments.isEnabled = false;

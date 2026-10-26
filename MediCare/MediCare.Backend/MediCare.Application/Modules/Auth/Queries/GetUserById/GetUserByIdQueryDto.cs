@@ -11,7 +11,7 @@ namespace MediCare.Application.Modules.Auth.Queries.GetUserById
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public string Address { get; set; }  // popravio tipografsku grešku Adress -> Address
+        public string Address { get; set; }  // fixed the typo Adress -> Address
         public string City { get; set; }
 
         public string UserName { get; set; }

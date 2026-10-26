@@ -1,0 +1,58 @@
+// Global base. Intentionally small: no universal resets, so pages that have not been redesigned yet
+// keep their current layout while they inherit the new fonts, colours and Material look.
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--mc-font);
+  font-size: 1rem;
+  line-height: 1.55;
+  font-weight: 400;
+  color: var(--mc-text);
+  background-color: var(--mc-bg);
+  color-scheme: light;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
+  // The existing dark-mode switch (adds this class to <body>) now only has to flip `color-scheme`:
+  // every token in _tokens.scss uses light-dark().
+  &.dark-mode {
+    color-scheme: dark;
+  }
+}
+
+// Visible keyboard focus everywhere (3px ring, high contrast in both themes)
+:focus-visible {
+  outline: 3px solid var(--mc-focus);
+  outline-offset: 2px;
+}
+
+// Respect "reduce motion" system setting
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// Snackbar / toaster variants (class names are used by ToasterService – do not rename).
+// Status is conveyed by colour AND by the message text; colours keep >= 4.5:1 contrast with white text.
+.snackbar-success,
+.snackbar-error,
+.snackbar-warning,
+.snackbar-info {
+  --mat-snack-bar-button-color: #ffffff;
+  --mat-snack-bar-supporting-text-color: #ffffff;
+}
+.snackbar-success { --mat-snack-bar-container-color: #1c7c4f; }
+.snackbar-error   { --mat-snack-bar-container-color: #b42318; }
+.snackbar-warning { --mat-snack-bar-container-color: #8a5300; }
+.snackbar-info    { --mat-snack-bar-container-color: #0b63a8; }

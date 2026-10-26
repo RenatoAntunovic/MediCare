@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+using FluentValidation;
+using MediCare.Application.Modules.Reservations.Common;
 
 namespace MediCare.Application.Modules.Reservations.Commands.Update
 {
@@ -13,10 +14,12 @@ namespace MediCare.Application.Modules.Reservations.Commands.Update
                 .GreaterThan(0).WithMessage("Tretman je obavezan.");
 
             RuleFor(x => x.ReservationDate)
-                .GreaterThanOrEqualTo(DateTime.Today).WithMessage("Datum mora biti u budućnosti.");
+                .Must(ReservationRules.IsBookableDate)
+                .WithMessage("Termin se može rezervisati najranije za sutra, i to samo radnim danom.");
 
             RuleFor(x => x.ReservationTime)
-                .NotEmpty().WithMessage("Vrijeme je obavezno.");
+                .Must(ReservationRules.IsValidSlot)
+                .WithMessage("Termin mora biti između 08:00 i 17:00, na puni sat ili pola sata.");
         }
     }
 }

@@ -1,319 +1,86 @@
-// Teget paleta
-$primary-color: #4976b5;
-$primary-light: #6b96d1;
-$primary-lighter: #e8f0f9;
-$primary-dark: #3a5e91;
-
-$text-primary: #2c3e50;
-$text-secondary: #546e7a;
-$border-color: rgba(73, 118, 181, 0.15);
-$hover-bg: rgba(73, 118, 181, 0.08);
-
+// Shared paginator bar – used by every paged list (client + admin). Tokens only, so dark mode is automatic.
 .paginator-bar {
-  padding: 0;
-  background: transparent;
+  margin-top: 24px;
+  padding: 14px 18px;
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius-lg);
+}
 
-  .paginator-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
-    padding: 16px 24px;
-    background: white;
-    border-radius: 0 0 16px 16px;
-  }
+.paginator-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 24px;
+}
 
-  // Info Section
-  .paginator-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: $text-secondary;
-    font-size: 14px;
-    flex-wrap: wrap;
+.paginator-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  color: var(--mc-text-muted);
+  font-size: 1rem;
 
-    .info-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-      color: $primary-color;
-    }
+  strong { color: var(--mc-text); }
+  .info-icon { display: none; }
+  .info-divider { opacity: 0.6; }
+}
 
-    .info-text,
-    .info-total {
-      display: flex;
-      align-items: center;
-      gap: 4px;
+.paginator-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+}
 
-      strong {
-        color: $primary-color;
-        font-weight: 600;
-      }
-    }
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 
-    .info-divider {
-      color: rgba(73, 118, 181, 0.3);
-      font-weight: bold;
-    }
-  }
+  .selector-label { color: var(--mc-text-muted); font-size: 1rem; }
 
-  // Actions Section
-  .paginator-actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-
-    // Page Size Selector
-    .page-size-selector {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-
-      .selector-label {
-        color: $text-secondary;
-        font-size: 14px;
-        font-weight: 500;
-        white-space: nowrap;
-      }
-
-      .page-size-field {
-        width: 80px;
-        height: 65px;
-
-        ::ng-deep {
-          .mat-form-field-wrapper {
-            padding-bottom: 0;
-            margin: 0;
-          }
-          .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-            background-color: white !important;
-          }
-
-          .mat-form-field-flex {
-            height: 40px;
-            align-items: center;
-            padding: 0 8px;
-          }
-
-          .mat-form-field-outline {
-            color: $border-color;
-          }
-
-          .mat-form-field-outline-thick {
-            color: $primary-color;
-          }
-
-          .mat-form-field-infix {
-            padding: 8px 0;
-            border-top: none;
-            width: auto;
-          }
-
-          .mat-select {
-            padding: 0;
-          }
-
-          .mat-select-value {
-            color: $primary-color;
-            font-weight: 600;
-            font-size: 15px;
-          }
-
-          .mat-select-arrow {
-            color: $primary-color;
-            margin: 0 0 0 4px;
-          }
-
-          .mat-form-field-subscript-wrapper {
-            display: none;
-          }
-        }
-      }
-    }
-
-    // Navigation Buttons
-    .nav-buttons {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-
-      .nav-btn {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        height: 40px;
-        padding: 0 16px;
-        border: 2px solid $border-color;
-        border-radius: 8px;
-        color: $primary-color;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        background: white;
-
-        mat-icon {
-          font-size: 20px;
-          width: 20px;
-          height: 20px;
-        }
-
-        &:not(:disabled):hover {
-          background: $primary-lighter;
-          border-color: $primary-color;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(73, 118, 181, 0.2);
-        }
-
-        &:not(:disabled):active {
-          transform: translateY(0);
-        }
-
-        &:disabled {
-          opacity: 0.4;
-          cursor: not-allowed;
-          background: #f5f5f5;
-          border-color: #e0e0e0;
-          color: $text-secondary;
-        }
-      }
-
-      .page-indicator {
-        min-width: 48px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
-        color: white;
-        font-weight: 700;
-        font-size: 16px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(73, 118, 181, 0.3);
-        padding: 0 12px;
-      }
-    }
+  .page-size-field {
+    width: 92px;
+    --mat-form-field-container-height: 44px;
+    --mat-form-field-container-vertical-padding: 8px;
   }
 }
 
-// Mat Select Panel Styling
-::ng-deep .mat-select-panel {
-  .mat-option {
-    font-size: 14px;
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .nav-btn { min-width: 0; }
+
+  .page-indicator {
+    min-width: 44px;
     height: 44px;
-
-    &.mat-selected {
-      background: $primary-lighter;
-      color: $primary-dark;
-      font-weight: 600;
-    }
-
-    &:hover {
-      background: $hover-bg;
-    }
-
-    .mat-option-text {
-      display: flex;
-      align-items: center;
-    }
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--mc-radius);
+    background: var(--mc-primary);
+    color: var(--mc-on-primary);
+    font-size: 1.0625rem;
+    font-weight: 700;
   }
 }
 
-// Responzivnost
-@media (max-width: 768px) {
-  .paginator-bar {
-    .paginator-container {
-      flex-direction: column;
-      align-items: stretch;
-      padding: 16px;
-      gap: 16px;
-    }
-
-    .paginator-info {
-      justify-content: center;
-      text-align: center;
-      font-size: 13px;
-
-      .info-divider {
-        display: none;
-      }
-
-      .info-text,
-      .info-total {
-        flex-direction: column;
-        gap: 2px;
-      }
-    }
-
-    .paginator-actions {
-      flex-direction: column;
-      gap: 12px;
-
-      .page-size-selector {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .nav-buttons {
-        width: 100%;
-        justify-content: space-between;
-
-        .nav-btn {
-          flex: 1;
-          max-width: calc(50% - 30px);
-
-          span {
-            display: none;
-          }
-
-          &.prev-btn {
-            justify-content: center;
-          }
-
-          &.next-btn {
-            justify-content: center;
-          }
-        }
-
-        .page-indicator {
-          min-width: 56px;
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .paginator-bar {
-    .paginator-info {
-      font-size: 12px;
-      flex-direction: column;
-      gap: 8px;
-
-      .info-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-      }
-    }
-
-    .paginator-actions {
-      .nav-buttons {
-        .nav-btn {
-          padding: 0 12px;
-
-          mat-icon {
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
-          }
-        }
-
-        .page-indicator {
-          min-width: 44px;
-          font-size: 14px;
-        }
-      }
-    }
+@media (max-width: 640px) {
+  .paginator-bar { padding: 12px; }
+  .paginator-container,
+  .paginator-actions { justify-content: center; }
+  // chevrons only on narrow screens; the text stays available to screen readers (visually hidden, not removed)
+  .nav-btn span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 }

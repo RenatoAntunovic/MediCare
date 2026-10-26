@@ -36,7 +36,7 @@ export class LoginComponent extends BaseComponent {
   onSubmit(): void {
      const now = Date.now();
 
-  // Resetuj pokušaje ako je prošlo više od blockTimeMs
+  // Reset the attempts if more than blockTimeMs has passed
   if (now - this.lastAttemptTime > this.blockTimeMs) {
     this.loginAttempts = 0;
   }
@@ -45,7 +45,7 @@ export class LoginComponent extends BaseComponent {
   this.loginAttempts++;
 
   if (this.loginAttempts > this.maxAttempts) {
-    this.stopLoading('Too many login attempts. Please wait a while.');
+    this.stopLoading('Previše pokušaja prijave. Pričekajte malo pa pokušajte ponovo.');
     return;
   }
 
@@ -63,16 +63,18 @@ export class LoginComponent extends BaseComponent {
       next: (loggedInUser: CurrentUserDto) => {
         this.stopLoading();
 
-         this.authApi.setCurrentUserId(loggedInUser.userId); // ← OVDJE
-
-    console.log('Logged in user ID:', loggedInUser.userId);
+         this.authApi.setCurrentUserId(loggedInUser.userId);
 
         const target = this.currentUser.getDefaultRoute();
-        console.log('DEFAULT ROUTE:', target);
         this.router.navigate([target]);
       },
       error: (err) => {
-        this.stopLoading('Invalid credentials. Please try again.');
+        // status 0 = the request never reached the API (server not running, wrong URL, untrusted certificate)
+        this.stopLoading(
+          err?.status === 0
+            ? 'Server nije dostupan. Provjerite da li je API pokrenut.'
+            : 'Pogrešan email ili lozinka. Pokušajte ponovo.'
+        );
         console.error('Login error:', err);
       },
     });

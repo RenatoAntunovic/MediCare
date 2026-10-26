@@ -32,7 +32,9 @@ public sealed class UpdateMedicineCommandValidator
             .GreaterThan(0)
             .WithMessage("Weight must be greater than 0.");
 
-        // ImageFile je OPCIONALNO - može biti null ili prazan
-        // Za inline edit - nema slike!
+        RuleFor(x => x.ImageFile).MustBeValidImage();
+
+        // ImageFile is OPTIONAL - it can be null or empty
+        // For inline edit - no image!
     }
 }

@@ -33,10 +33,12 @@
       "HOSPITAL": "Hospital",
       "TREATMENT_CATEGORIES":"Treatment categories",
       "TREATMENT":"Treatment",
-      "ORDERS_SECTION": "ORDERS",
-      "ORDERS": "Orders Overview",
-      "SYSTEM": "SYSTEM",
+      "ORDERS_SECTION": "Orders",
+      "ORDERS": "Orders overview",
+      "SYSTEM": "System",
       "SETTINGS": "Settings",
+      "STATISTICS": "Statistics",
+      "ASSISTANT": "AI assistant",
       "LOGOUT": "Logout"
     }
   },
@@ -56,15 +58,17 @@
       "HOSPITAL": "Hospital",
       "TREATMENT_CATEGORIES":"Treatment categories",
       "TREATMENT":"Treatment",
-      "ORDERS_SECTION": "ORDERS",
-      "ORDERS": "Orders Overview",
-      "SYSTEM": "SYSTEM",
+      "ORDERS_SECTION": "Orders",
+      "ORDERS": "Orders overview",
+      "SYSTEM": "System",
       "SETTINGS": "Settings",
+      "ASSISTANT": "AI assistant",
       "LOGOUT": "Logout"
     }
   },
   "CART":{
     "TITLE":"Cart",
+    "ACTIONS": { "REMOVE_TOOLTIP": "Remove from cart" },
 "TABLE": {
       "QUANTITY": "Quantity",
       "PRICE": "Price (KM)",
@@ -76,6 +80,7 @@
 },
 "FAVOURITES":{
     "TITLE":"Favourites",
+    "ACTIONS": { "REMOVE_TOOLTIP": "Remove from favourites" },
 "TABLE": {
       "PRICE": "Price (KM)",
       "ACTIONS": "Action"
@@ -85,6 +90,7 @@
 },
 "FOR_LATER":{
     "TITLE":"For later",
+    "ACTIONS": { "REMOVE_TOOLTIP": "Remove from list" },
 "TABLE": {
       "PRICE": "Price (KM)",
       "ACTIONS": "Action"
@@ -298,7 +304,8 @@
       "STOCK_PLACEHOLDER": "0",
       "CANCEL": "Cancel",
       "SAVE": "Save",
-      "UPDATE": "Update"
+      "UPDATE": "Update",
+      "STATUS": "Status"
     },
     "DIALOGS": {
       "DELETE_TITLE": "Delete treatment",
@@ -540,5 +547,91 @@
     "CONFLICT": "This action conflicts with existing data.",
     "VALIDATION": "Please check the form for errors.",
     "UNKNOWN": "Unknown error occurred."
+  },
+  "STATISTICS": {
+    "TITLE": "Statistics",
+    "SUMMARY": "Summary",
+    "LOAD_ERROR": "Statistics could not be loaded.",
+    "NO_DATA": "No orders or reservations in the selected period.",
+    "SHOW_TABLE": "Show as table",
+    "PERIOD": {
+      "LABEL": "Period",
+      "ALL": "All",
+      "LAST_30_DAYS": "Last 30 days",
+      "LAST_3_MONTHS": "Last 3 months",
+      "LAST_12_MONTHS": "Last 12 months",
+      "THIS_YEAR": "This year"
+    },
+    "TILES": {
+      "REVENUE": "Total revenue",
+      "ORDERS": "Orders",
+      "RESERVATIONS": "Reservations",
+      "NEW_USERS": "New users",
+      "LOW_STOCK": "Low stock",
+      "NEEDS_RESTOCK": "Restock needed"
+    },
+    "SERIES": {
+      "MEDICINES": "Medicines",
+      "TREATMENTS": "Treatments",
+      "ORDERS": "Orders",
+      "RESERVATIONS": "Reservations",
+      "SOLD_QUANTITY": "Quantity sold"
+    },
+    "CHARTS": {
+      "REVENUE_BY_MONTH": "Revenue by month",
+      "REVENUE_BY_MONTH_SUB": "Excludes draft and cancelled orders and reservations",
+      "ACTIVITY_BY_MONTH": "Orders and reservations by month",
+      "ORDERS_BY_STATUS": "Orders by status",
+      "TOP_MEDICINES": "Best-selling medicines",
+      "RESERVATIONS_BY_TREATMENT": "Reservations by treatment",
+      "RESERVATIONS_BY_WEEKDAY": "Reservations by weekday"
+    },
+    "WEEKDAYS": {
+      "MONDAY": "Monday",
+      "TUESDAY": "Tuesday",
+      "WEDNESDAY": "Wednesday",
+      "THURSDAY": "Thursday",
+      "FRIDAY": "Friday"
+    },
+    "LOW_STOCK": {
+      "TITLE": "Medicines with low stock",
+      "SUB": "Current warehouse state (10 pieces or fewer)",
+      "ALL_GOOD": "All medicines have enough stock",
+      "OUT_OF_STOCK": "Out of stock",
+      "PIECES": "{{count}} pcs"
+    }
+  },
+  "ASSISTANT": {
+    "TITLE": "AI assistant",
+    "SUBTITLE_PATIENT": "Ask about medicines, treatments and free appointments",
+    "SUBTITLE_ADMIN": "Ask about bookings, orders, stock and statistics",
+    "INTRO_PATIENT": "Hi! Describe your symptoms or ask about a medicine or an appointment – I will suggest something we offer.",
+    "INTRO_ADMIN": "Hi! Ask me who is booked, how orders or stock look. I only read data, I never change anything.",
+    "NEW_CHAT": "New conversation",
+    "PLACEHOLDER": "Type your question…",
+    "INPUT_LABEL": "Your question",
+    "SEND": "Send",
+    "THINKING": "The assistant is typing…",
+    "BOOK": "Book",
+    "DETAILS": "Medicine details",
+    "OUT_OF_STOCK": "Out of stock",
+    "ADDED_TO_CART": "{{name}} was added to the cart",
+    "DISCLAIMER": "The AI assistant can make mistakes and does not replace a doctor. In an emergency call 124 or 112.",
+    "EXAMPLES": {
+      "PATIENT_HEADACHE": "I have had a headache since this morning, what do you recommend?",
+      "PATIENT_BACK": "My back hurts, which appointment should I book?",
+      "PATIENT_SLOTS": "When is there a free general check-up this week?",
+      "PATIENT_MY_BOOKINGS": "Which appointments do I have booked?",
+      "ADMIN_TODAY": "Who is booked today and tomorrow?",
+      "ADMIN_ORDERS": "How do orders look – how many are waiting to be processed?",
+      "ADMIN_STOCK": "Which medicines are low on stock?",
+      "ADMIN_MONTH": "What was the revenue last month?"
+    },
+    "ERRORS": {
+      "OFFLINE": "The server is not reachable. Check that the API is running.",
+      "TOO_MANY": "Too many questions in a short time. Please wait a minute.",
+      "GENERIC": "The assistant cannot answer right now. Please try again.",
+      "CART": "The medicine was not added to the cart. Please try again."
+    }
   }
 }

@@ -8,3 +8,4 @@ global using Microsoft.AspNetCore.Mvc;
 global using MediCare.Application.Common;
 
 global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.RateLimiting;

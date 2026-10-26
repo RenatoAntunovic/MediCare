@@ -1,15 +1,20 @@
 import { Component, OnInit } from '@angular/core';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { AuthService } from '../../../api-services/auth/register-api.service';
 import { RegisterCommand } from '../../../api-services/auth/register-api.model';
 import { Router } from '@angular/router';
 import { ToasterService } from '../../../core/services/toaster.service';
+import { formatDate } from '@angular/common';
+import { notBlank, PHONE_PATTERN } from '../../../core/utils/form-validators';
+import { startOfToday } from '../../../core/utils/date-utils';
 
 @Component({
   selector: 'app-register',
   standalone:false,
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styleUrls: ['./register.component.scss'],
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'bs-BA' }] // dd.MM.yyyy, Monday first – like the other date fields
 })
 export class RegisterComponent implements OnInit {
 
@@ -18,6 +23,8 @@ export class RegisterComponent implements OnInit {
   hidePassword: boolean = true;         
   hideConfirmPassword: boolean = true;  
   errorMessage: string = '';           
+  readonly maxBirthDate = startOfToday();
+  readonly minBirthDate = new Date(1900, 0, 2);
 
   constructor(
     private fb: FormBuilder, 
@@ -28,16 +35,17 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-  firstName: ['', Validators.required],
-  lastName: ['', Validators.required],
-  userName: ['', Validators.required],
-  email: ['', [Validators.required, Validators.email]],
-  password: ['', Validators.required],
+  // Same rules as RegisterCommandValidator on the backend
+  firstName: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
+  lastName: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
+  userName: ['', [Validators.required, notBlank, Validators.minLength(3), Validators.maxLength(50)]],
+  email: ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
+  password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
   confirmPassword: ['', Validators.required],
-  phoneNumber: ['', Validators.required],
+  phoneNumber: ['', [Validators.required, Validators.pattern(PHONE_PATTERN)]],
   dateOfBirth: [null, Validators.required],
-  address: ['', Validators.required],
-  city: ['', Validators.required],
+  address: ['', [Validators.required, notBlank, Validators.maxLength(100)]],
+  city: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
 }, {
   validators: this.passwordsMatchValidator
 });
@@ -83,30 +91,19 @@ const payload: RegisterCommand = {
   phoneNumber: this.form.value.phoneNumber,
   address: this.form.value.address,
   city: this.form.value.city,
-  dateOfBirth: this.form.value.dateOfBirth
-    .toISOString()
-    .split('T')[0]
+  dateOfBirth: formatDate(this.form.value.dateOfBirth, 'yyyy-MM-dd', 'en')
 };
 
-fetch('https://localhost:7260/api/auth/register', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(payload)
-})
-.then(res => res.json())
-.then(data => console.log('Fetch test response:', data))
-.catch(err => console.error('Fetch test error:', err));
+
 
  this.authService.register(payload).subscribe({
       next: (res) => {
         this.isLoading = false;
-        // Prikaz poruke uspješne registracije
+        // Show the registration success message
         this.toaster.success('Registracija uspješna! Možete se sada prijaviti.');
         
-        // Automatski redirect na login stranicu
-        this.router.navigate(['/login']);
+        // Automatically redirect to the login page
+       this.router.navigate(['/auth/login']);
       },
       error: (err) => {
         this.isLoading = false;

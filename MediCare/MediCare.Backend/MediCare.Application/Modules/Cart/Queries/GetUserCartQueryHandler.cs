@@ -36,9 +36,9 @@ namespace MediCare.Application.Modules.Cart.Queries
                 {
                     CartItemId = ci.Id,
                     MedicineId = ci.MedicineId,
-                    Name = ci.Medicine.Name,
+                    MedicineName = ci.Medicine.Name,
                     Quantity = ci.Quantity,
-                    Price = ci.Price,
+                    Price = ci.Medicine.Price * ci.Quantity, // current price – the same one checkout charges
                     ImagePath = ci.Medicine.ImagePath
                 }).ToList()
             };

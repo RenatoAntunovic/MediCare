@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-auth-layout',
@@ -7,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './auth-layout.component.scss',
 })
 export class AuthLayoutComponent {
-
+  theme = inject(ThemeService);
 }

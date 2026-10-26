@@ -2,14 +2,13 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
+    "rootDir": "./src",
     "types": [],
-    "baseUrl": "./src/app",
     "paths": {
-      "@shared/*": ["modules/shared/*"],
-      "@shared/models/*": ["modules/shared/models/*"],
-      "@api/*": ["api-services/*"]
+      "@shared/*": ["./src/app/modules/shared/*"],
+      "@shared/models/*": ["./src/app/modules/shared/models/*"],
+      "@api/*": ["./src/app/api-services/*"]
     }
-    // Uklonjen moduleResolution - nasljeđuje iz tsconfig.json (node)
   },
   "files": [],
   "include": [

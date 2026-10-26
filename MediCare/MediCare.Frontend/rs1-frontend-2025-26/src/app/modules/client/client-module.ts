@@ -12,6 +12,8 @@ import { FavouritesComponent } from './pharmacy/favourites/favourites.component'
 import { ForLaterComponent } from './pharmacy/for-later/for-later.component';
 import { OrderDetailsClientDialogComponent } from './orders/client-order-details-dialog/order-details-dialog.component';
 import { ClientOrdersComponent } from './orders/client-orders.component';
+import { ClientAssistantComponent } from './assistant/client-assistant.component';
+import { AssistantChatComponent } from '../shared/components/assistant-chat/assistant-chat.component';
 
 @NgModule({
   declarations: [
@@ -24,11 +26,13 @@ import { ClientOrdersComponent } from './orders/client-orders.component';
     FavouritesComponent,
     ForLaterComponent,
     OrderDetailsClientDialogComponent,
-    ClientOrdersComponent
+    ClientOrdersComponent,
+    ClientAssistantComponent
   ],
   imports: [
     SharedModule,
-    ClientRoutingModule
+    ClientRoutingModule,
+    AssistantChatComponent
   ]
 })
 export class ClientModule { }

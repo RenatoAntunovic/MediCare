@@ -38,7 +38,7 @@ using MediCare.Application.Modules.Favourites.Command.Delete;
                 throw new KeyNotFoundException($"Favourite with Id {request.Id} not found.");
             }
 
-            // Obriši stavku iz baze
+            // Delete the item from the database
             _context.Favourites.Remove(favourites);
             await _context.SaveChangesAsync(cancellationToken);
 

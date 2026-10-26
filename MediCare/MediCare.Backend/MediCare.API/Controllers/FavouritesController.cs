@@ -7,6 +7,7 @@ namespace MediCare.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class FavouritesController : ControllerBase
     {
         private readonly IMediator _mediator;

@@ -1,27 +1,75 @@
-<div class="search-container">
-  <input 
-    type="text" 
-    class="search-input"
-    placeholder="Pretraži medicine..."
-    [(ngModel)]="searchQuery"
-    (keyup)="onSearchChange(searchQuery)"
-  />
+<section class="search-container">
+  <label class="search-label" for="medicine-search">Pretraga lijekova</label>
 
-  <div *ngIf="isLoading" class="loading">
-    ⏳ Pretraživanje...
+  <div class="search-box">
+    <input
+      id="medicine-search"
+      type="search"
+      class="search-input"
+      placeholder="Naziv, opis ili kategorija (npr. brufen, sirup, bol)"
+      autocomplete="off"
+      [(ngModel)]="searchQuery"
+      (ngModelChange)="onSearchChange($event)"
+    />
+    <button
+      *ngIf="searchQuery"
+      type="button"
+      class="clear-btn"
+      aria-label="Obriši pretragu"
+      (click)="clearSearch()"
+    >×</button>
   </div>
+
+  <p class="hint" *ngIf="searchQuery && searchQuery.trim().length < minQueryLength">
+    Unesite najmanje {{ minQueryLength }} znaka.
+  </p>
+
+  <p class="status" *ngIf="isLoading">Pretraživanje…</p>
+
+  <p class="error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
 
   <div *ngIf="medicines.length > 0" class="results">
-    <h3>Rezultati ({{ medicines.length }})</h3>
-    <ul>
-      <li *ngFor="let medicine of medicines" class="medicine-item">
-        <strong>{{ medicine.name }}</strong>
-        <p>{{ medicine.description }}</p>
+    <p class="results-count">
+      Pronađeno: {{ total }}
+      <span *ngIf="total > medicines.length">(prikazano prvih {{ medicines.length }})</span>
+    </p>
+
+    <ul class="results-list">
+      <li *ngFor="let medicine of medicines; trackBy: trackById">
+        <div class="medicine-item">
+          <img
+            *ngIf="medicine.imagePath"
+            class="thumb"
+            [src]="imageUrl(medicine.imagePath)"
+            [alt]="medicine.name"
+            loading="lazy"
+          />
+          <div class="info">
+            <div class="title-row">
+              <strong class="name">{{ medicine.name }}</strong>
+              <span class="price">{{ medicine.price | number: '1.2-2' }} KM</span>
+            </div>
+            <span class="category">{{ medicine.category }}</span>
+            <p class="description">{{ medicine.description }}</p>
+          </div>
+        </div>
       </li>
     </ul>
+
+    <!-- Visitors are not signed in: details and ordering are available after login -->
+    <div class="search-cta">
+      <p class="search-cta__text">
+        <mat-icon aria-hidden="true">lock</mat-icon>
+        Za detalje o lijeku i narudžbu potrebna je prijava.
+      </p>
+      <div class="search-cta__actions">
+        <a routerLink="/auth/login" class="search-cta__btn search-cta__btn--primary">Prijavite se</a>
+        <a routerLink="/auth/register" class="search-cta__btn">Registrujte se</a>
+      </div>
+    </div>
   </div>
 
-  <div *ngIf="searchQuery && medicines.length === 0 && !isLoading" class="no-results">
-    ❌ Nema rezultata za "{{ searchQuery }}"
-  </div>
-</div>
+  <p class="no-results" *ngIf="showNoResults">
+    Nema rezultata za „{{ searchedFor }}”. Probajte kraći pojam ili naziv kategorije.
+  </p>
+</section>

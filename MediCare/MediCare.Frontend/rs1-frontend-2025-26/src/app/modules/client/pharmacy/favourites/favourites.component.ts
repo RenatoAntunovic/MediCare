@@ -32,24 +32,17 @@ export class FavouritesComponent extends BaseListPagedComponent<FavouritesDto, a
 
   constructor() {
     super();
-    this.request = {}; // nema filtera
+    this.request = {}; // no filters
   }
 
   ngOnInit(): void {
     this.loadPagedData();
-
-    // Dark mode
-    const darkMode = localStorage.getItem('darkMode');
-    if (darkMode === 'true') {
-      document.body.classList.add('dark-mode');
-    }
   }
 
   protected loadPagedData(): void {
     this.startLoading();
     this.api.getFavourites().subscribe({
       next: (res: FavouritesDto[]) => {
-        console.log('Favourite items from backend:', res);
         this.items = res;
         this.stopLoading();
       },
@@ -75,8 +68,9 @@ addToCart(item: any) {
         panelClass: ['custom-snackbar']
       });
     },
-    error: () => {
-      this.snackbar.open('Greška prilikom dodavanja', '', {
+    error: (err) => {
+      // 409 carries the reason (medicine unavailable, cart limit of 100) – show it
+      this.snackbar.open(err?.error?.message || 'Greška prilikom dodavanja', '', {
         duration: 2000,
         panelClass: ['custom-snackbar']
       });

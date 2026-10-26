@@ -1,119 +1,113 @@
-<div class="dialog-container">
+<div class="od">
   <!-- Header -->
-  <div class="dialog-header">
-    <div class="header-left">
-      <mat-icon class="header-icon">receipt_long</mat-icon>
-      <h2 mat-dialog-title>
-        {{ 'ORDERS.DETAILS.TITLE' | translate }}
-        <span class="order-ref" *ngIf="order">{{ order.id }}</span>
-      </h2>
-    </div>
-    <button mat-icon-button (click)="onClose()" class="close-btn">
+  <div class="od__head">
+    <h2 mat-dialog-title class="od__title">
+      {{ 'ORDERS.DETAILS.TITLE' | translate }}
+      <span class="od__ref" *ngIf="order">#{{ order.id }}</span>
+    </h2>
+    <button mat-icon-button type="button" (click)="onClose()" aria-label="Zatvori">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
   <!-- Loading -->
-  <div *ngIf="isLoading" class="loading-container">
-    <mat-spinner diameter="48" color="primary"></mat-spinner>
+  <div *ngIf="isLoading" class="od__state" role="status">
+    <mat-spinner diameter="40" color="primary"></mat-spinner>
     <p>{{ 'ORDERS.DETAILS.LOADING' | translate }}</p>
   </div>
 
   <!-- Error -->
-  <div *ngIf="!isLoading && errorMessage" class="error-container">
-    <mat-icon>error_outline</mat-icon>
-    <div class="error-content">
-      <p>{{ errorMessage }}</p>
-      <button mat-stroked-button color="primary" (click)="retry()">
-        <mat-icon>refresh</mat-icon>
-        {{ 'ORDERS.RETRY' | translate }}
-      </button>
-    </div>
+  <div *ngIf="!isLoading && errorMessage" class="od__state od__state--danger" role="alert">
+    <mat-icon aria-hidden="true">error_outline</mat-icon>
+    <p>{{ errorMessage }}</p>
+    <button mat-stroked-button type="button" (click)="retry()">
+      <mat-icon>refresh</mat-icon>
+      {{ 'ORDERS.RETRY' | translate }}
+    </button>
   </div>
 
   <!-- Content -->
-  <div mat-dialog-content *ngIf="!isLoading && !errorMessage && order" class="dialog-content">
-
-    <!-- Status Section -->
-    <div class="status-section">
-      <div class="status-badge-large" [ngClass]="getStatusClass(order.statusId)">
-        <mat-icon>{{ getStatusIcon(order.statusId) }}</mat-icon>
-        <span>{{ order.statusName | translate }}</span>
-      </div>
-
-      <div class="dates-info">
-        <div class="date-item">
-          <mat-icon>schedule</mat-icon>
-          <div>
-            <span class="label">{{ 'ORDERS.DETAILS.ORDERED_AT' | translate }}</span>
-            <span class="value">{{ order.orderDate| date:'dd.MM.yyyy HH:mm' }}</span>
-          </div>
-        </div>
-      </div>
+  <div mat-dialog-content *ngIf="!isLoading && !errorMessage && order" class="od__content">
+    <div class="od__status">
+      <span
+        class="mc-badge"
+        [ngClass]="{
+          'mc-badge--warning': order.statusId === 1,
+          'mc-badge--info': order.statusId === 2,
+          'mc-badge--teal': order.statusId === 3,
+          'mc-badge--success': order.statusId === 4,
+          'mc-badge--danger': order.statusId === 5
+        }"
+      >
+        <mat-icon aria-hidden="true">{{
+          order.statusId === 1 ? 'edit_note'
+          : order.statusId === 2 ? 'check_circle'
+          : order.statusId === 3 ? 'payment'
+          : order.statusId === 4 ? 'done_all'
+          : order.statusId === 5 ? 'cancel'
+          : 'help_outline'
+        }}</mat-icon>
+        {{ ('ORDERS.STATUS.' + (order.statusId === 1 ? 'DRAFT' : order.statusId === 2 ? 'CONFIRMED' : order.statusId === 3 ? 'PAID' : order.statusId === 4 ? 'COMPLETED' : order.statusId === 5 ? 'CANCELLED' : 'UNKNOWN')) | translate }}
+      </span>
+      <span class="od__date">
+        <mat-icon aria-hidden="true">schedule</mat-icon>
+        <span>
+          <span class="od__label">{{ 'ORDERS.DETAILS.ORDERED_AT' | translate }}</span>
+          {{ order.orderDate | date : 'dd.MM.yyyy HH:mm' }}
+        </span>
+      </span>
     </div>
 
-    <!-- Customer Info Section -->
-    <mat-card class="info-card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar>person</mat-icon>
-        <mat-card-title>{{ 'ORDERS.DETAILS.CUSTOMER_INFO' | translate }}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="info-label">{{ 'ORDERS.DETAILS.CUSTOMER_NAME' | translate }}</span>
-            <span class="info-value">{{ getCustomerName() }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">{{ 'ORDERS.DETAILS.ADDRESS' | translate }}</span>
-            <span class="info-value">{{ getCustomerAddress() }}</span>
-          </div>
+    <!-- Customer -->
+    <section class="od__section">
+      <h3 class="od__h3">{{ 'ORDERS.DETAILS.CUSTOMER_INFO' | translate }}</h3>
+      <dl class="od__grid">
+        <div>
+          <dt>{{ 'ORDERS.DETAILS.CUSTOMER_NAME' | translate }}</dt>
+          <dd>{{ getCustomerName() }}</dd>
         </div>
-      </mat-card-content>
-    </mat-card>
+        <div>
+          <dt>{{ 'ORDERS.DETAILS.ADDRESS' | translate }}</dt>
+          <dd>{{ getCustomerAddress() }}</dd>
+        </div>
+      </dl>
+    </section>
 
-    <!-- Order Items Section -->
-    <mat-card class="info-card items-card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar>shopping_basket</mat-icon>
-        <mat-card-title>{{ 'ORDERS.DETAILS.ORDER_ITEMS' | translate }}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <table class="items-table">
+    <!-- Items -->
+    <section class="od__section">
+      <h3 class="od__h3">{{ 'ORDERS.DETAILS.ORDER_ITEMS' | translate }}</h3>
+      <div class="od__table-wrap">
+        <table class="od__table">
           <thead>
-          <tr>
-            <th>{{ 'ORDERS.DETAILS.PRODUCT' | translate }}</th>
-            <th class="text-right">{{ 'ORDERS.DETAILS.QUANTITY' | translate }}</th>
-            <th class="text-right">{{ 'ORDERS.DETAILS.UNIT_PRICE' | translate }}</th>
-            <th class="text-right">{{ 'ORDERS.DETAILS.TOTAL' | translate }}</th>
-          </tr>
+            <tr>
+              <th scope="col">{{ 'ORDERS.DETAILS.PRODUCT' | translate }}</th>
+              <th scope="col" class="num">{{ 'ORDERS.DETAILS.QUANTITY' | translate }}</th>
+              <th scope="col" class="num">{{ 'ORDERS.DETAILS.UNIT_PRICE' | translate }}</th>
+              <th scope="col" class="num">{{ 'ORDERS.DETAILS.TOTAL' | translate }}</th>
+            </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let item of order.items">
-            <td class="product-cell">
-              <span class="product-name">{{ item.medicine.medicineName }}</span>
-            </td>
-            <td class="text-right">{{ item.quantity }}</td>
-            <td class="text-right">{{ item.price | currency:'BAM':'symbol':'1.2-2' }}</td>
-            <td class="text-right total-cell">{{ (item.price * item.quantity) | currency:'BAM':'symbol':'1.2-2' }}</td>
-          </tr>
+            <tr *ngFor="let item of order.items">
+              <td>{{ item.medicine.medicineName }}</td>
+              <td class="num">{{ item.quantity }}</td>
+              <td class="num">{{ (item.quantity ? item.price / item.quantity : item.price) | currency : 'KM ' : 'symbol' : '1.2-2' }}</td>
+              <td class="num">{{ item.price | currency : 'KM ' : 'symbol' : '1.2-2' }}</td>
+            </tr>
           </tbody>
           <tfoot>
-          <tr class="total-row">
-            <td colspan="4" class="text-right"><strong>{{ 'ORDERS.DETAILS.ORDER_TOTAL' | translate }}</strong></td>
-            <td class="text-right total-amount"><strong>{{ getTotalAmount() | currency:'BAM':'symbol':'1.2-2' }}</strong></td>
-          </tr>
+            <tr>
+              <th scope="row" colspan="3" class="num">{{ 'ORDERS.DETAILS.ORDER_TOTAL' | translate }}</th>
+              <td class="num od__grand">{{ getTotalAmount() | currency : 'KM ' : 'symbol' : '1.2-2' }}</td>
+            </tr>
           </tfoot>
         </table>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Note Section (if exists) -->
-
+      </div>
+    </section>
+  </div>
 
   <!-- Actions -->
-  <div mat-dialog-actions class="dialog-actions" *ngIf="!isLoading && !errorMessage">
-    <button mat-button (click)="onClose()">
+  <div mat-dialog-actions class="od__actions" *ngIf="!isLoading && !errorMessage">
+    <button mat-flat-button color="primary" type="button" (click)="onClose()">
       {{ 'COMMON.CLOSE' | translate }}
     </button>
   </div>

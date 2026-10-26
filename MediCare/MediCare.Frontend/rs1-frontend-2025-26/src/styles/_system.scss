@@ -1,0 +1,100 @@
+// =====================================================================
+// MediCare design system – shared building blocks
+// =====================================================================
+
+// ---------- Brand mark: a rounded square with a cross, drawn in pure CSS ----------
+.mc-logo {
+  --mc-logo-size: 40px;
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-block;
+  width: var(--mc-logo-size);
+  height: var(--mc-logo-size);
+  border-radius: calc(var(--mc-logo-size) * 0.3);
+  background: linear-gradient(140deg, #2b8fd6 0%, #0a7478 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    border-radius: calc(var(--mc-logo-size) * 0.06);
+  }
+  &::before { width: 52%; height: 15%; }
+  &::after  { width: 15%; height: 52%; }
+}
+
+// ---------- Inline alert (errors / info). Colour + icon + text, never colour alone ----------
+.mc-alert {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--mc-radius);
+  border: 1px solid transparent;
+  font-size: 1rem;
+  line-height: 1.45;
+  animation: mc-fade-in 220ms var(--mc-ease);
+
+  mat-icon,
+  .mat-icon {
+    flex: 0 0 auto;
+    margin-top: 1px;
+  }
+
+  &--danger {
+    background: var(--mc-danger-tint);
+    border-color: color-mix(in srgb, var(--mc-danger) 35%, transparent);
+    color: var(--mc-text);
+    mat-icon { color: var(--mc-danger); }
+  }
+  &--info {
+    background: var(--mc-primary-tint);
+    border-color: color-mix(in srgb, var(--mc-primary) 30%, transparent);
+    color: var(--mc-text);
+    mat-icon { color: var(--mc-primary); }
+  }
+}
+
+@keyframes mc-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+// ---------- Status badge: icon + text + colour ----------
+.mc-badge {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 2px 12px 2px 8px;
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  background: var(--mc-surface-muted);
+  color: var(--mc-text);
+
+  mat-icon,
+  .mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 18px;
+  }
+
+  &--success { background: var(--mc-success-tint); color: var(--mc-success); }
+  &--warning { background: var(--mc-warning-tint); color: var(--mc-warning); }
+  &--danger  { background: var(--mc-danger-tint);  color: var(--mc-danger); }
+  &--info    { background: var(--mc-primary-tint); color: var(--mc-on-primary-tint); }
+  &--teal    { background: var(--mc-teal-tint);    color: var(--mc-teal); }
+}
+
+.mc-logo--sm { --mc-logo-size: 32px; }

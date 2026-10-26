@@ -9,6 +9,7 @@ import {TreatmentCategoriesApiService} from '../../../../../api-services/treatme
 import {ToasterService} from '../../../../../core/services/toaster.service';
 import {ListTreatmentCategoriesQueryDto} from '../../../../../api-services/treatment-categories/treatment-categories-api.model';
 import {largePaging} from '../../../../../core/models/paging/paging-utils';
+import { apiImageUrl } from '../../../../../core/utils/api-image-url';
 
 
 @Component({
@@ -49,7 +50,7 @@ export class TreatmentsEditComponent
 
 get currentImageSrc(): string | null {
   if (this.model && this.model.imagePath) {
-    return `https://localhost:7260/${this.model.imagePath}`;
+      return apiImageUrl(this.model.imagePath);
   }
   return null;
 }
@@ -96,14 +97,9 @@ formData.append('TreatmentCategoryId',(formValue.categoryId ?? this.model?.treat
 formData.append('isEnabled','true');
 
 
+// Only a newly chosen image is sent – without one the backend keeps the existing image
 if (this.selectedFile) {
   formData.append('ImageFile', this.selectedFile);
-} else if (this.originalImageFile) {
-  // šalje originalnu sliku ako korisnik nije promijenio
-  formData.append('ImageFile', this.originalImageFile);
-} else {
-  // ako backend dopušta, pošalji prazno polje
-  formData.append('ImageFile', '');
 }
 
   this.api.updateFormData(this.treatmentId, formData).subscribe({

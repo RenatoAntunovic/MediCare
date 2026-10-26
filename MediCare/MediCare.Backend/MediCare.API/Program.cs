@@ -1,20 +1,21 @@
-﻿using Elastic.Clients.Elasticsearch;
-using Elastic.Transport;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
 using Market.API;
 using Market.API.Middlewares;
 using Market.Application;
 using Market.Infrastructure;
-using MediCare.API.FCM;
 using MediCare.Application.Abstractions;
 using MediCare.Application.Common.Behaviors;
-using MediCare.Application.Modules.FCM.Services;
+using MediCare.Application.Modules.MedicineSearch;
 using MediCare.Infrastructure.Services;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
+using Microsoft.AspNetCore.StaticFiles;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using MediCare.API.Notifications;
+using System.Security.Claims;
+using System.Threading.RateLimiting;
 
 
 public partial class Program
@@ -32,26 +33,18 @@ public partial class Program
         {
             Log.Information("Starting MediCare API...");
 
-            //
-            // 1) Standard builder (includes appsettings.json, appsettings.{ENV}.json,
-            //    environment variables, user-secrets (Dev), and command-line args)
-            //
             var builder = WebApplication.CreateBuilder(args);
 
-            // 2) Promote Serilog to full configuration from builder.Configuration
-            //    (reads "Serilog" section from appsettings + ENV overrides)
-            //
             builder.Host.UseSerilog((ctx, services, cfg) =>
             {
-                cfg.ReadFrom.Configuration(ctx.Configuration)   // Serilog section in appsettings
-                   .ReadFrom.Services(services)                 // DI enrichers if any
+                cfg.ReadFrom.Configuration(ctx.Configuration)
+                   .ReadFrom.Services(services)
                    .Enrich.FromLogContext()
                    .Enrich.WithThreadId()
                    .Enrich.WithProcessId()
                    .Enrich.WithMachineName();
             });
 
-            // Optional: remove default providers to have only Serilog
             builder.Logging.ClearProviders();
 
             // ---------------------------------------------------------
@@ -66,73 +59,148 @@ public partial class Program
             {
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-                // Default limiter (npr za većinu API-ja)
-                options.AddFixedWindowLimiter("default", limiter =>
-                {
-                    limiter.PermitLimit = 100; // 100 requesta
-                    limiter.Window = TimeSpan.FromMinutes(1);
-                    limiter.QueueLimit = 0;
-                });
+                // Every limit is counted PER CLIENT (logged-in user, otherwise IP address),
+                // so one client hitting the limit never blocks everybody else.
+                static string ClientKey(HttpContext ctx) =>
+                    ctx.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? ctx.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown";
 
-                // Login limiter (strožiji)
-                options.AddFixedWindowLimiter("login", limiter =>
-                {
-                    limiter.PermitLimit = 5; // 5 pokušaja
-                    limiter.Window = TimeSpan.FromMinutes(1);
-                    limiter.QueueLimit = 0;
-                });
+                static RateLimitPartition<string> PerClient(HttpContext ctx, int permitLimit, TimeSpan window) =>
+                    RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = permitLimit,
+                        Window = window,
+                        QueueLimit = 0
+                    });
 
-                // Search limiter (strogi)
-                options.AddFixedWindowLimiter("search", limiter =>
+                // Global limit for the whole API: 200 requests per minute per client
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
+                    RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 200,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0
+                    }));
+
+                // Login: 5 attempts per minute per IP address (brute-force protection)
+                options.AddPolicy("login", ctx =>
+                    RateLimitPartition.GetFixedWindowLimiter(ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0
+                        }));
+
+                // Search: 10 requests per 10 seconds per client
+                options.AddPolicy("search", ctx =>
+                    RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 10,
+                        Window = TimeSpan.FromSeconds(10),
+                        QueueLimit = 0
+                    }));
+
+                // Register: 5 attempts per minute per IP address (fake account spam).
+                // Failed attempts (e.g. a wrong phone format) count too, so the window is short –
+                // a user who mistypes waits at most 60 s, not 10 minutes.
+                options.AddPolicy("register", ctx =>
+                    RateLimitPartition.GetFixedWindowLimiter(ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0
+                        }));
+
+                // Checkout and reservations: 5 per minute per user (order / booking spam)
+                options.AddPolicy("orders", ctx => PerClient(ctx, 5, TimeSpan.FromMinutes(1)));
+
+                // PDF generation is expensive: 10 per minute per user
+                options.AddPolicy("reports", ctx => PerClient(ctx, 10, TimeSpan.FromMinutes(1)));
+
+                // Test notifications: 5 per minute per user
+                options.AddPolicy("notifications", ctx => PerClient(ctx, 5, TimeSpan.FromMinutes(1)));
+
+                // AI assistant: 10 questions per minute per user (each one can be several calls to Groq's free plan)
+                options.AddPolicy("assistant", ctx => PerClient(ctx, 10, TimeSpan.FromMinutes(1)));
+
+                // Tell the client how long to wait and return a readable message
+                options.OnRejected = async (context, ct) =>
                 {
-                    limiter.PermitLimit = 2;  // Max 2 requesta
-                    limiter.Window = TimeSpan.FromSeconds(5); // U 5 sekundi
-                    limiter.QueueLimit = 0;
-                });
+                    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                        context.HttpContext.Response.Headers.RetryAfter =
+                            ((int)Math.Ceiling(retryAfter.TotalSeconds)).ToString();
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(new
+                    {
+                        code = "rate.limit",
+                        message = "Previše zahtjeva. Sačekajte malo pa pokušajte ponovo."
+                    }, ct);
+                };
             });
-
-            //Kaze sejtan da pomocu ovog ispisuje Ime mora biti puno i to gresku baci ali ne radi moraju se skinuti ovi
-            //paketi tako da moramo skontati nesto drugo
-
-            //builder.Services.AddControllers()
-            //.AddFluentValidation(fv =>
-            //{
-            //    fv.RegisterValidatorsFromAssemblyContaining<UpdateMedicineCommandValidator>();
-            //    fv.DisableDataAnnotationsValidation = true;
-            //});
-
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAngularDev",
                     policy =>
                     {
                         policy.WithOrigins("http://localhost:4200")
-                        .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+                              .AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+                              .WithExposedHeaders("Retry-After"); // lets the frontend read how long to wait
                     });
             });
 
-            // Registracija pipeline behavior za MediatR i FluentValidation
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            builder.Services.AddSingleton<IFcmService, FcmService>();
-            builder.Services.AddHttpClient(); // HttpClient za FcmService
 
-            // Registracija FcmService
+            // ---------------------------------------------------------
+            // PUSH NOTIFICATIONS (Firebase Cloud Messaging)
+            // The key file is NOT in git. Without it the app runs normally, notifications are skipped.
+            // ---------------------------------------------------------
+            var firebaseKeyPath = Path.Combine(
+                builder.Environment.ContentRootPath,
+                builder.Configuration["Firebase:CredentialsPath"] ?? "firebase-adminsdk.json");
 
-            //// ===== ELASTICSEARCH CONFIGURATION =====
-            //var esUri = builder.Configuration["Elasticsearch:Uri"];
-            //var esUsername = builder.Configuration["Elasticsearch:Username"];
-            //var esPassword = builder.Configuration["Elasticsearch:Password"];
+            if (File.Exists(firebaseKeyPath))
+            {
+                FirebaseApp.Create(new AppOptions { Credential = GoogleCredential.FromFile(firebaseKeyPath) });
+                builder.Services.AddScoped<IPushNotificationService, FirebasePushNotificationService>();
+                Log.Information("Firebase push notifications enabled.");
+            }
+            else
+            {
+                builder.Services.AddScoped<IPushNotificationService, NoOpPushNotificationService>();
+                Log.Warning("firebase-adminsdk.json not found – push notifications are disabled.");
+            }
 
-            //var settings = new ElasticsearchClientSettings(new Uri(esUri))
-            //    .Authentication(new BasicAuthentication(esUsername, esPassword))
-            //    .ServerCertificateValidationCallback((o, certificate, chain, errors) => true);
+            builder.Services.AddHttpClient();
 
-            //var elasticClient = new ElasticsearchClient(settings);
-            //builder.Services.AddSingleton(elasticClient);
+            // ---------------------------------------------------------
+            // FULL-TEXT SEARCH – Search:Provider in appsettings.json
+            //   "Lucene"        → Lucene.Net, runs inside the API (default, no extra server needed)
+            //   "Sql"           → plain SQL LIKE search (always works, simplest)
+            // ---------------------------------------------------------
+            var searchProvider = (builder.Configuration["Search:Provider"] ?? "Lucene")
+                .Trim()
+                .ToLowerInvariant();
 
-            //// ===== REGISTER ELASTICSEARCH SERVICE =====
-            //builder.Services.AddSingleton<ElasticsearchService>();
+            switch (searchProvider)
+            {
+                case "lucene":
+                    builder.Services.AddSingleton<LuceneMedicineSearchService>();
+                    builder.Services.AddSingleton<IMedicineSearchService>(sp => sp.GetRequiredService<LuceneMedicineSearchService>());
+                    builder.Services.AddSingleton<IMedicineSearchIndex>(sp => sp.GetRequiredService<LuceneMedicineSearchService>());
+                    break;
 
+                case "sql":
+                    builder.Services.AddScoped<IMedicineSearchService, SqlMedicineSearchService>();
+                    builder.Services.AddSingleton<IMedicineSearchIndex, NoOpMedicineSearchIndex>();
+                    break;
+       
+                default:
+                    throw new InvalidOperationException(
+                        $"Unknown Search:Provider '{searchProvider}'. Allowed values: Lucene, Sql.");
+            }
 
             var app = builder.Build();
 
@@ -145,21 +213,24 @@ public partial class Program
                 app.UseSwaggerUI();
             }
 
-            // Global exception handler (IExceptionHandler)
             app.UseExceptionHandler();
             app.UseMiddleware<RequestResponseLoggingMiddleware>();
             app.UseStaticFiles();
+
+            var imageContentTypes = new FileExtensionContentTypeProvider();
+            imageContentTypes.Mappings[".jfif"] = "image/jpeg";
+
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
                     Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images")
                 ),
                 RequestPath = "/images",
-                ServeUnknownFileTypes = true,
+                ContentTypeProvider = imageContentTypes,
                 OnPrepareResponse = ctx =>
                 {
-                    // dozvoli svima da vide fajlove
                     ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=600");
+                    ctx.Context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
                 }
             });
             app.UseCors("AllowAngularDev");
@@ -172,22 +243,23 @@ public partial class Program
             // Database migrations + seeding
             await app.Services.InitializeDatabaseAsync(app.Environment);
 
-            // ===== ELASTICSEARCH INDEX INITIALIZATION =====
-            //var elasticsearchService = app.Services.GetRequiredService<ElasticsearchService>();
-
-            //// Obriši stari index
-            //await elasticsearchService.DeleteProductIndexAsync();
-
-            //// Kreiraj novi sa novim mappingom
-            //await elasticsearchService.CreateProductIndexAsync();
-
-            //// ===== SYNC MEDICINES FROM DATABASE TO ELASTICSEARCH =====
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var dbContext = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
-            //    await elasticsearchService.SyncMedicinesFromDatabaseAsync(dbContext);
-            //    Log.Information("Medicines synced to Elasticsearch.");
-            //}
+            // ===== SEARCH INDEX: build it from the database on startup =====
+            // Lucene keeps its index in memory, so it must be rebuilt on every start.
+            // If the index cannot be built (e.g. a database error), the application still starts.
+            if (searchProvider == "lucene")
+            {
+                try
+                {
+                    await using var scope = app.Services.CreateAsyncScope();
+                    var sender = scope.ServiceProvider.GetRequiredService<ISender>();
+                    var count = await sender.Send(new RebuildMedicineSearchIndexCommand());
+                    Log.Information("Search index ({Provider}) built: {Count} medicines.", searchProvider, count);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "Search index ({Provider}) could not be built on startup. Search will not work until POST /api/sync/sync-medicines succeeds.", searchProvider);
+                }
+            }
 
             Log.Information("MediCare API started successfully.");
             app.Run();
@@ -195,18 +267,14 @@ public partial class Program
 
         catch (HostAbortedException)
         {
-            // EF Core tools abortiraju host nakon što uzmu DbContext.
-            // Ovo nije runtime greška – samo tiho izađi.
             Log.Information("Host aborted by EF Core tooling (design-time) - its ok.");
         }
         catch (Exception ex)
         {
-            // Any startup failure will be logged here
             Log.Fatal(ex, "MediCare API terminated unexpectedly.");
         }
         finally
         {
-            // Ensure all logs are flushed before the app exits
             Log.CloseAndFlush();
         }
     }

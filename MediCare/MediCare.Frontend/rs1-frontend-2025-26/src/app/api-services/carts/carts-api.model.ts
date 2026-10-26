@@ -7,7 +7,7 @@ export interface CartItemDto {
   medicineId: number;
   medicineName: string;
   quantity: number;
-  price: number; // cijena po stavci (Medicine.Price * quantity)
+  price: number; // price per line (Medicine.Price * quantity)
   imagePath:string
 }
 
@@ -39,5 +39,11 @@ export interface AddFromForLaterDto{
 export interface CheckoutOrderResponseDto {
   orderId: number;
   totalPrice: number;
-  FcmToken: string;
+}
+
+/** Response of PUT /Cart/items/{id} – the updated row */
+export interface SetCartItemQuantityResultDto {
+  cartItemId: number;
+  quantity: number;
+  price: number; // new line total
 }

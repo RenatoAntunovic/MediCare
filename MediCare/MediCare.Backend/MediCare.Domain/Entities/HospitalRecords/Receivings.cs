@@ -11,7 +11,7 @@ namespace MediCare.Domain.Entities.HospitalRecords
     {
         public DateTime ReceivedDate { get; set; }
         public int SupplierId { get; set; }
-        public Suppliers Supplier { get; set; } // supplier od kojeg stiže roba
+        public Suppliers Supplier { get; set; } // supplier the goods come from
 
         public List<ReceivingItems> Items { get; set; } = new List<ReceivingItems>();
     }

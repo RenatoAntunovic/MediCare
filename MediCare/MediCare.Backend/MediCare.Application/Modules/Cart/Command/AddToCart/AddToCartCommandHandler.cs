@@ -1,4 +1,5 @@
 ﻿using System;
+using MediCare.Application.Modules.Cart.Common;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,47 +28,12 @@ namespace MediCare.Application.Modules.Cart.Command.AddToCart
 
             int userId = _currentUser.UserId.Value;
 
-
-            // 1️⃣ Nađi ili kreiraj cart
-            var cart = await _context.Carts
-                .FirstOrDefaultAsync(x => x.UserId == userId && !x.IsDeleted, cancellationToken);
-
-            if (cart == null)
-            {
-                cart = new Carts { UserId = userId };
-                _context.Carts.Add(cart);
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-
-            // 2️⃣ Nađi medicine
+            // Missing medicine → 404; disabled medicine or over the cart limit → 409 (CartRules)
             var medicine = await _context.Medicine
-                .FirstAsync(x => x.Id == request.MedicineId, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.MedicineId, cancellationToken)
+                ?? throw new MediCareNotFoundException($"Medicine with Id {request.MedicineId} not found.");
 
-            // 3️⃣ Provjeri postoji li već item
-            var cartItem = await _context.CartItems
-                .FirstOrDefaultAsync(x =>
-                    x.CartId == cart.Id &&
-                    x.MedicineId == request.MedicineId &&
-                    !x.IsDeleted,
-                    cancellationToken);
-
-            if (cartItem != null)
-            {
-                cartItem.Quantity += request.Quantity;
-                cartItem.Price = medicine.Price * cartItem.Quantity;
-            }
-            else
-            {
-                cartItem = new CartItems
-                {
-                    CartId = cart.Id,
-                    MedicineId = request.MedicineId,
-                    Quantity = request.Quantity,
-                    Price = medicine.Price * request.Quantity
-                };
-
-                _context.CartItems.Add(cartItem);
-            }
+            var cartItem = await CartRules.AddAsync(_context, userId, medicine, request.Quantity, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
             return cartItem.Id;

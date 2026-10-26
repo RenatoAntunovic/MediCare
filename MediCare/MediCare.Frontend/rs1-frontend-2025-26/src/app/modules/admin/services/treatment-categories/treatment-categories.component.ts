@@ -44,7 +44,7 @@ export class TreatmentCategoriesComponent
 
     this.api.list(this.request).subscribe({
       next: (response) => {
-        // mapiramo categoryName u name
+        // map categoryName to name
         const itemsWithName = response.items.map(item => ({
           ...item,
           name: item.categoryName
@@ -131,7 +131,7 @@ export class TreatmentCategoriesComponent
         console.error('Delete category error:', err);
         this.dialogHelper.showError(
           'DIALOGS.TITLES.ERROR',
-          'PRODUCT_CATEGORIES.DIALOGS.ERROR_DELETE'
+           err?.error?.message || 'TREATMENT_CATEGORIES.DIALOGS.ERROR_DELETE'
         ).subscribe();
       },
     });

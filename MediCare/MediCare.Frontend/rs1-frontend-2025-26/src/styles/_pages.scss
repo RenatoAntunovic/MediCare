@@ -1,0 +1,513 @@
+// =====================================================================
+// Page building blocks (client + admin pages): page frame, headers, toolbars, product cards,
+// item lists, cart summary, product detail, empty / loading / error states.
+// Pages use .mc-page as their root; everything is coloured by tokens, so dark mode is automatic.
+// =====================================================================
+
+.mc-page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--mc-page-max);
+  margin: 0 auto;
+  padding: 32px 32px 64px;
+}
+
+.mc-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  &__title {
+    margin: 0;
+    color: var(--mc-text);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  &__sub {
+    margin: 6px 0 0;
+    color: var(--mc-text-muted);
+    font-size: 1.0625rem;
+  }
+}
+
+// ---------- Filters / search row ----------
+.mc-toolbar {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius-lg);
+
+  .mat-mdc-form-field {
+    flex: 1 1 260px;
+    max-width: 440px;
+  }
+}
+
+.mc-price {
+  color: var(--mc-primary);
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+// ---------- States: loading / error / empty ----------
+.mc-state {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--mc-text-muted);
+  background: var(--mc-surface);
+  border: 1px dashed var(--mc-border-strong);
+  border-radius: var(--mc-radius-lg);
+  font-size: 1.125rem;
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--mc-primary-tint);
+    color: var(--mc-primary);
+
+    mat-icon,
+    .mat-icon { width: 32px; height: 32px; font-size: 32px; line-height: 32px; }
+  }
+
+  &--danger {
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--mc-danger) 40%, transparent);
+    color: var(--mc-text);
+    .mc-state__icon { background: var(--mc-danger-tint); color: var(--mc-danger); }
+  }
+}
+
+// ---------- Product grid + card ----------
+.mc-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.mc-product {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius-lg);
+  transition: box-shadow var(--mc-dur) var(--mc-ease), transform var(--mc-dur) var(--mc-ease),
+    border-color var(--mc-dur) var(--mc-ease);
+
+  &:hover,
+  &:focus-within {
+    border-color: var(--mc-border-strong);
+    box-shadow: var(--mc-shadow);
+    transform: translateY(-2px);
+  }
+
+  // Photos keep a white background in both themes so product shots look natural
+  &__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    padding: 16px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--mc-border);
+
+    img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 auto;
+    padding: 16px 18px 18px;
+  }
+
+  &__category {
+    color: var(--mc-teal);
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  &__name {
+    margin: 0;
+    font-size: 1.1875rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  // One link per card; its ::after stretches over the whole card, so the card is fully clickable
+  &__link {
+    color: var(--mc-text);
+    text-decoration: none;
+    border-radius: 4px;
+
+    &::after { content: ''; position: absolute; inset: 0; }
+    &:hover { color: var(--mc-primary); }
+    &:focus-visible { outline: none; }
+    &:focus-visible::after { outline: 3px solid var(--mc-focus); outline-offset: -3px; border-radius: var(--mc-radius-lg); }
+  }
+
+  &__meta {
+    color: var(--mc-text-muted);
+    font-size: 1rem;
+  }
+
+  &__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  // Favourite button floats on the photo, above the stretched link.
+  // (selector is deliberately more specific than Material's own `.mat-mdc-icon-button { position: relative }`)
+  > .mc-product__fav {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.94);
+    color: #b42318;
+    box-shadow: var(--mc-shadow-sm);
+  }
+}
+
+// ---------- Item rows (cart, favourites, for later) ----------
+.mc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__item {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 8px 20px;
+    padding: 14px 18px 14px 14px;
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-lg);
+  }
+
+  &__thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 88px;
+    height: 88px;
+    background: #ffffff;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius);
+    overflow: hidden;
+
+    img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  }
+
+  &__name {
+    color: var(--mc-text);
+    font-size: 1.1875rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-decoration: none;
+    border-radius: 4px;
+
+    &:hover { color: var(--mc-primary); text-decoration: underline; text-underline-offset: 3px; }
+  }
+
+  &__meta {
+    display: block;
+    margin-top: 4px;
+    color: var(--mc-text-muted);
+    font-size: 1rem;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+// ---------- Cart: list + order summary ----------
+.mc-cart {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+.mc-summary {
+  position: sticky;
+  top: 24px;
+  padding: 24px;
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius-lg);
+  box-shadow: var(--mc-shadow-sm);
+
+  &__title { margin: 0 0 16px; font-size: 1.25rem; font-weight: 700; }
+
+  &__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--mc-border);
+    color: var(--mc-text-muted);
+    font-size: 1.0625rem;
+
+    strong { color: var(--mc-text); font-size: 1.5rem; letter-spacing: -0.01em; }
+  }
+
+  &__action {
+    width: 100%;
+    height: 52px;
+    margin-top: 12px;
+    font-size: 1.125rem;
+  }
+}
+
+// ---------- Product detail ----------
+.mc-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 32px;
+  align-items: start;
+
+  &__info {
+    padding: clamp(20px, 3vw, 32px);
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-lg);
+  }
+
+  &__name {
+    margin: 8px 0 12px;
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  &__desc {
+    margin: 0 0 20px;
+    color: var(--mc-text);
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  &__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 32px;
+    margin: 0 0 24px;
+    padding: 16px 0;
+    border-block: 1px solid var(--mc-border);
+
+    div { display: flex; flex-direction: column; gap: 2px; }
+    dt { color: var(--mc-text-muted); font-size: 1rem; }
+    dd { margin: 0; color: var(--mc-text); font-size: 1.25rem; font-weight: 700; }
+  }
+
+  &__buy {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px 16px;
+
+    .quantity-field { width: 130px; }
+    .mc-detail__cta { height: 56px; flex: 1 1 200px; font-size: 1.125rem; }
+  }
+
+  &__secondary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+  }
+}
+
+// Zoomable product photo (behaviour lives in MedicineDetailComponent)
+.mc-zoom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background: #ffffff;
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius-lg);
+  touch-action: pan-y;
+
+  &.zoomed { touch-action: none; }
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transform-origin: center center;
+    will-change: transform;
+    user-select: none;
+
+    &:focus-visible { outline: 3px solid var(--mc-focus); outline-offset: -3px; }
+  }
+
+  &__hint {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(15, 30, 45, 0.78);
+    color: #ffffff;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mc-zoom img { transition: none !important; }
+  .mc-product { transition: none; }
+}
+
+// ---------- Responsive ----------
+@media (max-width: 959.98px) {
+  .mc-page { padding: 20px 16px 48px; }
+  .mc-page-header__title { font-size: 1.625rem; }
+  .mc-cart { grid-template-columns: 1fr; }
+  .mc-summary { position: static; }
+  .mc-detail { grid-template-columns: 1fr; gap: 20px; }
+}
+
+@media (max-width: 640px) {
+  .mc-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .mc-product__body { padding: 12px 14px 14px; }
+  .mc-product__name { font-size: 1.0625rem; }
+  .mc-list__item {
+    grid-template-columns: 72px minmax(0, 1fr);
+    padding: 12px;
+  }
+  .mc-list__thumb { width: 72px; height: 72px; }
+  .mc-list__item > .mc-price { grid-column: 2; }
+  .mc-list__actions { grid-column: 1 / -1; justify-content: flex-end; }
+}
+
+// ---------- Treatments (cards reuse .mc-product) ----------
+.mc-grid--wide { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+
+.mc-product__desc {
+  margin: 0;
+  color: var(--mc-text-muted);
+  font-size: 1rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mc-product__cta {
+  width: 100%;
+  height: var(--mc-touch);
+  margin-top: 14px;
+}
+
+// ---------- Orders ----------
+.mc-orders {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mc-order {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 24px;
+  padding: 18px 20px;
+  background: var(--mc-surface);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius-lg);
+
+  &__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+  }
+
+  &__id {
+    margin: 0;
+    font-size: 1.1875rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    margin-top: 10px;
+    color: var(--mc-text-muted);
+    font-size: 1rem;
+
+    span { display: inline-flex; align-items: center; gap: 6px; }
+
+    mat-icon,
+    .mat-icon { width: 20px; height: 20px; font-size: 20px; line-height: 20px; }
+  }
+
+  &__side {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px 20px;
+  }
+}
+
+@media (max-width: 720px) {
+  .mc-order { grid-template-columns: 1fr; }
+  .mc-order__side { justify-content: space-between; }
+}

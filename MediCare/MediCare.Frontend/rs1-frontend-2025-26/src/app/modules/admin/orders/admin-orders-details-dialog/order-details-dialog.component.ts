@@ -49,12 +49,13 @@ export class OrderDetailsDialogComponent {
 
   getTotalAmount(): number {
   if (!this.order?.items) return 0;
-  return this.order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // item.price is already the TOTAL of the line (price x quantity), so the order total is the plain sum
+  return this.order.items.reduce((sum, item) => sum + item.price, 0);
 }
   // === Status Helpers ===
 
 getStatusLabel(status: { id: number; name: string } | number): string {
-  // Ako je broj, možeš vratiti odgovarajući label ili koristiti statusName
+  // If it's a number, return the matching label or use statusName
   if (typeof status === 'number') {
     switch (status) {
       case 1: return 'ORDERS.STATUS.DRAFT';
@@ -65,7 +66,7 @@ getStatusLabel(status: { id: number; name: string } | number): string {
       default: return 'ORDERS.STATUS.UNKNOWN';
     }
   } else {
-    // status je objekat {id, name}
+    // status is an object {id, name}
     return status.name;
   }
 }

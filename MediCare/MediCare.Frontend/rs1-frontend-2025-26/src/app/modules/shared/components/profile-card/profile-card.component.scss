@@ -1,0 +1,46 @@
+// "My profile" card – tokens only (light + dark)
+.mc-profile__readonly {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  color: var(--mc-text);
+  font-weight: 600;
+
+  mat-icon { color: var(--mc-text-muted); }
+}
+
+.mc-profile__muted {
+  color: var(--mc-text-muted);
+  font-weight: 400;
+}
+
+// Two columns on desktop, one on mobile
+.mc-profile__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 16px;
+
+  mat-form-field { width: 100%; }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mc-profile__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mc-profile__state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  color: var(--mc-text-muted);
+
+  &--error { color: var(--mc-danger); }
+}

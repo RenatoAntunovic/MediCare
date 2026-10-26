@@ -7,6 +7,7 @@ namespace MediCare.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ForLaterController : ControllerBase
     {
         private readonly IMediator _mediator;

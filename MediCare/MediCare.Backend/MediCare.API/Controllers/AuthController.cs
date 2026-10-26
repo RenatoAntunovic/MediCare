@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Security.Claims;
+using MediatR;
 using MediCare.Application.Modules.Auth.Commands.Login;
 using MediCare.Application.Modules.Auth.Commands.Logout;
 using MediCare.Application.Modules.Auth.Commands.Refresh;
@@ -14,7 +15,7 @@ public sealed class AuthController : ControllerBase
 {
     private readonly ISender _sender; // MediatR sender
 
-    // Konstruktor - dependency injection
+    // Constructor - dependency injection
     public AuthController(ISender sender)
     {
         _sender = sender;
@@ -31,11 +32,12 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("register")]
     [AllowAnonymous]
+    [EnableRateLimiting("register")]
     public async Task<ActionResult<RegisterCommandDto>> Register([FromBody] RegisterCommand command, CancellationToken ct)
     {
         int id = await _sender.Send(command, ct);
 
-        // Vraćamo 201 Created sa lokacijom novog korisnika
+        // Return 201 Created with the location of the new user
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 
@@ -55,11 +57,17 @@ public sealed class AuthController : ControllerBase
         return NoContent();
     }
 
-    // Primjer GetById endpoint-a za CreatedAtAction
+    // GetById endpoint used by CreatedAtAction
+    // Users can only see their own profile; admins can see anyone
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<ActionResult<RegisterCommandDto>> GetById(int id, CancellationToken ct)
     {
-        var user = await _sender.Send(new GetUserByIdQuery(id), ct); // moraš imati query za ovo
+        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (currentUserId != id && !User.IsInRole("Admin"))
+            return Forbid();
+
+        var user = await _sender.Send(new GetUserByIdQuery(id), ct);
         if (user == null) return NotFound();
         return Ok(user);
     }

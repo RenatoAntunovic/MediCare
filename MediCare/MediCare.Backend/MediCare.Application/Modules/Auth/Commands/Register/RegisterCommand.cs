@@ -11,12 +11,12 @@ namespace MediCare.Application.Modules.Auth.Commands.Register
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public string Address { get; set; }  // popravio tipografsku grešku Adress -> Address
+        public string Address { get; set; }  // fixed the typo Adress -> Address
         public string City { get; set; }
 
         public string UserName { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; } // plain text iz inputa
+        public string Password { get; set; } // plain text from the input
         public string PhoneNumber { get; set; }
     }
 }

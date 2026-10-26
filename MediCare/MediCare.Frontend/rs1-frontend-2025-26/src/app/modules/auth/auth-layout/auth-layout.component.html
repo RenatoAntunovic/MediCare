@@ -1,7 +1,63 @@
-<!-- auth-layout.component.html -->
-<div class="auth-shell">
-  <div class="auth-card mat-elevation-z4">
-    <div class="logo">FIT Market</div>
+<div class="auth-page">
+  <!-- Colour band with brand and headline. The form card floats over its lower edge. -->
+  <header class="auth-hero">
+    <div class="auth-top">
+      <a routerLink="/" class="auth-brand" aria-label="MediCare – početna stranica">
+        <span class="mc-logo" aria-hidden="true"></span>
+        MediCare
+      </a>
+
+      <div class="auth-top__actions">
+        <button
+          type="button"
+          class="mc-iconbtn"
+          (click)="theme.toggle()"
+          [attr.aria-label]="theme.isDark() ? 'Uključi svijetli način' : 'Uključi tamni način'"
+        >
+          <mat-icon>{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </button>
+        <a routerLink="/" class="auth-back">
+          <mat-icon aria-hidden="true">arrow_back</mat-icon>
+          Nazad na početnu
+        </a>
+      </div>
+    </div>
+
+    <div class="auth-hero__copy">
+      <p class="auth-hero__title">Tretmani i lijekovi, jedan nalog</p>
+      <p class="auth-hero__lead">Rezervišite termin u našoj bolnici i naručite lijekove iz naše apoteke.</p>
+    </div>
+  </header>
+
+  <!-- Form card: login / register / logout render here -->
+  <main class="auth-main">
     <router-outlet></router-outlet>
-  </div>
+  </main>
+
+  <!-- What the account gives you -->
+  <section aria-label="Šta dobijate nalogom">
+  <ul class="auth-points">
+    <li>
+      <mat-icon aria-hidden="true">event_available</mat-icon>
+      <div>
+        <strong>Rezervacija tretmana</strong>
+        <span>Odaberite dan i slobodan termin.</span>
+      </div>
+    </li>
+    <li>
+      <mat-icon aria-hidden="true">local_pharmacy</mat-icon>
+      <div>
+        <strong>Apoteka</strong>
+        <span>Pregledajte i naručite lijekove.</span>
+      </div>
+    </li>
+    <li>
+      <mat-icon aria-hidden="true">receipt_long</mat-icon>
+      <div>
+        <strong>Vaše narudžbe</strong>
+        <span>Pratite status na jednom mjestu.</span>
+      </div>
+    </li>
+  </ul>
+  </section>
 </div>

@@ -23,6 +23,8 @@ export interface ListTreatmentsQueryDto {
   price: number;
   treatmentCategoryId: number;
   categoryName: string;
+  /** name sent by the backend (ListTreatmentsQueryDto.TreatmentsCategoryName) */
+  treatmentsCategoryName: string;
   imagePath: string;
   isEnabled: boolean;
 }

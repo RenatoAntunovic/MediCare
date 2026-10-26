@@ -13,6 +13,7 @@ import {materialModules} from './modules/shared/material-modules';
 import {SharedModule} from './modules/shared/shared-module';
 import { environment } from '../environments/environment';
 import { ImageZoomComponent } from './image-zoom/image-zoom.component';
+import { rateLimitInterceptor } from './core/interceptors/rate-limit-interceptor.service';
 
 
 @NgModule({
@@ -41,7 +42,8 @@ import { ImageZoomComponent } from './image-zoom/image-zoom.component';
       withInterceptors([
         loadingBarInterceptor,
         authInterceptor,
-        errorLoggingInterceptor
+        errorLoggingInterceptor,
+        rateLimitInterceptor
       ])
     )
   ],

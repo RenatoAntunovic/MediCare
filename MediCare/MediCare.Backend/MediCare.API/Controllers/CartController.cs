@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using MediCare.API.FCM;
 using MediCare.Application.Modules.Cart.Command.AddToCart;
 using MediCare.Application.Modules.Cart.Command.AddToCartFromFavourites;
 using MediCare.Application.Modules.Cart.Command.AddToCartFromForLater;
@@ -7,22 +6,22 @@ using MediCare.Application.Modules.Cart.Command.Checkout;
 using MediCare.Application.Modules.Cart.Command.Delete;
 using MediCare.Application.Modules.Cart.Queries;
 using MediCare.Application.Abstractions;
+using MediCare.Application.Modules.Cart.Command.SetQuantity;
 
 namespace MediCare.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IFcmService _fcmService;
         private readonly IAppDbContext _context;
 
-        public CartController(IMediator mediator, IFcmService fcmService, IAppDbContext context)
+        public CartController(IMediator mediator, IAppDbContext context)
         {
             _mediator = mediator;
             _context = context;
-            _fcmService = fcmService;
         }
 
         // GET /api/cart
@@ -49,13 +48,22 @@ namespace MediCare.API.Controllers
             return NoContent();
         }
 
+        // PUT /api/cart/items/{id} – set the quantity of one cart item
+        [HttpPut("items/{id}")]
+        public async Task<ActionResult<SetCartItemQuantityResultDto>> SetQuantity(
+            int id, [FromBody] SetCartItemQuantityCommand command, CancellationToken ct)
+        {
+            command.CartItemId = id;
+            return Ok(await _mediator.Send(command, ct));
+        }
+
         [Authorize]
         [HttpPost("add-from-favourites")]
         public async Task<IActionResult> AddFromFavourites([FromBody] AddToCartFromFavouritesDto dto)
         {
             var userIdClaim = User.FindFirst("id") ?? User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-                return Unauthorized(); // ili BadRequest
+                return Unauthorized(); // or BadRequest
 
             var command = new AddToCartFromFavouritesCommand(userId, dto.FavouriteId, dto.Quantity);
             var result = await _mediator.Send(command);
@@ -73,7 +81,7 @@ namespace MediCare.API.Controllers
         {
             var userIdClaim = User.FindFirst("id") ?? User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-                return Unauthorized(); // ili BadRequest
+                return Unauthorized(); // or BadRequest
 
             var command = new AddToCartFromForLaterCommand(userId, dto.ForLaterId, dto.Quantity);
             var result = await _mediator.Send(command);
@@ -86,6 +94,7 @@ namespace MediCare.API.Controllers
         }
 
         [HttpPost("checkout")]
+        [EnableRateLimiting("orders")]
         public async Task<IActionResult> Checkout(CancellationToken ct)
         {
             var userId = int.Parse(

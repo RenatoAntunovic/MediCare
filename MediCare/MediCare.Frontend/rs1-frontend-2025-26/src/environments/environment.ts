@@ -1,15 +1,16 @@
-
 export const environment = {
   production: false,
   apiUrl: 'https://localhost:7260',
-  firebase: {
-    apiKey: "AIzaSyAuPUq4Rm8084w4e74Kzvib8peBhW7BlCQ",
-    authDomain: "medicare-a919a.firebaseapp.com",
-    projectId: "medicare-a919a",
-    storageBucket: "medicare-a919a.firebasestorage.app",
-    messagingSenderId: "207583477678",
-    appId: "1:207583477678:web:59519150f75230e653523f",
-    vapidKey: "BAOhL4tSQhQxZoWUK3fxUTj6izhhMcmSKpcn1J3NUo9t9Xg9wXfuFsPHypkTNmvWpGA14zdAzF23A6r-jgj1VCY"
-  }
-};
 
+  // Firebase web config – these values are public by design (they end up in every user's browser)
+  firebase: {
+    apiKey: 'AIzaSyCVQA4rlQXC5apKPM_dxopwVWcZYovx6l8',
+    authDomain: 'medicare-6720f.firebaseapp.com',
+    projectId: 'medicare-6720f',
+    storageBucket: 'medicare-6720f.firebasestorage.app',
+    messagingSenderId: '993016260544',
+    appId: '1:993016260544:web:844b5ee6d13e35fe5e4a25'
+  },
+  // Web Push certificate (Firebase console → Project settings → Cloud Messaging)
+  firebaseVapidKey: 'BA6kMIYdZMSdisNOTYLWo1aVIXBH4yHnPxb_AlC0z6-1f-NbZXPV7btHs9M_JSaDT9ti-9Xlp_9Ti8J5Xsfv_lM'
+};

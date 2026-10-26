@@ -15,7 +15,7 @@ import { buildHttpParams } from '../../core/models/build-http-params';
   providedIn: 'root'
 })
 export class TreatmentsApiService {
-  private readonly baseUrl = 'https://localhost:7260/api/Treatments';
+  private readonly baseUrl = `${environment.apiUrl}/api/Treatments`;
   private http = inject(HttpClient);
 
   /**
@@ -55,11 +55,11 @@ createFormData(formData: FormData) {
    * Update an existing product.
    */
   update(id: number, data: FormData) {
-  return this.http.put(`/api/Treatments/${id}`, data);
+    return this.http.put(`${this.baseUrl}/${id}`, data);
 }
 
 updateFormData(id: number, formData: FormData): Observable<void> {
-  return this.http.put<void>(`/api/Treatments/${id}`, formData);
+    return this.http.put<void>(`${this.baseUrl}/${id}`, formData);
 }
 
   /**

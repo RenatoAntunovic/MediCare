@@ -14,7 +14,16 @@ public sealed class ListOrdersWithItemsQueryHandler(IAppDbContext ctx, IAppCurre
         }
         var searchTerm = request.Search?.Trim().ToLower() ?? string.Empty;
 
-        var projectedQuery = q.OrderBy(x => x.OrderDate)
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            q = q.Where(x =>
+                x.User.FirstName.ToLower().Contains(searchTerm) ||
+                x.User.LastName.ToLower().Contains(searchTerm) ||
+                x.User.City.ToLower().Contains(searchTerm) ||
+                x.Id.ToString().Contains(searchTerm));
+        }
+
+        var projectedQuery = q.OrderByDescending(x => x.OrderDate).ThenByDescending(x => x.Id)
             .Select(x => new ListOrdersWithItemsQueryDto
             {
                 OrderId = x.Id,
@@ -29,7 +38,7 @@ public sealed class ListOrdersWithItemsQueryHandler(IAppDbContext ctx, IAppCurre
                 OrderDate = x.OrderDate,
                 StatusId = x.OrderStatusId,
                 StatusName = x.OrderStatus.StatusName,
-                //"x.Items" ili "ctx.OrderItems.Where(x => x.OrderId == x.Id)"
+                //"x.Items" or "ctx.OrderItems.Where(x => x.OrderId == x.Id)"
                 Items = x.OrderItems.Select(i => new ListOrdersWithItemsQueryDtoItem
                 {
                     Id = i.Id,

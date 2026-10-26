@@ -1,11 +1,20 @@
-import { Component, inject, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import {ListOrdersQueryDto} from '../../../../api-services/orders/orders-api.models';
-import {OrderStatusHelper} from '../../../../api-services/orders/order-status.helper';
+import { ListOrdersQueryDto } from '../../../../api-services/orders/orders-api.models';
 
 export interface ChangeStatusDialogData {
   order: ListOrdersQueryDto;
 }
+
+/** Order status as shown in the dialog (id matches the OrderStatus table, name is a translation key). */
+interface StatusOption {
+  id: number;
+  name: string;
+}
+
+/** Ids from the OrderStatus table (seed 1–5). */
+const DRAFT = 1, CONFIRMED = 2, PAID = 3, COMPLETED = 4, CANCELLED = 5;
 
 @Component({
   selector: 'app-change-status-dialog',
@@ -15,98 +24,59 @@ export interface ChangeStatusDialogData {
 })
 export class ChangeStatusDialogComponent {
   private dialogRef = inject(MatDialogRef<ChangeStatusDialogComponent>);
+  readonly data = inject<ChangeStatusDialogData>(MAT_DIALOG_DATA);
 
-  selectedStatusId?: number;
-  availableStatuses: { id: number; name: string }[] = [
-  { id: 1, name: 'Draft' },
-  { id: 2, name: 'Confirmed' },
-  { id: 3, name: 'Paid' },
-  { id: 4, name: 'Completed' },
-  { id: 6, name: 'Cancelled' },
-];
+  /** Only the statuses the order can move to from its current status. */
+  readonly availableStatuses: StatusOption[] = this.getNextStatuses(this.data.order.statusId);
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: ChangeStatusDialogData) {
-    this.selectedStatusId = data.order.statusId;
+  /** Reactive Forms: a new status must be chosen (the first allowed one is pre-selected). */
+  readonly statusControl = new FormControl<number | null>(
+    this.availableStatuses[0]?.id ?? null,
+    Validators.required
+  );
 
-    // Pre-select first available status
-   if (!this.selectedStatusId && this.availableStatuses.length > 0) {
-    this.selectedStatusId = this.availableStatuses[0].id;
+  readonly CANCELLED = CANCELLED;
+
+  // === Status helpers ===
+
+  getStatusLabel(status: StatusOption): string {
+    return status.name;
+  }
+
+  /** Allowed transitions: Draft → Confirmed → Paid → Completed, cancel is possible until completed. */
+  getNextStatuses(currentStatusId: number): StatusOption[] {
+    switch (currentStatusId) {
+      case DRAFT:
+        return [this.option(CONFIRMED), this.option(CANCELLED)];
+      case CONFIRMED:
+        return [this.option(PAID), this.option(CANCELLED)];
+      case PAID:
+        return [this.option(COMPLETED), this.option(CANCELLED)];
+      default:
+        return []; // Completed and Cancelled have no next status
     }
-
   }
 
-  // === Status Helpers ===
-
-getStatusLabel(status: { id: number; name: string }): string {
-  return status.name;
-}
-
-getNextStatuses(currentStatusId: number): { id: number; name: string }[] {
-  switch (currentStatusId) {
-    case 1: // Draft
-      return [
-        { id: 2, name: 'Confirmed' },
-        { id: 6, name: 'Cancelled' }
-      ];
-    case 2: // Confirmed
-      return [
-        { id: 3, name: 'Paid' },
-        { id: 6, name: 'Cancelled' }
-      ];
-    case 3: // Paid
-      return [
-        { id: 4, name: 'Completed' },
-        { id: 6, name: 'Cancelled' }
-      ];
-    default:
-      return []; // Completed i Cancelled nemaju dalje
+  getCurrentStatusLabel(): string {
+    return `ORDERS.STATUS.${(this.data.order.statusName ?? 'UNKNOWN').toUpperCase()}`;
   }
-}
 
-
-getStatusIcon(statusId: number): string {
-  switch(statusId) {
-    case 1: return 'draft_icon';
-    case 2: return 'check_circle';
-    case 3: return 'payment';
-    case 4: return 'done_all';
-    case 6: return 'cancel';
-    default: return 'help';
+  private option(id: number): StatusOption {
+    const keys: Record<number, string> = {
+      [DRAFT]: 'DRAFT',
+      [CONFIRMED]: 'CONFIRMED',
+      [PAID]: 'PAID',
+      [COMPLETED]: 'COMPLETED',
+      [CANCELLED]: 'CANCELLED'
+    };
+    return { id, name: `ORDERS.STATUS.${keys[id]}` };
   }
-}
-
-getStatusClass(statusId: number): string {
-  switch(statusId) {
-    case 1: return 'status-draft';
-    case 2: return 'status-confirmed';
-    case 3: return 'status-paid';
-    case 4: return 'status-completed';
-    case 6: return 'status-cancelled';
-    default: return '';
-  }
-}
-
-getCurrentStatusLabel(): string {
-  return this.data.order.statusName;
-}
-
-getCurrentStatusClass(): string {
-  return this.getStatusClass(this.data.order.statusId);
-}
-
-getCurrentStatusIcon(): string {
-  return this.getStatusIcon(this.data.order.statusId);
-}
-
 
   // === Actions ===
 
   onConfirm(): void {
-    if (this.selectedStatusId !== undefined &&
-        this.selectedStatusId !== this.data.order.statusId) {
-
-      this.dialogRef.close(this.selectedStatusId);
-    }
+    if (!this.canConfirm()) return;
+    this.dialogRef.close(this.statusControl.value);
   }
 
   onCancel(): void {
@@ -114,8 +84,6 @@ getCurrentStatusIcon(): string {
   }
 
   canConfirm(): boolean {
-    return this.selectedStatusId !== undefined &&
-           this.selectedStatusId !== this.data.order.statusId;
+    return this.statusControl.valid && this.statusControl.value !== this.data.order.statusId;
   }
-
 }

@@ -30,4 +30,8 @@
     <ProjectReference Include="..\MediCare.Shared\MediCare.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ProductCategoryTests\IntegrationTests\" />
+  </ItemGroup>
+
 </Project>

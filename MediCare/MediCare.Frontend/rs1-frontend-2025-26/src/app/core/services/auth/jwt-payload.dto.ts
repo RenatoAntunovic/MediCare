@@ -1,4 +1,4 @@
-// payload kako dolazi iz JWT-a
+// payload as it comes from the JWT
 export interface JwtPayloadDto {
   sub: string;
   email: string;

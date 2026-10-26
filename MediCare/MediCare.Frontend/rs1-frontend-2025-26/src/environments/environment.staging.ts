@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,     // staging obično nije "production"
+  production: false,     // staging is usually not "production"
   apiUrl: 'https://staging.api.myapp.com'
 };

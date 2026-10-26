@@ -63,7 +63,7 @@ createFormData(formData: FormData) {
    * Update an existing product.
    */
   update(id: number, data: FormData) {
-  return this.http.put(`/api/Medicine/${id}`, data);
+    return this.http.put(`${this.baseUrl}/${id}`, data);
 }
 
 updateFormData(id: number, formData: FormData): Observable<void> {
@@ -90,7 +90,7 @@ updateFormData(id: number, formData: FormData): Observable<void> {
   }
 
     /**
-   * ELASTICSEARCH SEARCH
+   * FULL-TEXT SEARCH (Lucene)
    */
   searchMedicines(query: string, page: number = 1, pageSize: number = 10): Observable<any> {
     const params = buildHttpParams({
