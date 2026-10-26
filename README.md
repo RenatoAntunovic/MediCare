@@ -68,16 +68,18 @@ The interface is available in **Bosnian** and **English**, in a **light** and a 
 - Role-based access (**Admin** and **User**) enforced by route guards in the UI and by authorisation on the API.
 - Rate limiting on sensitive endpoints (login, registration, search, orders, assistant).
 - Validation with FluentValidation, structured logging with Serilog, API documentation with Swagger.
-- Switchable search engine: **Lucene.Net** (default, runs inside the API), plain **SQL**, or **Elasticsearch**.
+- Switchable search engine: **Lucene.Net** (default, runs inside the API, no extra server) or a plain **SQL** search.
 - Optional push notifications through Firebase Cloud Messaging.
 
 ## Screenshots
 
 ### Public area
 
-| Landing page with live search | Login |
-|:--:|:--:|
-| <img src="docs/screenshots/01-landing.png" alt="Landing page"> | <img src="docs/screenshots/02-login.png" alt="Login page"> |
+<p align="center">
+  <img src="docs/screenshots/01-landing.png" alt="Landing page" width="49%">
+  <img src="docs/screenshots/02-login.png" alt="Login page" width="49%"><br>
+  <em>Landing page with live search &nbsp;|&nbsp; Login</em>
+</p>
 
 ### Pharmacy
 
@@ -86,9 +88,11 @@ The interface is available in **Bosnian** and **English**, in a **light** and a 
   <em>Medicine catalogue with search and category filter</em>
 </p>
 
-| Product page | Cart and order summary |
-|:--:|:--:|
-| <img src="docs/screenshots/04-medicine-detail.png" alt="Medicine detail page"> | <img src="docs/screenshots/05-cart.png" alt="Shopping cart"> |
+<p align="center">
+  <img src="docs/screenshots/04-medicine-detail.png" alt="Medicine detail page" width="49%">
+  <img src="docs/screenshots/05-cart.png" alt="Shopping cart" width="49%"><br>
+  <em>Product page &nbsp;|&nbsp; Cart and order summary</em>
+</p>
 
 ### Hospital
 
@@ -102,9 +106,10 @@ The interface is available in **Bosnian** and **English**, in a **light** and a 
   <em>Booking calendar: pick a day, then a free time slot (taken slots are struck through and disabled)</em>
 </p>
 
-| My orders | Order details |
-|:--:|:--:|
-| <img src="docs/screenshots/08-orders.png" alt="Client orders"> | <img src="docs/screenshots/09-order-details.png" alt="Order details dialog"> |
+<p align="center">
+  <img src="docs/screenshots/08-orders.png" alt="Orders with the order details dialog" width="900"><br>
+  <em>My orders with a clear status, and the details of an order</em>
+</p>
 
 ### AI assistant
 
@@ -126,13 +131,23 @@ The interface is available in **Bosnian** and **English**, in a **light** and a 
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/13-admin-statistics.png" alt="Statistics dashboard" width="900"><br>
-  <em>Statistics dashboard</em>
+  <img src="docs/screenshots/13-admin-statistics-1.png" alt="Statistics dashboard: key figures and trends" width="900"><br>
+  <em>Statistics dashboard (1/2): period filter, key figures and trends</em>
 </p>
 
-| PDF report dialog | Generated PDF |
-|:--:|:--:|
-| <img src="docs/screenshots/14-pdf-report.png" alt="PDF report dialog"> | <img src="docs/screenshots/15-pdf-result.png" alt="Generated PDF report"> |
+<p align="center">
+  <img src="docs/screenshots/13-admin-statistics-2.png" alt="Statistics dashboard: breakdowns" width="900"><br>
+  <em>Statistics dashboard (2/2): breakdowns by status, best sellers and treatments</em>
+</p>
+
+### PDF report
+
+<p align="center">
+  <img src="docs/screenshots/14-pdf-report.png" alt="Generated PDF report" width="900"><br>
+  <em>The generated PDF report (per order, or for a chosen period and status)</em>
+</p>
+
+### Settings
 
 <p align="center">
   <img src="docs/screenshots/16-settings.png" alt="Settings" width="700"><br>
@@ -152,12 +167,6 @@ The interface is available in **Bosnian** and **English**, in a **light** and a 
   <img src="docs/screenshots/19-mobile-menu.png" alt="Mobile navigation menu" width="280">
 </p>
 
-### API documentation
-
-<p align="center">
-  <img src="docs/screenshots/20-swagger.png" alt="Swagger UI" width="900">
-</p>
-
 ## Tech stack
 
 | Layer | Technologies |
@@ -165,7 +174,7 @@ The interface is available in **Bosnian** and **English**, in a **light** and a 
 | **Backend** | C#, ASP.NET Core (.NET 8), Entity Framework Core 8, MediatR (CQRS), FluentValidation, Serilog, Swagger / Swashbuckle |
 | **Database** | Microsoft SQL Server (code-first migrations, automatic seeding in Development) |
 | **Auth** | JWT bearer tokens, rotating refresh tokens (stored hashed), role-based authorisation |
-| **Search** | Lucene.Net 4.8 (default) · SQL fallback · Elasticsearch (optional) |
+| **Search** | Lucene.Net 4.8 (default, in-process) · SQL fallback |
 | **Documents** | iTextSharp (PDF per order and parameterised PDF report) |
 | **AI** | Groq chat completions (OpenAI-compatible API) with read-only tools over the catalogue and, for admins, business data |
 | **Frontend** | Angular 21, Angular Material 21, RxJS, signals, ngx-translate (bs / en), Chart.js, jwt-decode |
@@ -231,6 +240,10 @@ Open `MediCare/MediCare.Backend/MediCare.API/appsettings.json` and point `Connec
 You do not need to create the database or run migrations by hand. In the **Development** environment the API
 applies all migrations and seeds demo data on startup.
 
+> **Using a different SQL Server instance?** Do not edit `appsettings.json` (it is shared). Keep your own string in user secrets instead:
+> `dotnet user-secrets set "ConnectionStrings:Main" "Server=YOUR_SERVER;Database=MediCare;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"`
+
+
 ### 3. Run the backend
 
 **Visual Studio:** open `MediCare/MediCare.Backend/MediCare.Backend.sln`, set **MediCare.API** as the startup project and press **F5**.
@@ -272,8 +285,7 @@ dotnet user-secrets set "Groq:ApiKey" "gsk_your_key_here"
 | `ConnectionStrings:Main` | SQL Server connection string | `localhost\SQLEXPRESS`, database `MediCare` |
 | `Jwt:Key`, `Jwt:Issuer`, `Jwt:Audience` | Token signing. Use your own secret outside development | development values |
 | `Jwt:AccessTokenMinutes`, `Jwt:RefreshTokenDays` | Token lifetimes | see file |
-| `Search:Provider` | `Lucene` (in-process, default), `Sql`, or `Elasticsearch` | `Lucene` |
-| `Elasticsearch:*` | Only when `Search:Provider` is `Elasticsearch` (server must be running) | none |
+| `Search:Provider` | `Lucene` (in-process index, default) or `Sql` (plain `LIKE` search) | `Lucene` |
 | `Groq:ApiKey` | Enables the AI assistant | not set |
 | `Groq:Model`, `Groq:BaseUrl` | Assistant model and endpoint | `openai/gpt-oss-120b`, Groq OpenAI-compatible URL |
 
