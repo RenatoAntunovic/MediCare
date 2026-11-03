@@ -33,36 +33,27 @@ export class MedicineCategoriesComponent
     super();
     this.request = new ListMedicineCategoriesRequest();
     this.request.onlyEnabled = true;
+    this.request.paging.pageSize = 10;
   }
-
-  private lastRequestTime = 0;
-  private requestCooldown = 2000;
 
   ngOnInit(): void {
     this.initList();
   }
 
-protected loadPagedData(): void {
-  const now = Date.now();
-  if (now - this.lastRequestTime < this.requestCooldown) {
-    this.toaster.error('Too many requests, please wait a few seconds.');
-    return;
+  protected loadPagedData(): void {
+    this.startLoading();
+
+    this.api.list(this.request).subscribe({
+      next: (response) => {
+        this.handlePageResult(response);
+        this.stopLoading();
+      },
+      error: (err) => {
+        console.error('Load error:', err);
+        this.stopLoading('Učitavanje kategorija nije uspjelo.');
+      }
+    });
   }
-  this.lastRequestTime = now;
-
-  this.startLoading();
-
-  this.api.list(this.request).subscribe({
-    next: (response) => {
-      this.items = response.items;
-      this.stopLoading();
-    },
-    error: (err) => {
-      console.error('Load error:', err);
-      this.stopLoading('Failed to load categories');
-    }
-  });
-}
 
   // === Filters ===
 
