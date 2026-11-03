@@ -25,10 +25,11 @@ export abstract class BaseListPagedComponent<TItem, TRequest extends BasePagedQu
 
   protected handlePageResult(result: PageResult<TItem>) {
     this.items = result.items;
-    this.totalItems = result.totalItems;
-    this.totalPages = result.totalPages;
+    // The backend sends "total" (not totalItems/totalPages), so the page count is computed here
+    const total = (result as any).total ?? result.totalItems ?? 0;
+    this.totalItems = total;
+    this.totalPages = Math.max(1, Math.ceil(total / this.paging.pageSize));
   }
-
   goToPage(page: number): void {
     if (page < 1 || (this.totalPages && page > this.totalPages)) return;
     this.paging.page = page;
