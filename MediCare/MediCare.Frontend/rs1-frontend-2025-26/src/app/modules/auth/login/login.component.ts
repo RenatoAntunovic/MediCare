@@ -23,8 +23,8 @@ export class LoginComponent extends BaseComponent {
   hidePassword = true;
 
   form = this.fb.group({
-    email: ['admin@market.com', [Validators.required, Validators.email]],
-    password: ['Admin', [Validators.required]],
+    email: ['admin@medicare.com', [Validators.required, Validators.email]],
+    password: ['admin123!', [Validators.required]],
     rememberMe: [false],
   });
 
