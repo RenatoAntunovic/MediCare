@@ -301,8 +301,11 @@ Created by the seeder in the Development environment. Change or remove them befo
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | `admin@market.com` | `Admin` |
-| User | `client@gmail.com` | `test123` |
+| Admin | `admin@medicare.com` | `admin123!` |
+| User (demo patient) | `amra.hodzic@demo.medicare.com` | `demo123!` |
+| User (demo patient) | `marko.peric@demo.medicare.com` | `demo123!` |
+
+There are 12 demo patients in total, all with the password `demo123!`. Their emails follow the pattern `first.last@demo.medicare.com` (accents removed, e.g. `lejla.begic@demo.medicare.com`). They come with a year of orders and reservations, so the statistics dashboard has data to show.
 
 ## API overview
 
