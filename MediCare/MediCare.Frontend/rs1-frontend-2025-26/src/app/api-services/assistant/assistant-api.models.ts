@@ -21,6 +21,15 @@ export interface AssistantChatMessage {
 export interface AssistantChatResponseDto {
   reply: string;
   suggestions: AssistantSuggestionsDto;
+  /** Admin only: tables with names and notes, built by the server. They were never sent to the AI service. */
+  details: AssistantTable[];
+}
+
+/** A table attached to an answer (e.g. the reservations with patient names and notes). */
+export interface AssistantTable {
+  title: string;
+  columns: string[];
+  rows: string[][];
 }
 
 /** Items the assistant recommended (already checked on the server) – shown as buttons. */

@@ -92,7 +92,7 @@ export class AssistantChatComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: res => {
-          this.session.add({ role: 'assistant', content: res.reply, suggestions: res.suggestions });
+          this.session.add({ role: 'assistant', content: res.reply, suggestions: res.suggestions, details: res.details });
           this.isSending.set(false);
           this.scrollToBottom();
           this.focusInput();
