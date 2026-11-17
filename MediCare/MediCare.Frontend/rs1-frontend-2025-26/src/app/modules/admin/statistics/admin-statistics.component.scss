@@ -5,9 +5,18 @@
 
 .mc-stats__tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  // 6 tiles = 2 rows of 3; fewer columns on narrower screens
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 24px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 520px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .mc-stats__tile {
@@ -37,6 +46,14 @@
   &-sub {
     color: var(--mc-text-muted);
     font-size: 0.875rem;
+  }
+
+  // A badge (e.g. "Potrebna nabavka") must stay inside the tile: full width, centred, may wrap
+  .mc-badge {
+    align-self: stretch;
+    justify-content: center;
+    white-space: normal;
+    text-align: center;
   }
 }
 

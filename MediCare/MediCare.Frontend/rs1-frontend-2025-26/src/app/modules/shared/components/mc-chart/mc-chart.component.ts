@@ -6,9 +6,11 @@ import {
   effect,
   inject,
   input,
+  signal,
   viewChild,
 } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   BarController,
   BarElement,
@@ -24,6 +26,7 @@ import {
   TooltipItem,
 } from 'chart.js';
 import { ThemeService } from '../../../../core/services/theme.service';
+import { formatCount, formatMoney } from '../../../../core/utils/locale-format';
 
 // Register only the Chart.js parts we use (keeps the bundle small)
 Chart.register(
@@ -71,6 +74,9 @@ export class McChartComponent {
   ariaLabel = input('');
 
   private theme = inject(ThemeService);
+  private translate = inject(TranslateService);
+  /** Selected language; a change re-renders the chart so ticks and tooltips use the new locale */
+  private lang = signal(this.translate.currentLang || 'bs');
   private canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
   private probe = viewChild.required<ElementRef<HTMLElement>>('probe');
   private chart: Chart | null = null;
@@ -91,20 +97,23 @@ export class McChartComponent {
         money: this.money(),
       };
       this.theme.isDark();
+      this.lang();
 
       // Wait one frame so the theme class on <body> is already applied before reading colors
       const frame = requestAnimationFrame(() => this.render(config));
       return () => cancelAnimationFrame(frame);
     });
 
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed())
+      .subscribe((e) => this.lang.set(e.lang));
+
     inject(DestroyRef).onDestroy(() => this.chart?.destroy());
   }
 
+  /** Numbers (axis ticks, tooltips, table view) follow the language selected in the app */
   format(value: number): string {
-    if (this.money()) {
-      return 'KM ' + value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-    return value.toLocaleString('en-US');
+    return this.money() ? formatMoney(value, this.lang()) : formatCount(value, this.lang());
   }
 
   private render(c: {

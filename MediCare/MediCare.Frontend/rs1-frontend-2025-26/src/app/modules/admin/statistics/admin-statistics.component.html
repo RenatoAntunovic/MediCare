@@ -48,6 +48,14 @@
         </span>
       </div>
       <div class="mc-stats__tile">
+        <span class="mc-stats__tile-label">{{ 'STATISTICS.TILES.CONFIRMED_NOT_PAID' | translate }}</span>
+        <span class="mc-stats__tile-value">{{ formatMoney(confirmedNotPaid()) }}</span>
+        <span class="mc-stats__tile-sub">
+          {{ 'STATISTICS.SERIES.MEDICINES' | translate }} {{ formatMoney(d.ordersConfirmedAmount) }} ·
+          {{ 'STATISTICS.SERIES.TREATMENTS' | translate }} {{ formatMoney(d.reservationsConfirmedAmount) }}
+        </span>
+      </div>
+      <div class="mc-stats__tile">
         <span class="mc-stats__tile-label">{{ 'STATISTICS.TILES.ORDERS' | translate }}</span>
         <span class="mc-stats__tile-value">{{ d.ordersCount }}</span>
       </div>

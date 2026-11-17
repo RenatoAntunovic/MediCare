@@ -3,9 +3,6 @@ namespace MediCare.Application.Modules.Statistics.Queries.Dashboard;
 public sealed class StatisticsDashboardQueryHandler(IAppDbContext ctx)
     : IRequestHandler<StatisticsDashboardQuery, StatisticsDashboardDto>
 {
-    // Orders/reservations in these statuses are not real income
-    private static readonly string[] NotCountedStatuses = ["DRAFT", "CANCELLED"];
-
     public async Task<StatisticsDashboardDto> Handle(StatisticsDashboardQuery request, CancellationToken ct)
     {
         DateTime? from = request.From?.Date;
@@ -21,8 +18,10 @@ public sealed class StatisticsDashboardQueryHandler(IAppDbContext ctx)
             .Select(o => new { o.Id, o.OrderDate, o.TotalPrice, Status = o.OrderStatus.StatusName })
             .ToListAsync(ct);
 
-        var countedOrders = orders.Where(o => !NotCountedStatuses.Contains(o.Status)).ToList();
-        var countedOrderIds = countedOrders.Select(o => o.Id).ToList();
+        // Realised revenue = PAID / COMPLETED only (see RevenueRules). CONFIRMED is shown separately.
+        var realisedOrders = orders.Where(o => RevenueRules.IsRealised(o.Status)).ToList();
+        var realisedOrderIds = realisedOrders.Select(o => o.Id).ToList();
+        var confirmedOrders = orders.Where(o => RevenueRules.IsConfirmedNotPaid(o.Status)).ToList();
 
         // ---- Reservations ----
         var reservationsQuery = ctx.Reservations.AsNoTracking();
@@ -39,11 +38,12 @@ public sealed class StatisticsDashboardQueryHandler(IAppDbContext ctx)
             })
             .ToListAsync(ct);
 
-        var countedReservations = reservations.Where(r => !NotCountedStatuses.Contains(r.Status)).ToList();
+        var realisedReservations = reservations.Where(r => RevenueRules.IsRealised(r.Status)).ToList();
+        var confirmedReservations = reservations.Where(r => RevenueRules.IsConfirmedNotPaid(r.Status)).ToList();
 
-        // ---- Top medicines (from counted orders only) ----
+        // ---- Top medicines (from realised orders only, so the revenue matches the totals) ----
         var topMedicines = await ctx.OrderItems.AsNoTracking()
-            .Where(i => countedOrderIds.Contains(i.OrderId))
+            .Where(i => realisedOrderIds.Contains(i.OrderId))
             .GroupBy(i => i.Medicine.Name)
             .Select(g => new StatisticsTopMedicineDto
             {
@@ -77,8 +77,10 @@ public sealed class StatisticsDashboardQueryHandler(IAppDbContext ctx)
             From = from,
             To = request.To?.Date,
 
-            OrdersRevenue = countedOrders.Sum(o => o.TotalPrice),
-            ReservationsRevenue = countedReservations.Sum(r => r.Price),
+            OrdersRevenue = realisedOrders.Sum(o => o.TotalPrice),
+            ReservationsRevenue = realisedReservations.Sum(r => r.Price),
+            OrdersConfirmedAmount = confirmedOrders.Sum(o => o.TotalPrice),
+            ReservationsConfirmedAmount = confirmedReservations.Sum(r => r.Price),
             OrdersCount = orders.Count,
             ReservationsCount = reservations.Count,
             NewUsersCount = newUsersCount,
@@ -87,8 +89,8 @@ public sealed class StatisticsDashboardQueryHandler(IAppDbContext ctx)
             ByMonth = BuildMonths(
                 from,
                 request.To?.Date,
-                countedOrders.Select(o => (o.OrderDate, o.TotalPrice)).ToList(),
-                countedReservations.Select(r => (r.ReservationDate, r.Price)).ToList()),
+                realisedOrders.Select(o => (o.OrderDate, o.TotalPrice)).ToList(),
+                realisedReservations.Select(r => (r.ReservationDate, r.Price)).ToList()),
 
             OrdersByStatus = CountBy(orders.Select(o => o.Status)),
             ReservationsByStatus = CountBy(reservations.Select(r => r.Status)),

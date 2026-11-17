@@ -114,8 +114,10 @@ public static partial class OrderPdfBuilder
         AddCell(summary, report.OrdersCount.ToString(), false, AlignRight);
         AddCell(summary, "Prodanih komada", true);
         AddCell(summary, report.ItemsCount.ToString(), true, AlignRight);
-        AddCell(summary, "Ukupan promet", false, bold: true);
+        AddCell(summary, "Ostvareni promet (plaćeno)", false, bold: true);
         AddCell(summary, Money(report.TotalRevenue), false, AlignRight, bold: true);
+        AddCell(summary, "Potvrđeno, još nije plaćeno", true);
+        AddCell(summary, Money(report.ConfirmedNotPaid), true, AlignRight);
         document.Add(summary);
         document.Add(Spacer());
 
@@ -169,7 +171,7 @@ public static partial class OrderPdfBuilder
 
         document.Add(table);
         document.Add(Spacer());
-        document.Add(Text($"UKUPNO: {Money(report.TotalRevenue)}", Font(13, bold: true), AlignRight));
+        document.Add(Text($"OSTVARENI PROMET (plaćeno): {Money(report.TotalRevenue)}", Font(13, bold: true), AlignRight));
 
         AddFooter(document);
         document.Close();
