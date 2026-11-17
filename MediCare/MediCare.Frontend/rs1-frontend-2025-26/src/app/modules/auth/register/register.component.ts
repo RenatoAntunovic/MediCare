@@ -8,6 +8,7 @@ import { ToasterService } from '../../../core/services/toaster.service';
 import { formatDate } from '@angular/common';
 import { notBlank, PHONE_PATTERN } from '../../../core/utils/form-validators';
 import { startOfToday } from '../../../core/utils/date-utils';
+import { getPasswordStrength, PasswordStrength } from '../../../core/utils/password-strength';
 
 @Component({
   selector: 'app-register',
@@ -34,22 +35,33 @@ export class RegisterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // One FormGroup per wizard step, so a step can only be left when its own group is valid.
+    // Same rules as RegisterCommandValidator on the backend.
     this.form = this.fb.group({
-  // Same rules as RegisterCommandValidator on the backend
-  firstName: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
-  lastName: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
-  userName: ['', [Validators.required, notBlank, Validators.minLength(3), Validators.maxLength(50)]],
-  email: ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
-  password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
-  confirmPassword: ['', Validators.required],
-  phoneNumber: ['', [Validators.required, Validators.pattern(PHONE_PATTERN)]],
-  dateOfBirth: [null, Validators.required],
-  address: ['', [Validators.required, notBlank, Validators.maxLength(100)]],
-  city: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
-}, {
-  validators: this.passwordsMatchValidator
-});
+      personal: this.fb.group({
+        firstName: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
+        lastName: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
+        dateOfBirth: [null, Validators.required],
+      }),
+      account: this.fb.group({
+        userName: ['', [Validators.required, notBlank, Validators.minLength(3), Validators.maxLength(50)]],
+        email: ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
+        password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
+        confirmPassword: ['', Validators.required],
+      }, {
+        validators: this.passwordsMatchValidator
+      }),
+      contact: this.fb.group({
+        phoneNumber: ['', [Validators.required, Validators.pattern(PHONE_PATTERN)]],
+        address: ['', [Validators.required, notBlank, Validators.maxLength(100)]],
+        city: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
+      }),
+    });
+  }
 
+  /** Strength of the typed password, shown under the password field */
+  get passwordStrength(): PasswordStrength {
+    return getPasswordStrength(this.form.get('account.password')?.value);
   }
 
  passwordsMatchValidator(control: AbstractControl) {
@@ -82,17 +94,19 @@ export class RegisterComponent implements OnInit {
 
     this.isLoading = true;  
 
-const payload: RegisterCommand = {
-  firstName: this.form.value.firstName,
-  lastName: this.form.value.lastName,
-  userName: this.form.value.userName,
-  email: this.form.value.email,
-  password: this.form.value.password,
-  phoneNumber: this.form.value.phoneNumber,
-  address: this.form.value.address,
-  city: this.form.value.city,
-  dateOfBirth: formatDate(this.form.value.dateOfBirth, 'yyyy-MM-dd', 'en')
-};
+    // The API still receives one flat object, the step groups are only a UI structure
+    const { personal, account, contact } = this.form.getRawValue();
+    const payload: RegisterCommand = {
+      firstName: personal.firstName,
+      lastName: personal.lastName,
+      userName: account.userName,
+      email: account.email,
+      password: account.password,
+      phoneNumber: contact.phoneNumber,
+      address: contact.address,
+      city: contact.city,
+      dateOfBirth: formatDate(personal.dateOfBirth, 'yyyy-MM-dd', 'en')
+    };
 
 
 

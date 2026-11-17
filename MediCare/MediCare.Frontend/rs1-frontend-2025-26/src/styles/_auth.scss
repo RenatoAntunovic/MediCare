@@ -326,3 +326,53 @@
     font-weight: 700;
   }
 }
+
+// Register wizard (mat-stepper): the step content sits inside the card, buttons at the bottom
+.auth-stepper {
+  background: transparent;
+  width: 100%;
+
+  .mat-horizontal-content-container { padding: 16px 0 0; }
+}
+
+.auth-step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+
+  // the submit button shares the row with "Nazad"
+  .auth-submit { width: auto; flex: 1; margin-top: 0; }
+}
+
+// Password strength meter: four bars, filled according to data-score (1 to 4)
+.pw-meter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+  font-size: 0.875rem;
+  color: var(--mc-text-muted);
+
+  &__bars {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+    max-width: 180px;
+
+    span {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--mc-border);
+    }
+
+    // colour of the filled bars
+    &[data-score='1'] span:nth-child(-n + 1) { background: var(--mc-danger); }
+    &[data-score='2'] span:nth-child(-n + 2) { background: var(--mc-warning); }
+    &[data-score='3'] span:nth-child(-n + 3) { background: var(--mc-success); }
+    &[data-score='4'] span:nth-child(-n + 4) { background: var(--mc-success); }
+  }
+
+  strong { color: var(--mc-text); }
+}
