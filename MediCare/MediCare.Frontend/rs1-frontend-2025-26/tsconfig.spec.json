@@ -6,7 +6,12 @@
     "outDir": "./out-tsc/spec",
     "types": [
       "vitest/globals"
-    ]
+    ],
+    "paths": {
+      "@shared/*": ["./src/app/modules/shared/*"],
+      "@shared/models/*": ["./src/app/modules/shared/models/*"],
+      "@api/*": ["./src/app/api-services/*"]
+    }
   },
   "include": [
     "src/**/*.d.ts",

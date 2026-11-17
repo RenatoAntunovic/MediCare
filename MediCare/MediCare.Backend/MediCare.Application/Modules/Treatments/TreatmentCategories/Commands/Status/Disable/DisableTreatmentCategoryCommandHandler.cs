@@ -15,14 +15,14 @@ public sealed class DisableTreatmentCategoryCommandHandler(IAppDbContext ctx)
 
         if (!cat.isEnabled) return Unit.Value; // idempotent
 
-        // Business rule: cannot disable if there are active products
+        // Business rule: cannot disable if there are active treatments
         var hasActiveTreatments = await ctx.Treatments
             .AnyAsync(t=>t.TreatmentCategoryId == cat.Id && t.isEnabled, ct);
 
         if (hasActiveTreatments)
         {
             throw new MediCareBusinessRuleException("category.disable.blocked.activeProducts",
-                $"Category {cat.CategoryName} cannot be disabled because it contains active products.");
+                $"Category {cat.CategoryName} cannot be disabled because it contains active treatments.");
         }
 
         cat.isEnabled = false;

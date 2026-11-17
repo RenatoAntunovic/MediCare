@@ -16,7 +16,7 @@ public sealed class ListTreatmentCategoriesQueryHandler(IAppDbContext ctx)
         if (request.OnlyEnabled is not null)
             q = q.Where(x => x.isEnabled == request.OnlyEnabled);
 
-        var projectedQuery = q.OrderBy(x => x.CategoryName)
+        var projectedQuery = q.OrderBy(x => x.CategoryName).ThenBy(x => x.Id) // stable order between pages
             .Select(x => new ListTreatmentCategoriesQueryDto
             {
                 Id = x.Id,

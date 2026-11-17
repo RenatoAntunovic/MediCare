@@ -15,14 +15,14 @@
       <input
         matInput
         [placeholder]="'TREATMENTS.SEARCH_INPUT_PLACEHOLDER' | translate"
-        (keyup.enter)="request.paging.page = 1; loadPagedData()"
+        (keyup.enter)="onSearch()"
         [(ngModel)]="request.search"
       />
       <button
         mat-icon-button
         matSuffix
         type="button"
-        (click)="request.paging.page = 1; loadPagedData()"
+        (click)="onSearch()"
         aria-label="Pretraži"
       >
         <mat-icon>search</mat-icon>

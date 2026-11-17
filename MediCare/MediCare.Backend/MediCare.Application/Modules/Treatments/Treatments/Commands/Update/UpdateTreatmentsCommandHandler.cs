@@ -1,8 +1,11 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Extensions.Logging;
 
 namespace MediCare.Application.Modules.Catalog.Treatments.Commands.Update;
 
-public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
+public sealed class UpdateTreatmentsCommandHandler(
+    IAppDbContext ctx,
+    IImageStorage storage,
+    ILogger<UpdateTreatmentsCommandHandler> logger)
             : IRequestHandler<UpdateTreatmentsCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateTreatmentsCommand request, CancellationToken ct)
@@ -35,41 +38,54 @@ public sealed class UpdateTreatmentsCommandHandler(IAppDbContext ctx)
         entity.TreatmentCategoryId = request.TreatmentCategoryId;
         entity.Description = request.Description;
 
+        var oldImagePath = entity.ImagePath;
+        string? newImagePath = null;
+
         if (request.ImageFile != null && request.ImageFile.Length > 0)
         {
-            var uploadsFolder = Path.Combine("wwwroot", "images");
-
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            // (optional) delete the old image
-            // Delete the old image only if no other treatment or medicine still uses it
-            if (!string.IsNullOrWhiteSpace(entity.ImagePath))
-            {
-                var relative = entity.ImagePath.TrimStart('/', '\\');
-                var withSlash = "/" + relative;
-
-                var usedElsewhere =
-                    await ctx.Treatments.AnyAsync(t => t.Id != entity.Id && (t.ImagePath == relative || t.ImagePath == withSlash), ct) ||
-                    await ctx.Medicine.AnyAsync(m => m.ImagePath == relative || m.ImagePath == withSlash, ct);
-
-                var oldPath = Path.Combine("wwwroot", relative);
-                if (!usedElsewhere && File.Exists(oldPath))
-                    File.Delete(oldPath);
-            }
-
-            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(request.ImageFile.FileName)}";
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await request.ImageFile.CopyToAsync(stream, ct);
-
-            // ⬅️ The ONLY place where ImagePath is set
-            entity.ImagePath = $"images/{uniqueFileName}";
+            // 1) save the NEW file first. If this fails, the old file and the database are untouched.
+            newImagePath = await storage.SaveAsync(request.ImageFile, ct);
+            entity.ImagePath = newImagePath;
         }
 
-        await ctx.SaveChangesAsync(ct);
+        // 2) write the new path to the database
+        try
+        {
+            await ctx.SaveChangesAsync(ct);
+        }
+        catch
+        {
+            // the treatment keeps its old image, so the new file is not needed
+            if (newImagePath is not null)
+                storage.Delete(newImagePath);
+            throw;
+        }
+
+        // 3) only now remove the old file (if nobody else uses it); a failure here must not fail the request
+        if (newImagePath is not null && !string.IsNullOrWhiteSpace(oldImagePath))
+            await TryDeleteOldImageAsync(oldImagePath, entity.Id, ct);
 
         return Unit.Value;
+    }
+
+    private async Task TryDeleteOldImageAsync(string oldImagePath, int treatmentId, CancellationToken ct)
+    {
+        try
+        {
+            var relative = oldImagePath.TrimStart('/', '\\');
+            var withSlash = "/" + relative;
+
+            // keep the file while another treatment or medicine still uses it
+            var usedElsewhere =
+                await ctx.Treatments.AnyAsync(t => t.Id != treatmentId && (t.ImagePath == relative || t.ImagePath == withSlash), ct) ||
+                await ctx.Medicine.AnyAsync(m => m.ImagePath == relative || m.ImagePath == withSlash, ct);
+
+            if (!usedElsewhere)
+                storage.Delete(relative);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Old treatment image {Path} could not be removed.", oldImagePath);
+        }
     }
 }

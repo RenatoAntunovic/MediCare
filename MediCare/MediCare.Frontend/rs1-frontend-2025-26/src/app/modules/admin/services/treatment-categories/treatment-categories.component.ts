@@ -33,6 +33,7 @@ export class TreatmentCategoriesComponent
     super();
     this.request = new ListTreatmentCategoriesRequest();
     this.request.onlyEnabled = true;
+    this.request.paging.pageSize = 10; // the server allows at most 100 per page
   }
 
   ngOnInit(): void {
@@ -69,7 +70,8 @@ export class TreatmentCategoriesComponent
 
   onToggleEnabledFilter(checked: boolean): void {
     this.showOnlyEnabled = checked;
-    this.request.onlyEnabled = checked;
+    // toggle off = show all (null), not "only disabled" (false)
+    this.request.onlyEnabled = checked ? true : null;
     this.request.paging.page = 1;
     this.loadPagedData();
   }
@@ -151,8 +153,14 @@ export class TreatmentCategoriesComponent
         this.loadPagedData();
       },
       error: (err) => {
-        this.stopLoading();
         console.error('Toggle status error:', err);
+        // e.g. 409: a category with active treatments cannot be disabled. Tell the admin why
+        // and reload, so the slide toggle goes back to the real status from the server.
+        this.dialogHelper.showError(
+          'DIALOGS.TITLES.ERROR',
+          err?.error?.message || 'TREATMENT_CATEGORIES.DIALOGS.ERROR_UPDATE'
+        ).subscribe();
+        this.loadPagedData();
       },
     });
   }

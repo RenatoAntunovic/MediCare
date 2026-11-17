@@ -51,6 +51,9 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<IAppCurrentUser, AppCurrentUser>();
 
+        // Image files (treatments) are stored in wwwroot/images
+        services.AddScoped<IImageStorage, LocalImageStorage>();
+
         // TimeProvider (if used in handlers/services)
         services.AddSingleton<TimeProvider>(TimeProvider.System);
 
