@@ -33,6 +33,7 @@ export class TreatmentCategoriesComponent
     super();
     this.request = new ListTreatmentCategoriesRequest();
     this.request.onlyEnabled = true;
+    this.request.paging.pageSize = 10; // the server allows at most 100 per page
   }
 
   ngOnInit(): void {
@@ -69,7 +70,8 @@ export class TreatmentCategoriesComponent
 
   onToggleEnabledFilter(checked: boolean): void {
     this.showOnlyEnabled = checked;
-    this.request.onlyEnabled = checked;
+    // toggle off = show all (null), not "only disabled" (false)
+    this.request.onlyEnabled = checked ? true : null;
     this.request.paging.page = 1;
     this.loadPagedData();
   }
