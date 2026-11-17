@@ -70,7 +70,9 @@ public sealed class OrdersReportQueryHandler(IAppDbContext ctx)
             ByStatus = byStatus,
             OrdersCount = rows.Count,
             ItemsCount = rows.Sum(r => r.ItemsCount),
-            TotalRevenue = rows.Sum(r => r.Total)
+            // Same rule as the statistics page: only paid orders are revenue, confirmed ones are shown apart
+            TotalRevenue = rows.Where(r => RevenueRules.IsRealised(r.StatusName)).Sum(r => r.Total),
+            ConfirmedNotPaid = rows.Where(r => RevenueRules.IsConfirmedNotPaid(r.StatusName)).Sum(r => r.Total)
         };
     }
 }

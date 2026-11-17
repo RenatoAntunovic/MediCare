@@ -14,7 +14,10 @@ public sealed class OrdersReportDto
     // Summary
     public int OrdersCount { get; init; }
     public int ItemsCount { get; init; }
+    /// <summary>Realised revenue: sum of PAID and COMPLETED orders only.</summary>
     public decimal TotalRevenue { get; init; }
+    /// <summary>Sum of CONFIRMED orders that are not paid yet. Not part of TotalRevenue.</summary>
+    public decimal ConfirmedNotPaid { get; init; }
 }
 
 public sealed class OrdersReportRowDto

@@ -7,8 +7,14 @@ public sealed class StatisticsDashboardDto
     public DateTime? To { get; init; }
 
     // Summary tiles
+    /// <summary>Realised revenue: only PAID and COMPLETED orders (see RevenueRules).</summary>
     public decimal OrdersRevenue { get; init; }
+    /// <summary>Realised revenue: only PAID and COMPLETED reservations.</summary>
     public decimal ReservationsRevenue { get; init; }
+    /// <summary>Amount of CONFIRMED orders that are not paid yet. Not part of the revenue.</summary>
+    public decimal OrdersConfirmedAmount { get; init; }
+    /// <summary>Amount of CONFIRMED reservations that are not paid yet. Not part of the revenue.</summary>
+    public decimal ReservationsConfirmedAmount { get; init; }
     public int OrdersCount { get; init; }
     public int ReservationsCount { get; init; }
     public int NewUsersCount { get; init; }
@@ -24,7 +30,7 @@ public sealed class StatisticsDashboardDto
     public List<StatisticsStockDto> LowStock { get; init; } = [];
 }
 
-/// <summary>One month on the time axis. Revenue counts only orders/reservations that are not DRAFT or CANCELLED.</summary>
+/// <summary>One month on the time axis. Revenue counts only PAID and COMPLETED orders/reservations, like the totals.</summary>
 public sealed class StatisticsMonthDto
 {
     public int Year { get; init; }
