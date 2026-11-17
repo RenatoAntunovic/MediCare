@@ -8,9 +8,11 @@ namespace MediCare.Application.Modules.Assistant.Tools;
 /// Tools for a logged-in patient: catalog, free appointments, their own orders/reservations,
 /// and suggest_actions – the only way an item becomes a button in the UI (validated here).
 /// </summary>
-internal sealed class PatientToolbox(IAppDbContext db, int userId) : IAssistantToolbox
+internal sealed class PatientToolbox(IAppDbContext db, IMedicineSearchService medicineSearch, int userId) : IAssistantToolbox
 {
     private const int MaxSuggestionsPerKind = 3;
+    private const int MaxSearchResults = 40;
+    private const int MaxSearchWords = 5;
 
     private readonly CatalogTools _catalog = new(db);
 
@@ -21,10 +23,10 @@ internal sealed class PatientToolbox(IAppDbContext db, int userId) : IAssistantT
     [
         new("search_medicines",
             "Search the pharmacy catalog. Pass symptom or medicine keywords (e.g. 'headache', 'fever', 'Brufen'). " +
-            "Returns matching medicines with id, price, description and stock; if nothing matches, returns the whole catalog.",
+            "Returns matching medicines with id, price, description and stock; if nothing matches, it says so (match=false) and returns no medicines.",
             """
             {"type":"object","properties":{
-              "query":{"type":"string","description":"Keywords; may be empty for the whole catalog"}}}
+              "query":{"type":"string","description":"Keywords, at least 3 letters"}}}
             """),
         CatalogTools.ListTreatmentsTool,
         CatalogTools.GetFreeSlotsTool,
@@ -58,47 +60,53 @@ internal sealed class PatientToolbox(IAppDbContext db, int userId) : IAssistantT
 
     private async Task<object> SearchMedicinesAsync(string? query, CancellationToken ct)
     {
-        // The catalog is small – load it once and match in memory (diacritics-insensitive)
-        var all = await db.Medicine.AsNoTracking()
-            .Where(m => m.isEnabled)
-            .OrderBy(m => m.Name)
-            .Select(m => new
+        var words = (query ?? string.Empty)
+            .Split([' ', ',', '.', ';', '/'], StringSplitOptions.RemoveEmptyEntries)
+            .Where(w => w.Length >= 3)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(MaxSearchWords)
+            .ToList();
+
+        if (words.Count == 0)
+            return NoMatch("The query had no usable keyword. Ask the patient what they are looking for.");
+
+        // 1) Search the WHOLE active catalogue first (Lucene or SQL, whatever is configured) ...
+        var found = new List<MedicineSearchItemDto>();
+        foreach (var word in words)
+        {
+            var result = await medicineSearch.SearchAsync(word, 1, MaxSearchResults, ct);
+            foreach (var item in result.Items.Where(i => found.All(f => f.Id != i.Id)))
+                found.Add(item);
+        }
+
+        // 2) ... and only then limit the number of results
+        found = found.Take(MaxSearchResults).ToList();
+        if (found.Count == 0)
+            return NoMatch("No medicine in our catalogue matches. Tell the patient we do not have it; do not recommend other medicines.");
+
+        // availability: no inventory row = stock not tracked, treat as available
+        var ids = found.Select(f => f.Id).ToList();
+        var stock = await db.Inventories.AsNoTracking()
+            .Where(i => ids.Contains(i.MedicineId))
+            .ToDictionaryAsync(i => i.MedicineId, i => i.QuantityInStock, ct);
+
+        return new
+        {
+            match = true,
+            note = (string?)null,
+            medicines = found.Select(m => new
             {
                 id = m.Id,
                 name = m.Name,
-                category = m.MedicineCategory.Name,
+                category = m.Category,
                 price = m.Price,
                 description = m.Description,
-                stock = db.Inventories.Where(i => i.MedicineId == m.Id).Select(i => (int?)i.QuantityInStock).FirstOrDefault()
+                inStock = !stock.TryGetValue(m.Id, out var quantity) || quantity > 0
             })
-            .Take(200)
-            .ToListAsync(ct);
-
-        var catalog = all.Select(m => new
-        {
-            m.id,
-            m.name,
-            m.category,
-            m.price,
-            m.description,
-            // no inventory row = stock not tracked, treat as available
-            inStock = m.stock is null or > 0
-        }).ToList();
-
-        var words = ToolText.Normalize(query)
-            .Split([' ', ',', '.', ';', '/'], StringSplitOptions.RemoveEmptyEntries)
-            .Where(w => w.Length >= 3)
-            .ToList();
-
-        var matches = words.Count == 0
-            ? catalog
-            : catalog.Where(m => words.Any(w =>
-                    ToolText.Normalize($"{m.name} {m.category} {m.description}").Contains(w))).ToList();
-
-        return matches.Count > 0
-            ? new { note = (string?)null, medicines = matches.Take(40) }
-            : new { note = (string?)"No direct match – this is the whole catalog. Recommend only what really fits.", medicines = catalog.Take(40) };
+        };
     }
+
+    private static object NoMatch(string note) => new { match = false, note, medicines = Array.Empty<object>() };
 
     private async Task<object> MyReservationsAsync(CancellationToken ct)
     {

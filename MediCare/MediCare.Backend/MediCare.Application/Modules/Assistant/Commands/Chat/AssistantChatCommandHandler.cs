@@ -14,6 +14,7 @@ public sealed class AssistantChatCommandHandler(
     IAppCurrentUser currentUser,
     IAiChatClient ai,
     ISender sender,
+    IMedicineSearchService medicineSearch,
     ILogger<AssistantChatCommandHandler> logger)
     : IRequestHandler<AssistantChatCommand, AssistantChatResponseDto>
 {
@@ -31,25 +32,22 @@ public sealed class AssistantChatCommandHandler(
         var userId = currentUser.UserId
             ?? throw new UnauthorizedAccessException();
 
-        var firstName = await db.Users.AsNoTracking()
-            .Where(u => u.Id == userId)
-            .Select(u => u.FirstName)
-            .FirstOrDefaultAsync(ct);
-
+        // The user's name is not sent to the external AI service (privacy), so the prompts have no name.
         var today = DateTime.Today;
         PatientToolbox? patientTools = null;
+        AdminToolbox? adminTools = null;
         IAssistantToolbox toolbox;
         string systemPrompt;
 
         if (currentUser.IsAdmin)
         {
-            toolbox = new AdminToolbox(db, sender);
-            systemPrompt = AssistantPrompts.Admin(firstName, today);
+            toolbox = adminTools = new AdminToolbox(db, sender);
+            systemPrompt = AssistantPrompts.Admin(today);
         }
         else
         {
-            toolbox = patientTools = new PatientToolbox(db, userId);
-            systemPrompt = AssistantPrompts.Patient(firstName, today);
+            toolbox = patientTools = new PatientToolbox(db, medicineSearch, userId);
+            systemPrompt = AssistantPrompts.Patient(today);
         }
 
         var messages = new List<AiMessage> { new(AiRoles.System, systemPrompt) };
@@ -68,7 +66,9 @@ public sealed class AssistantChatCommandHandler(
                     Reply = string.IsNullOrWhiteSpace(result.Content)
                         ? "Izvinite, nisam uspio pripremiti odgovor. Pokušajte ponovo."
                         : result.Content.Trim(),
-                    Suggestions = patientTools?.Suggestions ?? new AssistantSuggestionsDto()
+                    Suggestions = patientTools?.Suggestions ?? new AssistantSuggestionsDto(),
+                    // names and notes: attached by the app, they never went to the AI service
+                    Details = adminTools?.Tables ?? []
                 };
             }
 
@@ -85,7 +85,8 @@ public sealed class AssistantChatCommandHandler(
         return new AssistantChatResponseDto
         {
             Reply = "Izvinite, ovo pitanje mi je trenutno previše složeno. Pokušajte ga postaviti jednostavnije.",
-            Suggestions = patientTools?.Suggestions ?? new AssistantSuggestionsDto()
+            Suggestions = patientTools?.Suggestions ?? new AssistantSuggestionsDto(),
+            Details = adminTools?.Tables ?? []
         };
     }
 
