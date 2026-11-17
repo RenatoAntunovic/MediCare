@@ -42,6 +42,7 @@ export class TreatmentComponent
   constructor() {
     super();
     this.request = new ListTreatmentsRequest();
+    this.request.paging.pageSize = 10; // the server allows at most 100 per page
   }
 
   ngOnInit(): void {
@@ -60,7 +61,8 @@ export class TreatmentComponent
 
     this.api.list(this.request).subscribe({
       next: (response) => {
-        this.items = response.items;
+        // handlePageResult stores the items and the server total, so the paginator bar is shown
+        this.handlePageResult(response);
         this.stopLoading();
       },
       error: (err) => {
