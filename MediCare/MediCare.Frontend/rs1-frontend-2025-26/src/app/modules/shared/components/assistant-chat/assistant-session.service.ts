@@ -1,11 +1,13 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { AuthFacadeService } from '../../../../core/services/auth/auth-facade.service';
-import { AssistantSuggestionsDto } from '../../../../api-services/assistant/assistant-api.models';
+import { AssistantSuggestionsDto, AssistantTable } from '../../../../api-services/assistant/assistant-api.models';
 
 export interface AssistantChatEntry {
   role: 'user' | 'assistant';
   content: string;
   suggestions?: AssistantSuggestionsDto;
+  /** Names and notes for the admin: shown on screen only, never sent back to the server as history */
+  details?: AssistantTable[];
   /** A failed request – shown, but never sent back to the model */
   isError?: boolean;
 }

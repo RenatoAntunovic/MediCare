@@ -1,4 +1,6 @@
 using System.Text.Json;
+using MediCare.Application.Modules.Assistant.Commands.Chat;
+using MediCare.Application.Modules.Notifications;
 using MediCare.Application.Modules.Statistics.Queries.Dashboard;
 
 namespace MediCare.Application.Modules.Assistant.Tools;
@@ -6,6 +8,11 @@ namespace MediCare.Application.Modules.Assistant.Tools;
 /// <summary>
 /// Read-only tools for admins: who is booked when, order states, stock and the statistics summary.
 /// Nothing here changes data.
+///
+/// Privacy: every tool result is split in two.
+/// - The object a tool RETURNS goes to the external AI service: only counts, dates, times, statuses and ids.
+/// - Patient names and notes are put into <see cref="Tables"/>. The handler attaches them to the answer
+///   for the admin's screen; they are never part of a message sent to the AI service.
 /// </summary>
 internal sealed class AdminToolbox(IAppDbContext db, ISender sender) : IAssistantToolbox
 {
@@ -13,10 +20,14 @@ internal sealed class AdminToolbox(IAppDbContext db, ISender sender) : IAssistan
 
     private readonly CatalogTools _catalog = new(db);
 
+    /// <summary>Tables with personal data, filled by the tools, read by the handler after the final answer.</summary>
+    public List<AssistantTableDto> Tables { get; } = [];
+
     public IReadOnlyList<AiTool> Tools { get; } =
     [
         new("get_reservations",
-            "Appointments in a date range (default: today + next 7 days): date, time, patient, treatment, status, notes.",
+            "Appointments in a date range (default: today + next 7 days): id, date, time, treatment, status, with counts. " +
+            "Patient names and notes are NOT available to you: the app shows them to the admin in a table under your answer.",
             """
             {"type":"object","properties":{
               "from":{"type":"string","description":"yyyy-MM-dd"},
@@ -25,7 +36,8 @@ internal sealed class AdminToolbox(IAppDbContext db, ISender sender) : IAssistan
               "status":{"type":"string","enum":["DRAFT","CONFIRMED","PAID","COMPLETED","CANCELLED"]}}}
             """),
         new("get_orders",
-            "Pharmacy orders: counts and totals per status plus the latest orders (customer, date, total, status). Optional filters.",
+            "Pharmacy orders: counts and totals per status plus the latest orders (id, date, total, status). Optional filters. " +
+            "Customer names are NOT available to you: the app shows them to the admin in a table under your answer.",
             """
             {"type":"object","properties":{
               "from":{"type":"string","description":"yyyy-MM-dd"},
@@ -40,7 +52,8 @@ internal sealed class AdminToolbox(IAppDbContext db, ISender sender) : IAssistan
               "threshold":{"type":"integer"}}}
             """),
         new("get_statistics",
-            "Summary for a period (default: all time): revenue (medicines/treatments), counts, new users, best-selling medicines, busiest treatments, monthly totals.",
+            "Summary for a period (default: all time): realised revenue (paid only) and the confirmed-not-paid amount " +
+            "(medicines/treatments), counts, new users, best-selling medicines, busiest treatments, monthly totals.",
             ToolSchemas.DateRange),
         CatalogTools.ListTreatmentsTool,
         CatalogTools.GetFreeSlotsTool,
@@ -73,11 +86,16 @@ internal sealed class AdminToolbox(IAppDbContext db, ISender sender) : IAssistan
             q = q.Where(r => r.OrderStatus.StatusName == status);
 
         var total = await q.CountAsync(ct);
+        var byStatus = await q
+            .GroupBy(r => r.OrderStatus.StatusName)
+            .Select(g => new { status = g.Key, count = g.Count() })
+            .ToListAsync(ct);
         var rows = await q
             .OrderBy(r => r.ReservationDate).ThenBy(r => r.ReservationTime)
             .Take(MaxRows)
             .Select(r => new
             {
+                r.Id,
                 r.ReservationDate,
                 r.ReservationTime,
                 Patient = r.User.FirstName + " " + r.User.LastName,
@@ -87,21 +105,39 @@ internal sealed class AdminToolbox(IAppDbContext db, ISender sender) : IAssistan
             })
             .ToListAsync(ct);
 
+        // Display part: names and notes go to the admin's screen only
+        Tables.Add(new AssistantTableDto
+        {
+            Title = $"Rezervacije {from:dd.MM.yyyy} – {to:dd.MM.yyyy}",
+            Columns = ["Datum", "Vrijeme", "Pacijent", "Tretman", "Status", "Napomena"],
+            Rows = rows.Select(r => new List<string>
+            {
+                r.ReservationDate.ToString("dd.MM.yyyy"),
+                ToolText.Time(r.ReservationTime),
+                r.Patient,
+                r.Treatment,
+                StatusLabels.ToBosnian(r.Status),
+                r.Notes ?? string.Empty
+            }).ToList()
+        });
+
+        // Model part: no patient, no notes
         return new
         {
             from = ToolText.Day(from),
             to = ToolText.Day(to),
             total,
             shown = rows.Count,
+            byStatus,
             reservations = rows.Select(r => new
             {
+                id = r.Id,
                 date = ToolText.Day(r.ReservationDate),
                 time = ToolText.Time(r.ReservationTime),
-                patient = r.Patient,
                 treatment = r.Treatment,
-                status = r.Status,
-                notes = r.Notes
-            })
+                status = r.Status
+            }),
+            note = "Patient names and notes are not available to you. The app shows them to the admin in a table under your answer."
         };
     }
 
@@ -140,6 +176,23 @@ internal sealed class AdminToolbox(IAppDbContext db, ISender sender) : IAssistan
             })
             .ToListAsync(ct);
 
+        // Display part: customer names go to the admin's screen only
+        Tables.Add(new AssistantTableDto
+        {
+            Title = "Posljednje narudžbe",
+            Columns = ["Narudžba", "Datum", "Kupac", "Iznos", "Status", "Stavki"],
+            Rows = latest.Select(o => new List<string>
+            {
+                $"#{o.Id}",
+                o.OrderDate.ToString("dd.MM.yyyy"),
+                o.Customer,
+                $"{o.TotalPrice:0.00} KM",
+                StatusLabels.ToBosnian(o.Status),
+                o.ItemsCount.ToString()
+            }).ToList()
+        });
+
+        // Model part: no customer
         return new
         {
             byStatus,
@@ -147,11 +200,11 @@ internal sealed class AdminToolbox(IAppDbContext db, ISender sender) : IAssistan
             {
                 id = o.Id,
                 date = ToolText.Day(o.OrderDate),
-                customer = o.Customer,
                 total = o.TotalPrice,
                 status = o.Status,
                 items = o.ItemsCount
-            })
+            }),
+            note = "Customer names are not available to you. The app shows them to the admin in a table under your answer."
         };
     }
 
@@ -189,9 +242,12 @@ internal sealed class AdminToolbox(IAppDbContext db, ISender sender) : IAssistan
         {
             s.From,
             s.To,
+            // revenue = paid only; the confirmed amount is reported apart (same rule as the statistics page)
             s.OrdersRevenue,
             s.ReservationsRevenue,
             totalRevenue = s.OrdersRevenue + s.ReservationsRevenue,
+            s.OrdersConfirmedAmount,
+            s.ReservationsConfirmedAmount,
             s.OrdersCount,
             s.ReservationsCount,
             s.NewUsersCount,

@@ -241,3 +241,47 @@
 @media (prefers-reduced-motion: reduce) {
   .mc-chat__dots i { animation: none; }
 }
+
+// Table with names and notes for the admin (built by the server, not sent to the AI service)
+.mc-chat__table {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--mc-border);
+}
+
+.mc-chat__table-title {
+  margin: 0 0 8px;
+  font-weight: 700;
+  color: var(--mc-text);
+}
+
+.mc-chat__table-empty,
+.mc-chat__table-note {
+  margin: 6px 0 0;
+  font-size: 0.8125rem;
+  color: var(--mc-text-muted);
+}
+
+.mc-chat__table-scroll {
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  th,
+  td {
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--mc-border);
+  }
+
+  th {
+    color: var(--mc-text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+}

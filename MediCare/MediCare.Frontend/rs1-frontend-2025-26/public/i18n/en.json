@@ -617,6 +617,8 @@
     "DETAILS": "Medicine details",
     "OUT_OF_STOCK": "Out of stock",
     "ADDED_TO_CART": "{{name}} was added to the cart",
+    "DETAILS_NOTE": "Only you see the names and notes in the app – they are not sent to the external AI service.",
+    "DETAILS_EMPTY": "Nothing to show.",
     "DISCLAIMER": "The AI assistant can make mistakes and does not replace a doctor. In an emergency call 124 or 112.",
     "EXAMPLES": {
       "PATIENT_HEADACHE": "I have had a headache since this morning, what do you recommend?",

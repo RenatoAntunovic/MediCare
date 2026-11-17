@@ -617,6 +617,8 @@
     "DETAILS": "Detalji lijeka",
     "OUT_OF_STOCK": "Nema na stanju",
     "ADDED_TO_CART": "{{name}} je dodan u korpu",
+    "DETAILS_NOTE": "Imena i bilješke vidite samo vi u aplikaciji – ne šalju se vanjskom AI servisu.",
+    "DETAILS_EMPTY": "Nema podataka za prikaz.",
     "DISCLAIMER": "AI asistent može pogriješiti i ne zamjenjuje pregled kod ljekara. U hitnim slučajevima zovite 124 ili 112.",
     "EXAMPLES": {
       "PATIENT_HEADACHE": "Boli me glava od jutros, šta mi preporučuješ?",

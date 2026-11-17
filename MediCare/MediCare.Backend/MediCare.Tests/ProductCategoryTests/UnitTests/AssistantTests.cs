@@ -1,6 +1,7 @@
 using MediCare.Application.Abstractions;
 using MediCare.Application.Modules.Assistant.Commands.Chat;
 using MediCare.Domain.Entities.HospitalRecords;
+using MediCare.Infrastructure.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace MediCare.Tests.UnitTests;
@@ -39,7 +40,7 @@ public class AssistantTests
         new() { Messages = [new AssistantChatMessageDto { Role = "user", Content = question }] };
 
     private static AssistantChatCommandHandler Handler(DatabaseContext db, IAiChatClient ai, bool isAdmin = false) =>
-        new(db, new TestUser(1, isAdmin), ai, null!, NullLogger<AssistantChatCommandHandler>.Instance);
+        new(db, new TestUser(1, isAdmin), ai, null!, new SqlMedicineSearchService(db), NullLogger<AssistantChatCommandHandler>.Instance);
 
     private static DateTime NextWorkingDay(int afterDays)
     {
@@ -65,7 +66,7 @@ public class AssistantTests
         await db.SaveChangesAsync();
         await TestDb.AddMedicineAsync(db, price: 5.50m); // "Brufen"
         var ai = new ScriptedAiClient(
-            Call("search_medicines", """{"query":"brufen"}"""),
+            Call("search_medicines", """{"query":"Brufen"}"""),
             Answer("Preporučujem **Brufen**."));
 
         // Act

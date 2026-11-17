@@ -7,6 +7,9 @@ public sealed class AssistantChatResponseDto
 
     /// <summary>Items the assistant recommended – the UI shows them as buttons. Already checked against the database.</summary>
     public AssistantSuggestionsDto Suggestions { get; init; } = new();
+
+    /// <summary>Admin only: tables with personal data (patient names, notes) shown by the app, not seen by the AI service.</summary>
+    public List<AssistantTableDto> Details { get; init; } = [];
 }
 
 public sealed class AssistantSuggestionsDto
@@ -41,4 +44,16 @@ public sealed class AssistantSlotSuggestionDto
     public string Date { get; init; } = string.Empty;
     /// <summary>HH:mm</summary>
     public string Time { get; init; } = string.Empty;
+}
+
+/// <summary>
+/// A table that the APP attaches to the answer for the admin (names, notes, customers).
+/// It is built from the database after the tool ran and goes straight to the browser:
+/// it is never put into the messages that are sent to the external AI service.
+/// </summary>
+public sealed class AssistantTableDto
+{
+    public string Title { get; init; } = string.Empty;
+    public List<string> Columns { get; init; } = [];
+    public List<List<string>> Rows { get; init; } = [];
 }

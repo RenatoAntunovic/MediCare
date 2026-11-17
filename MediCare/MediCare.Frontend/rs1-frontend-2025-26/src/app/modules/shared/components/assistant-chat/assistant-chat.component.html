@@ -41,6 +41,38 @@
               <div class="mc-chat__text" [innerHTML]="toHtml(entry.content)"></div>
             }
 
+            <!-- Names and notes for the admin: built by the server, shown here only (not part of the chat history) -->
+            @for (table of entry.details ?? []; track $index) {
+              <div class="mc-chat__table">
+                <p class="mc-chat__table-title">{{ table.title }}</p>
+                @if (table.rows.length === 0) {
+                  <p class="mc-chat__table-empty">{{ 'ASSISTANT.DETAILS_EMPTY' | translate }}</p>
+                } @else {
+                  <div class="mc-chat__table-scroll">
+                    <table>
+                      <thead>
+                        <tr>
+                          @for (column of table.columns; track column) {
+                            <th scope="col">{{ column }}</th>
+                          }
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (row of table.rows; track $index) {
+                          <tr>
+                            @for (cell of row; track $index) {
+                              <td>{{ cell }}</td>
+                            }
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+                <p class="mc-chat__table-note">{{ 'ASSISTANT.DETAILS_NOTE' | translate }}</p>
+              </div>
+            }
+
             @if (hasSuggestions(entry.suggestions)) {
               <div class="mc-chat__actions">
                 @for (slot of entry.suggestions!.slots; track slot.treatmentId + slot.date + slot.time) {
