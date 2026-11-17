@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { TreatmentCategoriesComponent } from './treatment-categories.component';
 import { TreatmentCategoriesApiService } from '../../../../api-services/treatment-categories/treatment-categories-api.service';
 import { ToasterService } from '../../../../core/services/toaster.service';
@@ -12,8 +12,9 @@ describe('TreatmentCategoriesComponent (paging + filters)', () => {
     total
   });
 
-  let api: { list: ReturnType<typeof vi.fn> };
+  let api: { list: ReturnType<typeof vi.fn>; disable?: ReturnType<typeof vi.fn> };
   let component: TreatmentCategoriesComponent;
+  const dialogHelper = { showError: vi.fn().mockReturnValue(of(undefined)) };
 
   beforeEach(() => {
     api = { list: vi.fn().mockReturnValue(of(page(10, 25))) };
@@ -24,7 +25,7 @@ describe('TreatmentCategoriesComponent (paging + filters)', () => {
         { provide: TreatmentCategoriesApiService, useValue: api },
         { provide: MatDialog, useValue: {} },
         { provide: ToasterService, useValue: {} },
-        { provide: DialogHelperService, useValue: {} }
+        { provide: DialogHelperService, useValue: dialogHelper }
       ]
     }).overrideComponent(TreatmentCategoriesComponent, { set: { template: '' } });
 
@@ -55,5 +56,21 @@ describe('TreatmentCategoriesComponent (paging + filters)', () => {
 
     component.onToggleEnabledFilter(true);
     expect(component.request.onlyEnabled).toBe(true);
+  });
+
+  it('shows the server message and reloads when a category cannot be disabled (409)', () => {
+    api.disable = vi.fn().mockReturnValue(throwError(() => ({
+      status: 409,
+      error: { message: 'Category Pregled cannot be disabled because it contains active treatments.' }
+    })));
+    api.list.mockClear();
+
+    component.onToggleStatus({ id: 1, categoryName: 'Pregled', isEnabled: true } as any);
+
+    expect(dialogHelper.showError).toHaveBeenCalledWith(
+      'DIALOGS.TITLES.ERROR',
+      'Category Pregled cannot be disabled because it contains active treatments.'
+    );
+    expect(api.list).toHaveBeenCalledTimes(1); // list reloaded -> slide toggle shows the real status
   });
 });

@@ -1,5 +1,7 @@
 using MediCare.Application.Abstractions;
 using MediCare.Application.Common;
+using MediCare.Application.Common.Exceptions;
+using MediCare.Application.Modules.Catalog.TreatmentCategories.Commands.Status.Disable;
 using MediCare.Application.Modules.Catalog.TreatmentCategories.Queries.List;
 using MediCare.Application.Modules.Catalog.Treatments.Commands.Update;
 using MediCare.Application.Modules.Catalog.Treatments.Queries.List;
@@ -134,6 +136,24 @@ public class TreatmentsTests
         var result = await handler.Handle(new ListTreatmentCategoriesQuery(), CancellationToken.None);
 
         Assert.Equal(2, result.Total);
+    }
+
+    [Fact]
+    public async Task DisableCategory_WithActiveTreatment_IsRejected_AndWithoutOneIsDisabled()
+    {
+        using var db = TestDb.Create();
+        var busy = await AddCategoryAsync(db, "Busy");
+        var free = await AddCategoryAsync(db, "Free");
+        await AddTreatmentAsync(db, busy.Id, "Massage");
+        var handler = new DisableTreatmentCategoryCommandHandler(db);
+
+        // business rule -> the API answers 409 Conflict
+        await Assert.ThrowsAsync<MediCareBusinessRuleException>(() =>
+            handler.Handle(new DisableTreatmentCategoryCommand { Id = busy.Id }, CancellationToken.None));
+        Assert.True((await db.TreatmentCategories.FindAsync(busy.Id))!.isEnabled);
+
+        await handler.Handle(new DisableTreatmentCategoryCommand { Id = free.Id }, CancellationToken.None);
+        Assert.False((await db.TreatmentCategories.FindAsync(free.Id))!.isEnabled);
     }
 
     // ---------- fix 6: update treatment image – order of operations ----------

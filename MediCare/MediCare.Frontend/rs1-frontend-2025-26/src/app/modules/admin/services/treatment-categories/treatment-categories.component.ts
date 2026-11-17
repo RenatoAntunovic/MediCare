@@ -153,8 +153,14 @@ export class TreatmentCategoriesComponent
         this.loadPagedData();
       },
       error: (err) => {
-        this.stopLoading();
         console.error('Toggle status error:', err);
+        // e.g. 409: a category with active treatments cannot be disabled. Tell the admin why
+        // and reload, so the slide toggle goes back to the real status from the server.
+        this.dialogHelper.showError(
+          'DIALOGS.TITLES.ERROR',
+          err?.error?.message || 'TREATMENT_CATEGORIES.DIALOGS.ERROR_UPDATE'
+        ).subscribe();
+        this.loadPagedData();
       },
     });
   }
