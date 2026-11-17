@@ -38,6 +38,14 @@
     color: var(--mc-text-muted);
     font-size: 0.875rem;
   }
+
+  // A badge (e.g. "Potrebna nabavka") must stay inside the tile: full width, centred, may wrap
+  .mc-badge {
+    align-self: stretch;
+    justify-content: center;
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 .mc-stats__grid {
