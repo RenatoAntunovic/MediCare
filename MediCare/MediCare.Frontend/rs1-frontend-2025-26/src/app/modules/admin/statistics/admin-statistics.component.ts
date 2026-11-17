@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { StatisticsApiService } from '../../../api-services/statistics/statistics-api.service';
 import { StatisticsDashboardDto } from '../../../api-services/statistics/statistics-api.models';
 import { McChartSeries } from '../../shared/components/mc-chart/mc-chart.component';
+import { formatMoney, formatMonthYear } from '../../../core/utils/locale-format';
 
 type Period = 'all' | '30d' | '3m' | '12m' | 'year';
 
@@ -46,6 +47,12 @@ export class AdminStatisticsComponent implements OnInit {
   totalRevenue = computed(() => {
     const d = this.data();
     return d ? d.ordersRevenue + d.reservationsRevenue : 0;
+  });
+
+  /** Confirmed but not yet paid: shown on its own card, never added to the revenue */
+  confirmedNotPaid = computed(() => {
+    const d = this.data();
+    return d ? d.ordersConfirmedAmount + d.reservationsConfirmedAmount : 0;
   });
 
   revenueChart = computed<ChartData>(() => {
@@ -156,8 +163,9 @@ export class AdminStatisticsComponent implements OnInit {
       });
   }
 
+  /** Amounts on the key figure cards follow the selected language (bs: 1.234,50 / en: 1,234.50) */
   formatMoney(value: number): string {
-    return 'KM ' + value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return formatMoney(value, this.lang());
   }
 
   private periodRange(period: Period): { from: string | null; to: string | null } {
@@ -191,8 +199,7 @@ export class AdminStatisticsComponent implements OnInit {
   }
 
   private monthLabel(year: number, month: number): string {
-    const locale = this.lang() === 'en' ? 'en-GB' : 'bs-BA';
-    return new Date(year, month - 1, 1).toLocaleDateString(locale, { month: 'short', year: 'numeric' });
+    return formatMonthYear(year, month, this.lang());
   }
 
   private statusLabel(statusName: string): string {

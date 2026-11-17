@@ -563,7 +563,8 @@
       "THIS_YEAR": "Ova godina"
     },
     "TILES": {
-      "REVENUE": "Ukupan prihod",
+      "REVENUE": "Ostvareni prihod (plaćeno)",
+      "CONFIRMED_NOT_PAID": "Potvrđeno, još nije plaćeno",
       "ORDERS": "Narudžbe",
       "RESERVATIONS": "Rezervacije",
       "NEW_USERS": "Novi korisnici",
@@ -579,7 +580,7 @@
     },
     "CHARTS": {
       "REVENUE_BY_MONTH": "Prihod po mjesecima",
-      "REVENUE_BY_MONTH_SUB": "Bez nacrta i otkazanih narudžbi i rezervacija",
+      "REVENUE_BY_MONTH_SUB": "Samo plaćene narudžbe i rezervacije",
       "ACTIVITY_BY_MONTH": "Narudžbe i rezervacije po mjesecima",
       "ORDERS_BY_STATUS": "Narudžbe po statusu",
       "TOP_MEDICINES": "Najprodavaniji lijekovi",

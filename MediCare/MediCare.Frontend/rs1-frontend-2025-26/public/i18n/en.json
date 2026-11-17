@@ -563,7 +563,8 @@
       "THIS_YEAR": "This year"
     },
     "TILES": {
-      "REVENUE": "Total revenue",
+      "REVENUE": "Realised revenue (paid)",
+      "CONFIRMED_NOT_PAID": "Confirmed, not yet paid",
       "ORDERS": "Orders",
       "RESERVATIONS": "Reservations",
       "NEW_USERS": "New users",
@@ -579,7 +580,7 @@
     },
     "CHARTS": {
       "REVENUE_BY_MONTH": "Revenue by month",
-      "REVENUE_BY_MONTH_SUB": "Excludes draft and cancelled orders and reservations",
+      "REVENUE_BY_MONTH_SUB": "Paid orders and reservations only",
       "ACTIVITY_BY_MONTH": "Orders and reservations by month",
       "ORDERS_BY_STATUS": "Orders by status",
       "TOP_MEDICINES": "Best-selling medicines",

@@ -18,8 +18,12 @@ export interface StatisticsDashboardDto {
   from: string | null;
   to: string | null;
 
+  /** Realised revenue: only paid (PAID, COMPLETED) orders and reservations */
   ordersRevenue: number;
   reservationsRevenue: number;
+  /** CONFIRMED but not yet paid, not part of the revenue */
+  ordersConfirmedAmount: number;
+  reservationsConfirmedAmount: number;
   ordersCount: number;
   reservationsCount: number;
   newUsersCount: number;
