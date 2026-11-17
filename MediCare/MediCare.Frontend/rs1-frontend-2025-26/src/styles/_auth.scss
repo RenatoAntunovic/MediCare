@@ -335,6 +335,9 @@
   .mat-horizontal-content-container { padding: 16px 0 0; }
 }
 
+// Long hints wrap evenly instead of leaving one word alone on the second line
+.auth-stepper .mat-mdc-form-field-hint { text-wrap: balance; }
+
 .auth-step-actions {
   display: flex;
   justify-content: flex-end;

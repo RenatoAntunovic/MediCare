@@ -166,7 +166,7 @@
             <mat-form-field appearance="outline">
               <mat-label>Broj telefona</mat-label>
               <input matInput type="tel" formControlName="phoneNumber" autocomplete="tel" maxlength="20" />
-              <mat-hint>9–20 cifara, smiju razmaci, "-" i "/", npr. 061 123 456 ili +387 61 123 456</mat-hint>
+              <mat-hint>Npr. 061 123 456 ili +387 61 123 456</mat-hint>
               <mat-error *ngIf="form.get('contact.phoneNumber')?.hasError('required')">Telefon je obavezan</mat-error>
               <mat-error *ngIf="form.get('contact.phoneNumber')?.hasError('pattern')">
                 Neispravan broj – samo cifre, razmaci, "-" i "/" (opcionalno "+" na početku), 9–20 znakova
@@ -178,7 +178,7 @@
               <mat-form-field appearance="outline">
                 <mat-label>Adresa</mat-label>
                 <input matInput formControlName="address" autocomplete="street-address" maxlength="100" />
-                <mat-hint>Ulica i broj, npr. Maršala Tita 12</mat-hint>
+                <mat-hint>Npr. Maršala Tita 12</mat-hint>
                 <mat-error *ngIf="form.get('contact.address')?.hasError('required')">Adresa je obavezna</mat-error>
               </mat-form-field>
 
