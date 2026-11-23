@@ -24,7 +24,7 @@
 
                 <div class="mc-cart-item__info">
           <a class="mc-list__name" [routerLink]="['/client/medicine', item.medicineId]">{{ item.medicineName }}</a>
-          <span class="mc-list__meta">{{ item.price / item.quantity | number : '1.2-2' }} KM / kom.</span>
+          <span class="mc-list__meta">{{ item.price / item.quantity | localNumber : '1.2-2' }} KM / kom.</span>
 
           <div class="mc-qty" role="group"
                [class.is-busy]="updatingItemId === item.cartItemId"
@@ -43,7 +43,7 @@
           </div>
         </div>
 
-        <span class="mc-price">{{ item.price | number : '1.2-2' }} KM</span>
+        <span class="mc-price">{{ item.price | localNumber : '1.2-2' }} KM</span>
 
         <div class="mc-list__actions">
           <button
@@ -63,7 +63,7 @@
       <h2 class="mc-summary__title">Pregled narudžbe</h2>
       <div class="mc-summary__row">
         <span>Ukupno</span>
-        <strong>{{ cartTotal | number : '1.2-2' }} KM</strong>
+        <strong>{{ cartTotal | localNumber : '1.2-2' }} KM</strong>
       </div>
       <button
         mat-flat-button
