@@ -18,9 +18,8 @@ public sealed class GetByIdOrderQueryDtoUser
 
 public class GetByIdOrderQueryDtoItems
 {
-    public required int OrderId { get; set; }
-    public  Orders Order { get; set; }
-    public  int MedicineId { get; set; }
+    /// <summary>Id of the order ITEM (OrderItems.Id). The order id is already on the parent DTO (Id).</summary>
+    public required int OrderItemId { get; set; }
     public required GetByIdOrderQueryDtoItemMedicine Medicine { get; set; }
     public required int Quantity { get; set; }
     public required decimal Price { get; set; }
