@@ -51,6 +51,8 @@ export class MedicineComponent
   constructor() {
     super();
     this.request = new ListMedicineRequest();
+    // The server caps the page size at 100, so the default of 1000 would break the page count
+    this.request.paging.pageSize = 12;
   }
 
   goToMedicineDetail(medicine: any) {
@@ -105,47 +107,48 @@ export class MedicineComponent
   onDelete(medicine: any) {}
   onToggleStatus(medicine: any) {}
 
-  // Main loading: without a query -> SQL list, with a query -> full-text search
+  // Main loading: without a query -> SQL list, with a query -> full-text search.
+  // In both cases the category is sent to the server, which filters BEFORE paging and
+  // returns the total for the same criteria, so the paginator always matches the items.
   protected loadPagedData(): void {
-  this.startLoading();
+    this.startLoading();
 
-  const query = this.request.search?.trim() ?? '';
+    const query = this.request.search?.trim() ?? '';
 
-  if (!query) {
-    // No search – regular list from SQL
-    this.api.list(this.request).subscribe({
-      next: (response) => {
-        this.items = response.items;
-        this.stopLoading();
-      },
-      error: (err) => {
-        console.error('Load error (SQL):', err);
-        this.stopLoading('Failed to load medicines');
-      }
-    });
-  } else {
-    // With search – full-text search (name + description + category)
-    this.api.searchMedicines(query, this.request.paging.page, this.request.paging.pageSize)
+    if (!query) {
+      // No search – regular list from SQL (the server returns only active medicines here)
+      this.api.list(this.request).subscribe({
+        next: (response) => {
+          this.handlePageResult(response);
+          this.stopLoading();
+        },
+        error: (err) => {
+          console.error('Load error (SQL):', err);
+          this.stopLoading('Failed to load medicines');
+        }
+      });
+      return;
+    }
+
+    // With search – full-text search (name + description + category), filtered by category on the server
+    this.api.searchMedicines(query, this.request.paging.page, this.request.paging.pageSize, this.categoryFilter)
       .subscribe({
-               next: (response) => {
+        next: (response) => {
           // Search results have a different shape than the list (category instead of medicineCategoryName,
           // no isEnabled – the index holds only active medicines), so map them to the list shape
-          const selectedCategory = this.categories.find(c => c.id === this.categoryFilter)?.name;
+          const items = (response.results ?? []).map((r: any) => ({
+            id: r.id,
+            name: r.name,
+            description: r.description,
+            price: r.price,
+            weight: r.weight,
+            imagePath: r.imagePath,
+            medicineCategoryId: r.categoryId,
+            medicineCategoryName: r.category,
+            isEnabled: true
+          }));
 
-          this.items = (response.results ?? [])
-            .map((r: any) => ({
-              id: r.id,
-              name: r.name,
-              description: r.description,
-              price: r.price,
-              weight: r.weight,
-              imagePath: r.imagePath,
-              medicineCategoryName: r.category,
-              isEnabled: true
-            }))
-            // The search endpoint has no category filter, so apply the selected one here
-            .filter((m: any) => !selectedCategory || m.medicineCategoryName === selectedCategory);
-
+          this.handlePageResult({ items, total: response.total ?? 0 } as any);
           this.stopLoading();
         },
         error: (err) => {
@@ -154,8 +157,6 @@ export class MedicineComponent
         }
       });
   }
-}
-
 
   // Enter search
   private lastSearchTime: number = 0;

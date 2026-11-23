@@ -29,6 +29,7 @@
     "MENU": {
       "PHARMACY": "Apoteka",
       "CATEGORIES": "Kategorije lijekova",
+      "SUPPLIERS": "Dobavljači",
       "MEDICINE": "Lijekovi",
       "HOSPITAL": "Bolnica",
       "TREATMENT_CATEGORIES":"Kategorije tretmana",
@@ -68,6 +69,12 @@
   },
 "CART":{
   "TITLE":"Košara",
+  "CONFIRM": {
+    "CHECKOUT_TITLE": "Završiti narudžbu?",
+    "CHECKOUT_MESSAGE": "Naručujete {{count}} stavki u iznosu od {{total}} KM. Želite li potvrditi narudžbu?",
+    "REMOVE_TITLE": "Ukloniti iz korpe?",
+    "REMOVE_MESSAGE": "Da li želite ukloniti \"{{name}}\" iz korpe?"
+  },
    "ACTIONS": { "REMOVE_TOOLTIP": "Ukloni iz korpe" },
 "TABLE": {
       "QUANTITY": "Količina",
@@ -153,6 +160,15 @@
     "ADD_NEW": "Dodaj lijek",
     "FILTER_CATEGORY":"Filtriraj po kategoriji",
     "ALL_CATEGORIES":"Sve kategorije",
+    "FILTER_STATUS": "Status",
+    "STATUS_ALL": "Svi",
+    "STATUS_ACTIVE": "Aktivni",
+    "STATUS_INACTIVE": "Neaktivni",
+    "MIN_PRICE": "Cijena od (KM)",
+    "MAX_PRICE": "Cijena do (KM)",
+    "PRICE_NEGATIVE": "Cijena ne može biti negativna",
+    "PRICE_RANGE_ERROR": "Cijena do mora biti veća ili jednaka cijeni od",
+    "CLEAR_FILTERS": "Očisti filtere",
     "LOADING": "Učitavanje lijekova...",
     "NO_DATA": "Nema lijekova za prikaz",
     "NO_DATA_FILTER": "Nema rezultata za pretragu",
@@ -635,6 +651,63 @@
       "TOO_MANY": "Previše pitanja u kratkom vremenu. Sačekajte minutu.",
       "GENERIC": "Asistent trenutno ne može odgovoriti. Pokušajte ponovo.",
       "CART": "Lijek nije dodan u korpu. Pokušajte ponovo."
+    }
+  },
+  "SUPPLIERS": {
+    "TITLE": "Dobavljači",
+    "SUBTITLE": "Firme koje dobavljaju lijekove apoteci.",
+    "NEW": "Novi dobavljač",
+    "LOADING": "Učitavanje dobavljača...",
+    "NO_DATA": "Nema dobavljača za prikaz",
+    "NO_DATA_FILTER": "Nema dobavljača za odabrane filtere",
+    "FILTERS": {
+      "SEARCH": "Pretraga (firma, kontakt, email)",
+      "CITY": "Grad",
+      "ALL_CITIES": "Svi gradovi",
+      "STATUS": "Status",
+      "STATUS_ALL": "Svi",
+      "STATUS_ACTIVE": "Aktivan",
+      "STATUS_INACTIVE": "Neaktivan",
+      "MEDICINE": "Dobavlja lijek",
+      "ALL_MEDICINES": "Svi lijekovi",
+      "CREATED_FROM": "Dodan od datuma",
+      "DATE_IN_FUTURE": "Datum ne može biti u budućnosti",
+      "CLEAR": "Očisti filtere"
+    },
+    "TABLE": {
+      "COMPANY": "Firma",
+      "CONTACT": "Kontakt osoba",
+      "CITY": "Grad",
+      "MEDICINES": "Lijekova",
+      "CREATED": "Dodan",
+      "STATUS": "Status",
+      "ACTIONS": "Akcije"
+    },
+    "ACTIONS": {
+      "EDIT": "Uredi dobavljača",
+      "DELETE": "Obriši dobavljača"
+    },
+    "FORM": {
+      "NEW_TITLE": "Novi dobavljač",
+      "EDIT_TITLE": "Uredi dobavljača",
+      "COMPANY": "Naziv firme",
+      "CONTACT": "Kontakt osoba",
+      "EMAIL": "Email",
+      "PHONE": "Telefon",
+      "ADDRESS": "Adresa",
+      "CITY": "Grad",
+      "MEDICINES": "Lijekovi koje dobavlja",
+      "ACTIVE": "Aktivan",
+      "SAVE": "Spremi",
+      "CANCEL": "Odustani",
+      "ERRORS": {
+        "REQUIRED": "Obavezno polje",
+        "MIN_LENGTH": "Najmanje {{n}} znaka",
+        "MAX_LENGTH": "Najviše {{n}} znakova",
+        "EMAIL": "Neispravan email",
+        "PHONE": "Dozvoljene su cifre, razmak i + - / ( ) (6–30 znakova)",
+        "INVALID": "Neispravna vrijednost"
+      }
     }
   }
 }

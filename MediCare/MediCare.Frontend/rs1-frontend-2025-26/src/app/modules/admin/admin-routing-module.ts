@@ -14,6 +14,7 @@ import { AdminAssistantComponent } from './assistant/admin-assistant.component';
 import { TreatmentComponent } from './services/treatments/treatments.component';
 import { TreatmentsAddComponent } from './services/treatments/treatments-add/treatments-add.component';
 import { TreatmentsEditComponent } from './services/treatments/treatments-edit/treatments-edit.component';
+import { SuppliersComponent } from './procurement/suppliers/suppliers.component';
 
 const routes: Routes = [
   {
@@ -59,6 +60,10 @@ const routes: Routes = [
       {
         path: 'orders',
         component: AdminOrdersComponent,
+      },
+      {
+        path: 'suppliers',
+        component: SuppliersComponent,
       },
       {
         path: 'statistics',

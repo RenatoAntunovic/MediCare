@@ -109,6 +109,8 @@ statusOptions: { id: number; name: string; icon:string }[] = [
 
 onStatusFilterChange(status: number | null): void {
   this.statusFilter = status;
+  // Sent to the server, which filters before counting and paging
+  this.request.statusId = status;
   this.request.paging.page = 1;
   this.loadPagedData();
 }
@@ -116,6 +118,7 @@ onStatusFilterChange(status: number | null): void {
   clearFilters(): void {
     this.searchControl.setValue('', { emitEvent: false });
     this.statusFilter = null;
+    this.request.statusId = null;
     this.request.search = null;
     this.request.paging.page = 1;
     this.loadPagedData();
@@ -152,7 +155,7 @@ getStatusLabel(statusId: number): string {
     case 2: return 'ORDERS.STATUS.CONFIRMED';
     case 3: return 'ORDERS.STATUS.PAID';
     case 4: return 'ORDERS.STATUS.COMPLETED';
-    case 6: return 'ORDERS.STATUS.CANCELLED';
+    case 5: return 'ORDERS.STATUS.CANCELLED';
     default: return 'ORDERS.STATUS.UNKNOWN';
   }
 }
@@ -163,7 +166,7 @@ getStatusIcon(statusId: number): string {
     case 2: return 'check_circle';
     case 3: return 'payment';
     case 4: return 'done_all';
-    case 6: return 'cancel';
+    case 5: return 'cancel';
     default: return 'help_outline';
   }
 }
@@ -174,7 +177,7 @@ getStatusIcon(statusId: number): string {
     case 2: return 'status-confirmed';
     case 3: return 'status-paid';
     case 4: return 'status-completed';
-    case 6: return 'status-cancelled';
+    case 5: return 'status-cancelled';
     default: return 'status-unknown';
   }
 }

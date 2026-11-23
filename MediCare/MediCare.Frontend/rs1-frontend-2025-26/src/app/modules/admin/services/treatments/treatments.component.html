@@ -70,7 +70,7 @@
       <ng-container matColumnDef="price">
         <th mat-header-cell *matHeaderCellDef mat-sort-header="price">{{ 'TREATMENTS.TABLE.PRICE' | translate }}</th>
         <td mat-cell *matCellDef="let treatment">
-          <span class="mc-cell-price">{{ treatment.price | number : '1.2-2' }} KM</span>
+          <span class="mc-cell-price">{{ treatment.price | localNumber : '1.2-2' }} KM</span>
         </td>
       </ng-container>
 

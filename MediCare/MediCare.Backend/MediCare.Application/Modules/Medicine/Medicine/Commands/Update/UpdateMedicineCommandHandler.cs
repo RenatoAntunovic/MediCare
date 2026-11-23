@@ -1,8 +1,13 @@
-using MediCare.Application.Modules.MedicineSearch;
+﻿using MediCare.Application.Modules.MedicineSearch;
+using Microsoft.Extensions.Logging;
 
 namespace MediCare.Application.Modules.Medicine.Medicine.Commands.Update;
 
-public sealed class UpdateMedicineCommandHandler(IAppDbContext ctx, IMedicineSearchIndex searchIndex)
+public sealed class UpdateMedicineCommandHandler(
+    IAppDbContext ctx,
+    IMedicineSearchIndex searchIndex,
+    IImageStorage storage,
+    ILogger<UpdateMedicineCommandHandler> logger)
     : IRequestHandler<UpdateMedicineCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateMedicineCommand request, CancellationToken ct)
@@ -21,11 +26,17 @@ public sealed class UpdateMedicineCommandHandler(IAppDbContext ctx, IMedicineSea
         if (exists)
             throw new MediCareConflictException("Lijek s tim nazivom već postoji.");
 
-        var categoryExists = await ctx.MedicineCategories
-            .AnyAsync(c => c.Id == request.MedicineCategoryId, ct);
+        var category = await ctx.MedicineCategories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == request.MedicineCategoryId, ct);
 
-        if (!categoryExists)
+        if (category is null)
             throw new MediCareNotFoundException("Odabrana kategorija ne postoji.");
+
+        // Same rule as disabling a category: an active medicine cannot belong to a disabled category
+        if (request.isEnabled && !category.IsEnabled)
+            throw new MediCareBusinessRuleException("medicine.category.disabled",
+                "Aktivan lijek ne može pripadati neaktivnoj kategoriji.");
 
         entity.Name = normalizedName;
         entity.Description = request.Description ?? string.Empty;
@@ -34,43 +45,59 @@ public sealed class UpdateMedicineCommandHandler(IAppDbContext ctx, IMedicineSea
         entity.MedicineCategoryId = request.MedicineCategoryId;
         entity.isEnabled = request.isEnabled;
 
+        var oldImagePath = entity.ImagePath;
+        string? newImagePath = null;
+
         // The image is optional (inline edit does not send it)
         if (request.ImageFile != null && request.ImageFile.Length > 0)
         {
-            var uploadsFolder = Path.Combine("wwwroot", "images");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            if (!string.IsNullOrWhiteSpace(entity.ImagePath))
-            {
-                // The same file can be shared (the seed uses one image for several items),
-                // so it is deleted only if no other medicine or treatment still points to it.
-                var relative = entity.ImagePath.TrimStart('/', '\\');
-                var withSlash = "/" + relative;
-
-                var usedElsewhere =
-                    await ctx.Medicine.AnyAsync(m => m.Id != entity.Id && (m.ImagePath == relative || m.ImagePath == withSlash), ct) ||
-                    await ctx.Treatments.AnyAsync(t => t.ImagePath == relative || t.ImagePath == withSlash, ct);
-
-                // TrimStart: seed paths start with "/", so Path.Combine would return an absolute path
-                var oldPath = Path.Combine("wwwroot", relative);
-                if (!usedElsewhere && File.Exists(oldPath))
-                    File.Delete(oldPath);
-            }
-
-            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(request.ImageFile.FileName)}";
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await request.ImageFile.CopyToAsync(stream, ct);
-
-            entity.ImagePath = $"images/{uniqueFileName}";
+            // 1) save the NEW file under its own unique name first.
+            //    If this fails, the old file and the database are untouched.
+            newImagePath = await storage.SaveAsync(request.ImageFile, ct);
+            entity.ImagePath = newImagePath;
         }
 
-        await ctx.SaveChangesAsync(ct);
+        // 2) write the new reference to the database
+        try
+        {
+            await ctx.SaveChangesAsync(ct);
+        }
+        catch
+        {
+            // the medicine keeps its old image, so the new file is not needed
+            if (newImagePath is not null)
+                storage.Delete(newImagePath);
+            throw;
+        }
+
+        // 3) only now remove the old file (if nobody else uses it); a failure here must not fail the request
+        if (newImagePath is not null && !string.IsNullOrWhiteSpace(oldImagePath))
+            await TryDeleteOldImageAsync(oldImagePath, entity.Id, ct);
 
         await searchIndex.SyncMedicineAsync(ctx, entity.Id, ct);
 
         return Unit.Value;
+    }
+
+    private async Task TryDeleteOldImageAsync(string oldImagePath, int medicineId, CancellationToken ct)
+    {
+        try
+        {
+            // The same file can be shared (the seed uses one image for several items),
+            // so it is deleted only if no other medicine or treatment still points to it.
+            var relative = oldImagePath.TrimStart('/', '\\');
+            var withSlash = "/" + relative;
+
+            var usedElsewhere =
+                await ctx.Medicine.AnyAsync(m => m.Id != medicineId && (m.ImagePath == relative || m.ImagePath == withSlash), ct) ||
+                await ctx.Treatments.AnyAsync(t => t.ImagePath == relative || t.ImagePath == withSlash, ct);
+
+            if (!usedElsewhere)
+                storage.Delete(relative);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Old medicine image {Path} could not be removed.", oldImagePath);
+        }
     }
 }

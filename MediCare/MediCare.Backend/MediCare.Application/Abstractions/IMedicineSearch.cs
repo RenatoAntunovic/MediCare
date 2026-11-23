@@ -10,6 +10,7 @@ public sealed class MedicineSearchItemDto
     public string Description { get; init; } = string.Empty;
     public decimal Price { get; init; }
     public string Category { get; init; } = string.Empty;
+    public int CategoryId { get; init; }
     public string ImagePath { get; init; } = string.Empty;
     public int Weight { get; init; }
 
@@ -34,7 +35,8 @@ public sealed class MedicineSearchResultDto
 /// </summary>
 public interface IMedicineSearchService
 {
-    Task<MedicineSearchResultDto> SearchAsync(string query, int page, int pageSize, CancellationToken ct);
+    /// <param name="categoryId">Optional category filter, applied BEFORE paging so that Total matches the filtered set.</param>
+    Task<MedicineSearchResultDto> SearchAsync(string query, int page, int pageSize, CancellationToken ct, int? categoryId = null);
 }
 
 /// <summary>

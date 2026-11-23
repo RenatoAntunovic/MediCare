@@ -42,7 +42,7 @@ public sealed class GetOrderByIdQueryHandler(IAppDbContext ctx, IAppCurrentUser 
                 //"x.Items" or "ctx.OrderItems.Where(x => x.OrderId == x.Id)"
                 Items = x.OrderItems.Select(i => new GetByIdOrderQueryDtoItems
                 {
-                    OrderId = i.Id,
+                    OrderItemId = i.Id,
                     Medicine = new GetByIdOrderQueryDtoItemMedicine
                     {
                         MedicineId = i.MedicineId,

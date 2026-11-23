@@ -752,32 +752,51 @@ namespace MediCare.Infrastructure.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ContactName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<bool>("IsEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Suppliers");
+                    b.ToTable("Suppliers", (string)null);
                 });
 
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.TreatmentCategories", b =>
@@ -1099,7 +1118,7 @@ namespace MediCare.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("MediCare.Domain.Entities.HospitalRecords.Suppliers", "Supplier")
-                        .WithMany()
+                        .WithMany("MedicineSuppliers")
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1330,6 +1349,11 @@ namespace MediCare.Infrastructure.Migrations
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Receivings", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.Suppliers", b =>
+                {
+                    b.Navigation("MedicineSuppliers");
                 });
 
             modelBuilder.Entity("MediCare.Domain.Entities.HospitalRecords.TreatmentCategories", b =>

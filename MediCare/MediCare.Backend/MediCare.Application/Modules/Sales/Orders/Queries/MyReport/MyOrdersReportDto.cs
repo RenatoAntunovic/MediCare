@@ -13,7 +13,13 @@ public sealed class MyOrdersReportDto
     public List<MyOrdersReportOrderDto> Orders { get; init; } = [];
 
     // Summary
+    /// <summary>All orders in the report (every status).</summary>
     public int OrdersCount { get; init; }
+    /// <summary>Total value of all listed orders, including unpaid and cancelled ones.</summary>
+    public decimal OrdersValue { get; init; }
+
+    // Spending – only paid and completed orders (see MyOrdersReportQueryHandler.SpendingStatuses)
+    public int SpendingOrdersCount { get; init; }
     public int ItemsCount { get; init; }
     public decimal TotalSpent { get; init; }
     public decimal AverageOrder { get; init; }

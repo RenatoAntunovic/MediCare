@@ -32,17 +32,23 @@ public static partial class OrderPdfBuilder
         var summary = CreateTable(new float[] { 3, 2.5f });
         summary.WidthPercentage = 65;
         summary.HorizontalAlignment = AlignLeft;
-        AddCell(summary, "Broj narudžbi", false);
+        AddCell(summary, "Broj narudžbi (svi statusi)", false);
         AddCell(summary, report.OrdersCount.ToString(), false, AlignRight);
+        AddCell(summary, "Vrijednost svih narudžbi", true);
+        AddCell(summary, Money(report.OrdersValue), true, AlignRight);
+        AddCell(summary, "Plaćene i završene narudžbe", false);
+        AddCell(summary, report.SpendingOrdersCount.ToString(), false, AlignRight);
         AddCell(summary, "Kupljenih komada", true);
         AddCell(summary, report.ItemsCount.ToString(), true, AlignRight);
-        AddCell(summary, "Prosječna narudžba", false);
+        AddCell(summary, "Prosječna plaćena narudžba", false);
         AddCell(summary, Money(report.AverageOrder), false, AlignRight);
         AddCell(summary, "Najčešće kupovano", true);
         AddCell(summary, report.TopMedicine ?? "-", true, AlignRight);
         AddCell(summary, "Ukupno potrošeno", false, bold: true);
         AddCell(summary, Money(report.TotalSpent), false, AlignRight, bold: true);
         document.Add(summary);
+        document.Add(Text("Potrošnja uključuje samo plaćene i završene narudžbe. " +
+                          "Ostale narudžbe (npr. otkazane) su prikazane u listi sa svojim statusom.", Font(9)));
         document.Add(Spacer());
 
         if (report.Orders.Count == 0)
@@ -87,7 +93,7 @@ public static partial class OrderPdfBuilder
 
         document.Add(table);
         document.Add(Spacer());
-        document.Add(Text($"UKUPNO: {Money(report.TotalSpent)}", Font(13, bold: true), AlignRight));
+        document.Add(Text($"UKUPNO POTROŠENO: {Money(report.TotalSpent)}", Font(13, bold: true), AlignRight));
 
         AddFooter(document);
         document.Close();

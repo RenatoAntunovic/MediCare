@@ -16,7 +16,7 @@ public class MedicineSuppliersConfiguration : IEntityTypeConfiguration<MedicineS
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(ms => ms.Supplier)
-            .WithMany()
+            .WithMany(s => s.MedicineSuppliers)
             .HasForeignKey(ms => ms.SupplierId)
             .OnDelete(DeleteBehavior.Restrict);
     }

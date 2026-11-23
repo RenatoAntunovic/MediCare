@@ -12,19 +12,21 @@ namespace MediCare.API.Controllers;
 [EnableRateLimiting("search")]
 public class SearchController(ISender sender) : ControllerBase
 {
-    // GET /api/search?query=bru&page=1&pageSize=10
+    // GET /api/search?query=bru&page=1&pageSize=10&categoryId=2
     [HttpGet]
     public async Task<IActionResult> Search(
         [FromQuery] string query,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
+        [FromQuery] int? categoryId = null,
         CancellationToken ct = default)
     {
         var result = await sender.Send(new SearchMedicinesQuery
         {
             Query = query,
             Page = page,
-            PageSize = pageSize
+            PageSize = pageSize,
+            CategoryId = categoryId
         }, ct);
 
         return Ok(new

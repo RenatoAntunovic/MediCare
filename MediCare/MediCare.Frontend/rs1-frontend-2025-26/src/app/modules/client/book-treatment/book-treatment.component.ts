@@ -15,6 +15,7 @@ import { Subscription } from 'rxjs';
 
 import { ReservationsService } from '../../../api-services/reservations/reservations.service';
 import { startOfToday, toLocalDateString } from '../../../core/utils/date-utils';
+import { LocalNumberPipe } from '../../shared/pipes/local-format.pipes';
 
 interface TreatmentData {
   id: number;
@@ -44,6 +45,7 @@ const NOTES_MAX_LENGTH = 1000;
   standalone: true,
   imports: [
     CommonModule,
+    LocalNumberPipe,
     ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,

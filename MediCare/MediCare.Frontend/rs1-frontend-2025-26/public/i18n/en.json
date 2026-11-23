@@ -29,6 +29,7 @@
     "MENU": {
       "PHARMACY": "Pharmacy",
       "CATEGORIES": "Medicine Categories",
+      "SUPPLIERS": "Suppliers",
       "MEDICINE": "Medicine",
       "HOSPITAL": "Hospital",
       "TREATMENT_CATEGORIES":"Treatment categories",
@@ -68,6 +69,12 @@
   },
   "CART":{
     "TITLE":"Cart",
+    "CONFIRM": {
+      "CHECKOUT_TITLE": "Place the order?",
+      "CHECKOUT_MESSAGE": "You are ordering {{count}} items for {{total}} KM. Do you want to confirm the order?",
+      "REMOVE_TITLE": "Remove from cart?",
+      "REMOVE_MESSAGE": "Do you want to remove \"{{name}}\" from the cart?"
+    },
     "ACTIONS": { "REMOVE_TOOLTIP": "Remove from cart" },
 "TABLE": {
       "QUANTITY": "Quantity",
@@ -153,6 +160,15 @@
     "ADD_NEW": "Add Medicine",
     "FILTER_CATEGORY":"Filter by category",
     "ALL_CATEGORIES":"All categories",
+    "FILTER_STATUS": "Status",
+    "STATUS_ALL": "All",
+    "STATUS_ACTIVE": "Active",
+    "STATUS_INACTIVE": "Inactive",
+    "MIN_PRICE": "Price from (KM)",
+    "MAX_PRICE": "Price to (KM)",
+    "PRICE_NEGATIVE": "Price cannot be negative",
+    "PRICE_RANGE_ERROR": "Price to must be greater than or equal to price from",
+    "CLEAR_FILTERS": "Clear filters",
     "LOADING": "Loading medicines...",
     "NO_DATA": "No medicines to display",
     "NO_DATA_FILTER": "No results found for search",
@@ -635,6 +651,63 @@
       "TOO_MANY": "Too many questions in a short time. Please wait a minute.",
       "GENERIC": "The assistant cannot answer right now. Please try again.",
       "CART": "The medicine was not added to the cart. Please try again."
+    }
+  },
+  "SUPPLIERS": {
+    "TITLE": "Suppliers",
+    "SUBTITLE": "Companies that supply medicines to the pharmacy.",
+    "NEW": "New supplier",
+    "LOADING": "Loading suppliers...",
+    "NO_DATA": "No suppliers to display",
+    "NO_DATA_FILTER": "No suppliers match the selected filters",
+    "FILTERS": {
+      "SEARCH": "Search (company, contact, email)",
+      "CITY": "City",
+      "ALL_CITIES": "All cities",
+      "STATUS": "Status",
+      "STATUS_ALL": "All",
+      "STATUS_ACTIVE": "Active",
+      "STATUS_INACTIVE": "Inactive",
+      "MEDICINE": "Supplies medicine",
+      "ALL_MEDICINES": "All medicines",
+      "CREATED_FROM": "Added from",
+      "DATE_IN_FUTURE": "The date cannot be in the future",
+      "CLEAR": "Clear filters"
+    },
+    "TABLE": {
+      "COMPANY": "Company",
+      "CONTACT": "Contact person",
+      "CITY": "City",
+      "MEDICINES": "Medicines",
+      "CREATED": "Added",
+      "STATUS": "Status",
+      "ACTIONS": "Actions"
+    },
+    "ACTIONS": {
+      "EDIT": "Edit supplier",
+      "DELETE": "Delete supplier"
+    },
+    "FORM": {
+      "NEW_TITLE": "New supplier",
+      "EDIT_TITLE": "Edit supplier",
+      "COMPANY": "Company name",
+      "CONTACT": "Contact person",
+      "EMAIL": "Email",
+      "PHONE": "Phone",
+      "ADDRESS": "Address",
+      "CITY": "City",
+      "MEDICINES": "Supplied medicines",
+      "ACTIVE": "Active",
+      "SAVE": "Save",
+      "CANCEL": "Cancel",
+      "ERRORS": {
+        "REQUIRED": "This field is required",
+        "MIN_LENGTH": "At least {{n}} characters",
+        "MAX_LENGTH": "At most {{n}} characters",
+        "EMAIL": "Invalid email",
+        "PHONE": "Only digits, spaces and + - / ( ) are allowed (6–30 characters)",
+        "INVALID": "Invalid value"
+      }
     }
   }
 }

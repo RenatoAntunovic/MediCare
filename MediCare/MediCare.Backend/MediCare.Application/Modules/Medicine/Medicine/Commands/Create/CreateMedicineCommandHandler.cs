@@ -14,11 +14,17 @@ public class CreateMedicineCommandHandler(IAppDbContext context, IMedicineSearch
         if (exists)
             throw new MediCareConflictException("Lijek s tim nazivom već postoji.");
 
-        var categoryExists = await context.MedicineCategories
-            .AnyAsync(c => c.Id == request.MedicineCategoryId, cancellationToken);
+        var category = await context.MedicineCategories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == request.MedicineCategoryId, cancellationToken);
 
-        if (!categoryExists)
+        if (category is null)
             throw new MediCareNotFoundException("Odabrana kategorija ne postoji.");
+
+        // Same rule as disabling a category: an active medicine cannot belong to a disabled category
+        if (request.isEnabled && !category.IsEnabled)
+            throw new MediCareBusinessRuleException("medicine.category.disabled",
+                "Aktivan lijek ne može pripadati neaktivnoj kategoriji.");
 
         var medicine = new Medicine
         {

@@ -57,7 +57,7 @@ protected save(): void {
   formData.append('Name', formValue.name ?? '');
   formData.append('Price', (formValue.price ?? 0).toString());
   formData.append('Description', formValue.description ?? '');
-  formData.append('MedicineCategoryId', (formValue.categoryId ?? 0).toString()); // ispravljeno
+  formData.append('MedicineCategoryId', (formValue.categoryId ?? 0).toString());
   formData.append('Weight', (formValue.weight ?? 0).toString());
   formData.append('isEnabled', (formValue.isEnabled ?? false).toString());
 

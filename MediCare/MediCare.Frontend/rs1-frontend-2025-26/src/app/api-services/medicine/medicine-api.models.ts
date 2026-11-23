@@ -9,7 +9,11 @@ import { BasePagedQuery } from '../../core/models/paging/base-paged-query';
  */
 export class ListMedicineRequest extends BasePagedQuery {
   search?: string | null;
-  categoryId?:number | null;
+  categoryId?: number | null;
+  /** Status filter – the backend applies it only for the admin (others always get active medicines). */
+  onlyEnabled?: boolean | null;
+  minPrice?: number | null;
+  maxPrice?: number | null;
 }
 
 /**

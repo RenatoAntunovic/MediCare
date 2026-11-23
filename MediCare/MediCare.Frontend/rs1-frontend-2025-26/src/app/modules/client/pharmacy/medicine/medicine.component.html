@@ -57,7 +57,7 @@
         <span class="mc-product__meta">{{ 'MEDICINE.TABLE.WEIGHT' | translate }}: {{ medicine.weight }}</span>
 
         <div class="mc-product__foot">
-          <span class="mc-price">{{ medicine.price | number : '1.2-2' }} KM</span>
+          <span class="mc-price">{{ medicine.price | localNumber : '1.2-2' }} KM</span>
           <span class="mc-badge" [ngClass]="medicine.isEnabled ? 'mc-badge--success' : 'mc-badge--danger'">
             <mat-icon aria-hidden="true">{{ medicine.isEnabled ? 'check_circle' : 'block' }}</mat-icon>
             {{

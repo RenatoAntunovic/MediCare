@@ -53,7 +53,7 @@
         <mat-icon aria-hidden="true">schedule</mat-icon>
         <span>
           <span class="od__label">{{ 'ORDERS.DETAILS.ORDERED_AT' | translate }}</span>
-          {{ order.orderDate | date : 'dd.MM.yyyy HH:mm' }}
+          {{ order.orderDate | localDate : 'dd.MM.yyyy HH:mm' }}
         </span>
       </span>
     </div>
@@ -90,14 +90,14 @@
             <tr *ngFor="let item of order.items">
               <td>{{ item.medicine.medicineName }}</td>
               <td class="num">{{ item.quantity }}</td>
-              <td class="num">{{ (item.quantity ? item.price / item.quantity : item.price) | currency : 'KM ' : 'symbol' : '1.2-2' }}</td>
-              <td class="num">{{ item.price | currency : 'KM ' : 'symbol' : '1.2-2' }}</td>
+              <td class="num">{{ (item.quantity ? item.price / item.quantity : item.price) | localNumber : '1.2-2' }} KM</td>
+              <td class="num">{{ item.price | localNumber : '1.2-2' }} KM</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <th scope="row" colspan="3" class="num">{{ 'ORDERS.DETAILS.ORDER_TOTAL' | translate }}</th>
-              <td class="num od__grand">{{ getTotalAmount() | currency : 'KM ' : 'symbol' : '1.2-2' }}</td>
+              <td class="num od__grand">{{ getTotalAmount() | localNumber : '1.2-2' }} KM</td>
             </tr>
           </tfoot>
         </table>

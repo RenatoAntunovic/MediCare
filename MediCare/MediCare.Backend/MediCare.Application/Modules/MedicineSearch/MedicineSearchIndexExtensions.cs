@@ -15,6 +15,7 @@ public static class MedicineSearchIndexExtensions
             Description = m.Description ?? string.Empty,
             Price = m.Price,
             Category = m.MedicineCategory.Name,
+            CategoryId = m.MedicineCategoryId,
             ImagePath = m.ImagePath ?? string.Empty,
             Weight = m.Weight
         });

@@ -1,0 +1,159 @@
+<div class="mc-page">
+  <header class="mc-page-header">
+    <div>
+      <h1 class="mc-page-header__title">{{ 'SUPPLIERS.TITLE' | translate }}</h1>
+      <p class="mc-page-header__sub">{{ 'SUPPLIERS.SUBTITLE' | translate }}</p>
+    </div>
+
+    <button mat-flat-button color="primary" type="button" (click)="onCreate()">
+      <mat-icon>add</mat-icon>
+      {{ 'SUPPLIERS.NEW' | translate }}
+    </button>
+  </header>
+
+  <!-- 5 filters: text, city, status, supplied medicine, added from -->
+  <div class="mc-toolbar" role="search">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'SUPPLIERS.FILTERS.SEARCH' | translate }}</mat-label>
+      <input matInput maxlength="100" [(ngModel)]="searchText" (ngModelChange)="onSearchInput($event)" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'SUPPLIERS.FILTERS.CITY' | translate }}</mat-label>
+      <mat-select [(ngModel)]="cityFilter" (selectionChange)="onFilterChange()">
+        <mat-option [value]="null">{{ 'SUPPLIERS.FILTERS.ALL_CITIES' | translate }}</mat-option>
+        <mat-option *ngFor="let city of cities" [value]="city">{{ city }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'SUPPLIERS.FILTERS.STATUS' | translate }}</mat-label>
+      <mat-select [(ngModel)]="statusFilter" (selectionChange)="onFilterChange()">
+        <mat-option value="all">{{ 'SUPPLIERS.FILTERS.STATUS_ALL' | translate }}</mat-option>
+        <mat-option value="active">{{ 'SUPPLIERS.FILTERS.STATUS_ACTIVE' | translate }}</mat-option>
+        <mat-option value="inactive">{{ 'SUPPLIERS.FILTERS.STATUS_INACTIVE' | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'SUPPLIERS.FILTERS.MEDICINE' | translate }}</mat-label>
+      <mat-select [(ngModel)]="medicineFilter" (selectionChange)="onFilterChange()">
+        <mat-option [value]="null">{{ 'SUPPLIERS.FILTERS.ALL_MEDICINES' | translate }}</mat-option>
+        <mat-option *ngFor="let medicine of medicines" [value]="medicine.id">{{ medicine.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'SUPPLIERS.FILTERS.CREATED_FROM' | translate }}</mat-label>
+      <input matInput [matDatepicker]="createdPicker" [max]="today"
+             [(ngModel)]="createdFrom" (dateChange)="onFilterChange()" />
+      <mat-datepicker-toggle matIconSuffix [for]="createdPicker"></mat-datepicker-toggle>
+      <mat-datepicker #createdPicker></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-stroked-button type="button" (click)="clearFilters()" [disabled]="!hasActiveFilters">
+      <mat-icon>filter_alt_off</mat-icon>
+      {{ 'SUPPLIERS.FILTERS.CLEAR' | translate }}
+    </button>
+  </div>
+
+  <div *ngIf="isDateInvalid" class="mc-state mc-state--danger" role="alert">
+    <span class="mc-state__icon" aria-hidden="true"><mat-icon>error_outline</mat-icon></span>
+    <span>{{ 'SUPPLIERS.FILTERS.DATE_IN_FUTURE' | translate }}</span>
+  </div>
+
+  <!-- Loading / error -->
+  <div *ngIf="isLoading" class="mc-state" role="status">
+    <mat-progress-spinner mode="indeterminate" diameter="40" strokeWidth="4"></mat-progress-spinner>
+    <span>{{ 'SUPPLIERS.LOADING' | translate }}</span>
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="mc-state mc-state--danger" role="alert">
+    <span class="mc-state__icon" aria-hidden="true"><mat-icon>error_outline</mat-icon></span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Table -->
+  <div class="mc-table-wrap" [hidden]="isLoading || errorMessage">
+    <table mat-table [dataSource]="items" matSort (matSortChange)="onSortChange($event)">
+      <ng-container matColumnDef="companyName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="companyName">{{ 'SUPPLIERS.TABLE.COMPANY' | translate }}</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mc-cell-title">{{ s.companyName }}</span>
+          <div class="mc-cell-muted">{{ s.email }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="contactName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="contactName">{{ 'SUPPLIERS.TABLE.CONTACT' | translate }}</th>
+        <td mat-cell *matCellDef="let s">
+          {{ s.contactName }}
+          <div class="mc-cell-muted">{{ s.phone }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="city">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="city">{{ 'SUPPLIERS.TABLE.CITY' | translate }}</th>
+        <td mat-cell *matCellDef="let s">{{ s.city }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="medicinesCount">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SUPPLIERS.TABLE.MEDICINES' | translate }}</th>
+        <td mat-cell *matCellDef="let s">{{ s.medicinesCount }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="createdAtUtc">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="createdAtUtc">{{ 'SUPPLIERS.TABLE.CREATED' | translate }}</th>
+        <td mat-cell *matCellDef="let s">{{ s.createdAtUtc | localDate : 'dd.MM.yyyy' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="isEnabled">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SUPPLIERS.TABLE.STATUS' | translate }}</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mc-toggle">
+            <mat-slide-toggle
+              [checked]="s.isEnabled"
+              (change)="onToggleStatus(s)"
+              color="primary"
+              [disabled]="isSaving"
+              [aria-label]="'SUPPLIERS.TABLE.STATUS' | translate"
+            ></mat-slide-toggle>
+            <span class="mc-toggle__label" [ngClass]="s.isEnabled ? 'mc-toggle__label--on' : 'mc-toggle__label--off'">
+              {{ (s.isEnabled ? 'SUPPLIERS.FILTERS.STATUS_ACTIVE' : 'SUPPLIERS.FILTERS.STATUS_INACTIVE') | translate }}
+            </span>
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SUPPLIERS.TABLE.ACTIONS' | translate }}</th>
+        <td mat-cell *matCellDef="let s">
+          <div class="mc-cell-actions">
+            <button mat-icon-button type="button" color="primary" (click)="onEdit(s)"
+                    [matTooltip]="'SUPPLIERS.ACTIONS.EDIT' | translate"
+                    [attr.aria-label]="'SUPPLIERS.ACTIONS.EDIT' | translate">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button type="button" color="warn" (click)="onDelete(s)" [disabled]="isSaving"
+                    [matTooltip]="'SUPPLIERS.ACTIONS.DELETE' | translate"
+                    [attr.aria-label]="'SUPPLIERS.ACTIONS.DELETE' | translate">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <tr class="mat-mdc-no-data-row" *matNoDataRow>
+        <td class="mat-mdc-cell" [attr.colspan]="displayedColumns.length">
+          {{ (hasActiveFilters ? 'SUPPLIERS.NO_DATA_FILTER' : 'SUPPLIERS.NO_DATA') | translate }}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <app-fit-paginator-bar [vm]="this"></app-fit-paginator-bar>
+</div>

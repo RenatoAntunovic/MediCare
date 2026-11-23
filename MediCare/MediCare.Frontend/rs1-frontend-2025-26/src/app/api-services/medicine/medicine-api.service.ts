@@ -92,11 +92,12 @@ updateFormData(id: number, formData: FormData): Observable<void> {
     /**
    * FULL-TEXT SEARCH (Lucene)
    */
-  searchMedicines(query: string, page: number = 1, pageSize: number = 10): Observable<any> {
+  searchMedicines(query: string, page: number = 1, pageSize: number = 10, categoryId: number | null = null): Observable<any> {
     const params = buildHttpParams({
       query: query,
       page: page,
-      pageSize: pageSize
+      pageSize: pageSize,
+      categoryId: categoryId
     } as any);
 
     return this.http.get(`${environment.apiUrl}/api/search`, { params });

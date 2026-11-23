@@ -5,6 +5,10 @@ import { BaseListPagedComponent } from '../../../../core/components/base-classes
 import { ToasterService } from '../../../../core/services/toaster.service';
 import { DialogHelperService } from '../../../shared/services/dialog-helper.service';
 import { CartItemDto, UserCartDto, AddToCartCommand, DeleteCartItemCommand,CheckoutOrderResponseDto } from '../../../../api-services/carts/carts-api.model';
+import { DialogButton } from '../../../shared/models/dialog-config.model';
+import { TranslateService } from '@ngx-translate/core';
+import { formatNumber } from '@angular/common';
+import { formatCount, localeFor } from '../../../../core/utils/locale-format';
 
 @Component({
   selector: 'app-cart',
@@ -18,6 +22,7 @@ export class CartComponent extends BaseListPagedComponent<CartItemDto, any> impl
   private router = inject(Router);
   private toaster = inject(ToasterService);
   private dialogHelper = inject(DialogHelperService);
+  private translate = inject(TranslateService);
   isCheckingOut: boolean = false;
   checkoutResponse?: CheckoutOrderResponseDto;
 
@@ -67,7 +72,21 @@ checkout(): void {
     this.toaster.error('Your cart is empty');
     return;
   }
+  if (this.isCheckingOut) return;
 
+  // Ask before the final order; on "No" (or closing the dialog) nothing is sent
+  this.dialogHelper.confirm('CART.CONFIRM.CHECKOUT_TITLE', 'CART.CONFIRM.CHECKOUT_MESSAGE', {
+    count: formatCount(this.items.reduce((sum, item) => sum + item.quantity, 0), this.translate.currentLang),
+    // Same regional format as the rest of the cart (bs "1.234,50", en "1,234.50")
+    total: formatNumber(this.cartTotal, localeFor(this.translate.currentLang), '1.2-2')
+  }, 'shopping_cart_checkout').subscribe(result => {
+    if (result?.button === DialogButton.YES) {
+      this.performCheckout();
+    }
+  });
+}
+
+private performCheckout(): void {
   this.isCheckingOut = true;
 
   this.api.checkout().subscribe({
@@ -85,7 +104,18 @@ checkout(): void {
   });
 }
 
-removeItem(cartItem: any): void {
+removeItem(cartItem: CartItemDto): void {
+  // Ask before removing; on "No" (or closing the dialog) nothing is sent
+  this.dialogHelper.confirm('CART.CONFIRM.REMOVE_TITLE', 'CART.CONFIRM.REMOVE_MESSAGE', {
+    name: cartItem.medicineName
+  }, 'remove_shopping_cart').subscribe(result => {
+    if (result?.button === DialogButton.YES) {
+      this.performRemove(cartItem);
+    }
+  });
+}
+
+private performRemove(cartItem: CartItemDto): void {
   const command: DeleteCartItemCommand = { id: cartItem.cartItemId }; // <--- use cartItemId
   this.api.deleteCartItem(command.id).subscribe({
     next: () => {

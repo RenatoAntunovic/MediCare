@@ -33,6 +33,7 @@ public sealed class LuceneMedicineSearchService : IMedicineSearchService, IMedic
     private const string NameField = "name";
     private const string DescriptionField = "description";
     private const string CategoryField = "category";
+    private const string CategoryIdField = "categoryId";
     private const string PriceField = "price";
     private const string ImageField = "image";
     private const string WeightField = "weight";
@@ -58,13 +59,19 @@ public sealed class LuceneMedicineSearchService : IMedicineSearchService, IMedic
     // SEARCH
     // =========================================================
 
-    public Task<MedicineSearchResultDto> SearchAsync(string query, int page, int pageSize, CancellationToken ct)
+    public Task<MedicineSearchResultDto> SearchAsync(string query, int page, int pageSize, CancellationToken ct, int? categoryId = null)
     {
         var tokens = Tokenize(query);
         if (tokens.Count == 0)
             return Task.FromResult(new MedicineSearchResultDto());
 
         var luceneQuery = BuildQuery(tokens);
+
+        // The category is part of the query itself, so Lucene filters BEFORE paging and TotalHits is correct
+        if (categoryId.HasValue)
+            luceneQuery.Add(
+                new TermQuery(new Term(CategoryIdField, categoryId.Value.ToString(CultureInfo.InvariantCulture))),
+                Occur.MUST);
 
         // Near-real-time reader: sees everything written so far, even without a commit.
         using var reader = DirectoryReader.Open(_writer, true);
@@ -89,7 +96,7 @@ public sealed class LuceneMedicineSearchService : IMedicineSearchService, IMedic
     /// (word1 in name|category|description) AND (word2 in ...) AND ...
     /// Name matches rank highest, then category, then description.
     /// </summary>
-    private static Query BuildQuery(IReadOnlyList<string> tokens)
+    private static BooleanQuery BuildQuery(IReadOnlyList<string> tokens)
     {
         var all = new BooleanQuery();
 
@@ -198,6 +205,9 @@ public sealed class LuceneMedicineSearchService : IMedicineSearchService, IMedic
         doc.Add(new TextField(DescriptionField, item.Description ?? string.Empty, Field.Store.YES));
         doc.Add(new TextField(CategoryField, item.Category ?? string.Empty, Field.Store.YES));
 
+        // Not analyzed: exact category id used by the category filter.
+        doc.Add(new StringField(CategoryIdField, item.CategoryId.ToString(CultureInfo.InvariantCulture), Field.Store.YES));
+
         // Stored only (returned in results, never searched). Strings avoid any decimal/double precision issues.
         doc.Add(new StoredField(PriceField, item.Price.ToString(CultureInfo.InvariantCulture)));
         doc.Add(new StoredField(ImageField, item.ImagePath ?? string.Empty));
@@ -211,6 +221,7 @@ public sealed class LuceneMedicineSearchService : IMedicineSearchService, IMedic
         decimal.TryParse(doc.Get(PriceField), NumberStyles.Number, CultureInfo.InvariantCulture, out var price);
         int.TryParse(doc.Get(WeightField), NumberStyles.Integer, CultureInfo.InvariantCulture, out var weight);
         int.TryParse(doc.Get(IdField), NumberStyles.Integer, CultureInfo.InvariantCulture, out var id);
+        int.TryParse(doc.Get(CategoryIdField), NumberStyles.Integer, CultureInfo.InvariantCulture, out var categoryId);
 
         return new MedicineSearchItemDto
         {
@@ -218,6 +229,7 @@ public sealed class LuceneMedicineSearchService : IMedicineSearchService, IMedic
             Name = doc.Get(NameField) ?? string.Empty,
             Description = doc.Get(DescriptionField) ?? string.Empty,
             Category = doc.Get(CategoryField) ?? string.Empty,
+            CategoryId = categoryId,
             Price = price,
             ImagePath = doc.Get(ImageField) ?? string.Empty,
             Weight = weight
