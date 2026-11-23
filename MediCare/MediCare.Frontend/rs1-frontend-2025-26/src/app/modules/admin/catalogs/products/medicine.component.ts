@@ -61,6 +61,20 @@ export class MedicineComponent
   @ViewChild(MatSort) sort!: MatSort;
 
   categories: ListMedicineCategoriesQueryDto[] = [];
+  /** All categories (also disabled ones) for the category filter. */
+  filterCategories: ListMedicineCategoriesQueryDto[] = [];
+
+  // ==================== FILTERS ====================
+  // 5 filters, all applied on the server before paging: name, category, status, price from, price to
+  categoryFilter: number | null = null;
+  statusFilter: 'all' | 'active' | 'inactive' = 'all';
+  minPrice: number | null = null;
+  maxPrice: number | null = null;
+  /** Frontend validation message for the price range (translation key), null = valid. */
+  priceError: string | null = null;
+
+  /** Debounced reload for the price inputs (no request on every digit). */
+  private filters$ = new Subject<void>();
 
   // ==================== INLINE EDITING ====================
   editingRowId: number | null = null;
@@ -76,6 +90,8 @@ export class MedicineComponent
   constructor() {
     super();
     this.request = new ListMedicineRequest();
+    // The server caps the page size at 100, so the default of 1000 would break the page count
+    this.request.paging.pageSize = 10;
   }
 
   ngOnInit(): void {
@@ -88,6 +104,10 @@ export class MedicineComponent
         this.request.paging.page = 1;
         this.loadPagedData();
       });
+
+    this.filters$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.applyFilters());
   }
 
   // ==================== DATA ====================
@@ -97,6 +117,66 @@ export class MedicineComponent
       next: (response) => (this.categories = response.items),
       error: (err) => console.error('Failed to load categories:', err)
     });
+
+    this.categoriesApi.list({ paging: largePaging }).subscribe({
+      next: (response) => (this.filterCategories = response.items),
+      error: (err) => console.error('Failed to load filter categories:', err)
+    });
+  }
+
+  // ==================== FILTERS ====================
+
+  /** Category or status changed → reload right away. */
+  onFilterChange(): void {
+    this.applyFilters();
+  }
+
+  /** Price typed → validate and reload after a short pause. */
+  onPriceChange(): void {
+    this.filters$.next();
+  }
+
+  /** Same rules as ListMedicineQueryValidator on the backend. */
+  private validatePrices(): boolean {
+    const min = this.minPrice;
+    const max = this.maxPrice;
+
+    if ((min != null && min < 0) || (max != null && max < 0)) {
+      this.priceError = 'MEDICINE.PRICE_NEGATIVE';
+    } else if (min != null && max != null && min > max) {
+      this.priceError = 'MEDICINE.PRICE_RANGE_ERROR';
+    } else {
+      this.priceError = null;
+    }
+
+    return this.priceError === null;
+  }
+
+  private applyFilters(): void {
+    // An invalid range is not sent to the server; the message is shown under the fields
+    if (!this.validatePrices()) return;
+
+    this.request.categoryId = this.categoryFilter;
+    this.request.onlyEnabled =
+      this.statusFilter === 'all' ? null : this.statusFilter === 'active';
+    this.request.minPrice = this.minPrice;
+    this.request.maxPrice = this.maxPrice;
+    this.request.paging.page = 1;
+    this.loadPagedData();
+  }
+
+  clearFilters(): void {
+    this.request.search = '';
+    this.categoryFilter = null;
+    this.statusFilter = 'all';
+    this.minPrice = null;
+    this.maxPrice = null;
+    this.applyFilters();
+  }
+
+  get hasActiveFilters(): boolean {
+    return !!this.request.search?.trim() || this.categoryFilter !== null ||
+      this.statusFilter !== 'all' || this.minPrice != null || this.maxPrice != null;
   }
 
   protected loadPagedData(): void {
