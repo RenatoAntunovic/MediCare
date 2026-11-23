@@ -8,6 +8,24 @@
     </button>
   </header>
 
+  <!-- Status filter (applied on the server; the client still sees only own orders) -->
+  <div class="mc-toolbar" role="search">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'ORDERS.FILTER_STATUS' | translate }}</mat-label>
+      <mat-select [value]="statusFilter" (selectionChange)="onStatusFilterChange($event.value)">
+        <mat-option [value]="null">{{ 'ORDERS.ALL_STATUSES' | translate }}</mat-option>
+        <mat-option *ngFor="let option of statusOptions" [value]="option.id">
+          {{ option.name | translate }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-stroked-button type="button" (click)="clearFilters()" [disabled]="!statusFilter">
+      <mat-icon>clear_all</mat-icon>
+      {{ 'ORDERS.CLEAR_FILTERS' | translate }}
+    </button>
+  </div>
+
   <!-- Skeleton loader -->
   <app-fit-table-skeleton *ngIf="isLoading && !errorMessage" [rows]="6" [columns]="5" [showActions]="true">
   </app-fit-table-skeleton>
@@ -54,7 +72,7 @@
         <div class="mc-order__meta">
           <span>
             <mat-icon aria-hidden="true">schedule</mat-icon>
-            {{ order.orderDate | date : 'dd.MM.yyyy HH:mm' }}
+            {{ order.orderDate | localDate : 'dd.MM.yyyy HH:mm' }}
           </span>
           <span>
             <mat-icon aria-hidden="true">person</mat-icon>
@@ -68,7 +86,7 @@
       </div>
 
       <div class="mc-order__side">
-        <span class="mc-price">{{ order.totalAmount | number : '1.2-2' }} KM</span>
+        <span class="mc-price">{{ order.totalAmount | localNumber : '1.2-2' }} KM</span>
         <button
           mat-stroked-button
           type="button"

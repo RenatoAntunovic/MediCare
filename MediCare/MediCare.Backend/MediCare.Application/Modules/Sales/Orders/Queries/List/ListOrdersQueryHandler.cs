@@ -30,6 +30,9 @@ public sealed class ListOrdersQueryHandler(IAppDbContext ctx, IAppCurrentUser cu
                 x.Id.ToString().Contains(searchTerm));
         }
 
+        if (request.StatusId.HasValue)
+            q = q.Where(x => x.OrderStatusId == request.StatusId.Value);
+
         var projectedQuery = q.OrderByDescending(x => x.OrderDate).ThenByDescending(x => x.Id)
             .Select(x => new ListOrdersQueryDto
             {

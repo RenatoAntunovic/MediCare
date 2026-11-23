@@ -10,7 +10,8 @@ import { BasePagedQuery } from '../../core/models/paging/base-paged-query';
  */
 export class ListOrdersRequest extends BasePagedQuery {
   search?: string | null;
-  // Future filters: status?, dateFrom?, dateTo?, userId?
+  /** Order status id – filtered on the server before paging. */
+  statusId?: number | null;
   constructor() {
     super();
   }
@@ -163,7 +164,8 @@ export interface GetOrderByIdQueryDto {
   statusId: number;
   statusName: string;
   items: {
-    orderId: number;
+    /** Id of the order item (the order id is the "id" above). */
+    orderItemId: number;
     medicine: {
       medicineId: number;
       medicineName: string;
