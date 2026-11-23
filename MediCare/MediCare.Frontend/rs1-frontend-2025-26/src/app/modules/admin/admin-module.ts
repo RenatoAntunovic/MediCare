@@ -23,6 +23,8 @@ import { AdminStatisticsComponent } from './statistics/admin-statistics.componen
 import { McChartComponent } from '../shared/components/mc-chart/mc-chart.component';
 import { AdminAssistantComponent } from './assistant/admin-assistant.component';
 import { AssistantChatComponent } from '../shared/components/assistant-chat/assistant-chat.component';
+import { SuppliersComponent } from './procurement/suppliers/suppliers.component';
+import { SupplierUpsertComponent } from './procurement/suppliers/supplier-upsert/supplier-upsert.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +45,8 @@ import { AssistantChatComponent } from '../shared/components/assistant-chat/assi
     ChangeStatusDialogComponent,
     AdminStatisticsComponent,
     AdminAssistantComponent,
+    SuppliersComponent,
+    SupplierUpsertComponent,
   ],
   imports: [
     AdminRoutingModule,

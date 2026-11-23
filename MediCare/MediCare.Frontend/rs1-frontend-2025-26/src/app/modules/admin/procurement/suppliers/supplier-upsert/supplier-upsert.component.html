@@ -1,0 +1,71 @@
+<h2 mat-dialog-title>{{ (isEditMode ? 'SUPPLIERS.FORM.EDIT_TITLE' : 'SUPPLIERS.FORM.NEW_TITLE') | translate }}</h2>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading && !form" class="mc-state" role="status">
+    <mat-progress-spinner mode="indeterminate" diameter="36" strokeWidth="4"></mat-progress-spinner>
+  </div>
+
+  <form *ngIf="form" [formGroup]="form" (ngSubmit)="onSubmit()" class="mc-form-grid">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'SUPPLIERS.FORM.COMPANY' | translate }}</mat-label>
+      <input matInput formControlName="companyName" maxlength="100" autocomplete="off" />
+      <mat-error *ngIf="hasError('companyName')">{{ errorKey('companyName').key | translate: errorKey('companyName').params }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'SUPPLIERS.FORM.CONTACT' | translate }}</mat-label>
+      <input matInput formControlName="contactName" maxlength="100" autocomplete="off" />
+      <mat-error *ngIf="hasError('contactName')">{{ errorKey('contactName').key | translate: errorKey('contactName').params }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'SUPPLIERS.FORM.EMAIL' | translate }}</mat-label>
+      <input matInput type="email" formControlName="email" maxlength="100" autocomplete="off" />
+      <mat-error *ngIf="hasError('email')">{{ errorKey('email').key | translate: errorKey('email').params }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'SUPPLIERS.FORM.PHONE' | translate }}</mat-label>
+      <input matInput formControlName="phone" maxlength="30" placeholder="+387 61 123-456" autocomplete="off" />
+      <mat-error *ngIf="hasError('phone')">{{ errorKey('phone').key | translate: errorKey('phone').params }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'SUPPLIERS.FORM.ADDRESS' | translate }}</mat-label>
+      <input matInput formControlName="address" maxlength="200" autocomplete="off" />
+      <mat-error *ngIf="hasError('address')">{{ errorKey('address').key | translate: errorKey('address').params }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'SUPPLIERS.FORM.CITY' | translate }}</mat-label>
+      <input matInput formControlName="city" maxlength="50" autocomplete="off" />
+      <mat-error *ngIf="hasError('city')">{{ errorKey('city').key | translate: errorKey('city').params }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'SUPPLIERS.FORM.MEDICINES' | translate }}</mat-label>
+      <mat-select formControlName="medicineIds" multiple>
+        <mat-option *ngFor="let m of medicines" [value]="m.id">{{ m.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-slide-toggle formControlName="isEnabled" color="primary">
+      {{ 'SUPPLIERS.FORM.ACTIVE' | translate }}
+    </mat-slide-toggle>
+  </form>
+
+  <div *ngIf="serverError" class="mc-state mc-state--danger" role="alert">
+    <span class="mc-state__icon" aria-hidden="true"><mat-icon>error_outline</mat-icon></span>
+    <span>{{ serverError }}</span>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">
+    {{ 'SUPPLIERS.FORM.CANCEL' | translate }}
+  </button>
+  <button mat-flat-button color="primary" type="button" (click)="onSubmit()" [disabled]="!form || isLoading">
+    <mat-icon>save</mat-icon>
+    {{ 'SUPPLIERS.FORM.SAVE' | translate }}
+  </button>
+</mat-dialog-actions>

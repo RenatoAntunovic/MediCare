@@ -27,6 +27,11 @@
         <span>{{ 'ADMIN_PANEL.MENU.CATEGORIES' | translate }}</span>
       </a>
 
+      <a class="mc-nav-link" routerLink="/admin/suppliers" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
+        <mat-icon aria-hidden="true">local_shipping</mat-icon>
+        <span>{{ 'ADMIN_PANEL.MENU.SUPPLIERS' | translate }}</span>
+      </a>
+
       <a class="mc-nav-link" routerLink="/admin/orders" routerLinkActive="active" (click)="isMobile() && sidenav.close()">
         <mat-icon aria-hidden="true">receipt_long</mat-icon>
         <span>{{ 'ADMIN_PANEL.MENU.ORDERS' | translate }}</span>

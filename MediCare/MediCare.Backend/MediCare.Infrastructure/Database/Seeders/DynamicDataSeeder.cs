@@ -303,15 +303,38 @@ public static class DynamicDataSeeder
                 {
                     CompanyName="Pfizer",
                     ContactName="Hans",
+                    Email = "hans@pfizer.example",
                     Phone="061 111-111",
-                    Address= "Adresa 1"
+                    Address= "Adresa 1",
+                    City = "Sarajevo"
                 },
                 new Suppliers
                 {
                     CompanyName = "Bayer",
                     ContactName = "Miki",
+                    Email = "miki@bayer.example",
                     Phone = "062 222-222",
-                    Address = "Adresa 2"
+                    Address = "Adresa 2",
+                    City = "Mostar"
+                },
+                new Suppliers
+                {
+                    CompanyName = "Bosnalijek",
+                    ContactName = "Amra",
+                    Email = "amra@bosnalijek.example",
+                    Phone = "033 254-400",
+                    Address = "Jukićeva 53",
+                    City = "Sarajevo"
+                },
+                new Suppliers
+                {
+                    CompanyName = "Hemofarm",
+                    ContactName = "Marko",
+                    Email = "marko@hemofarm.example",
+                    Phone = "051 215-300",
+                    Address = "Ulica 1",
+                    City = "Banja Luka",
+                    IsEnabled = false
                 }
             );
 
