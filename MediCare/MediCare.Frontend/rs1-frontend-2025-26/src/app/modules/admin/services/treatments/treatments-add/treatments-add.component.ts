@@ -55,7 +55,7 @@ protected save(): void {
   formData.append('ServiceName', formValue.name ?? '');
   formData.append('Price', (formValue.price ?? 0).toString());
   formData.append('Description', formValue.description ?? '');
-  formData.append('TreatmentCategoryId', (formValue.categoryId ?? 0).toString()); // ispravljeno
+  formData.append('TreatmentCategoryId', (formValue.categoryId ?? 0).toString());
   formData.append('isEnabled', (formValue.isEnabled ?? false).toString());
 
   if (this.selectedImage) {
