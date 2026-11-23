@@ -1,3 +1,4 @@
+using System.Globalization;
 using iTextSharp.text.pdf;
 using MediCare.Application.Modules.Sales.Orders.Queries.Report;
 using iText = iTextSharp.text;
@@ -287,7 +288,13 @@ public static partial class OrderPdfBuilder
         table.AddCell(cell);
     }
 
-    private static string Money(decimal value) => $"{value:N2} KM";
+    /// <summary>
+    /// The PDF texts are in Bosnian, so amounts always use the Bosnian format ("1.234,50 KM"),
+    /// not whatever culture the server machine happens to run with.
+    /// </summary>
+    private static readonly CultureInfo Bosnian = CultureInfo.GetCultureInfo("bs-Latn-BA");
+
+    private static string Money(decimal value) => value.ToString("N2", Bosnian) + " KM";
 
     private static string StatusLabel(string? status) =>
         status is not null && StatusLabels.TryGetValue(status, out var label) ? label : status ?? "-";

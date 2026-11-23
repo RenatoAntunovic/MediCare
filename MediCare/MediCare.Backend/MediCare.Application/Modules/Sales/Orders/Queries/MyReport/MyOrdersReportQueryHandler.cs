@@ -3,6 +3,13 @@
 public sealed class MyOrdersReportQueryHandler(IAppDbContext ctx, IAppCurrentUser currentUser)
     : IRequestHandler<MyOrdersReportQuery, MyOrdersReportDto>
 {
+    /// <summary>
+    /// Only these statuses count as spending (the money was actually paid).
+    /// Draft, confirmed (not paid yet) and cancelled orders stay in the list with their status,
+    /// but are not part of the amount, the average, the item count or the most purchased medicine.
+    /// </summary>
+    public static readonly string[] SpendingStatuses = ["PAID", "COMPLETED"];
+
     public async Task<MyOrdersReportDto> Handle(MyOrdersReportQuery request, CancellationToken ct)
     {
         var userId = currentUser.UserId ?? throw new UnauthorizedAccessException();
@@ -61,16 +68,17 @@ public sealed class MyOrdersReportQueryHandler(IAppDbContext ctx, IAppCurrentUse
             .Select(u => u.FirstName + " " + u.LastName)
             .FirstOrDefaultAsync(ct) ?? string.Empty;
 
-        var allItems = orders.SelectMany(o => o.Items).ToList();
+        var spendingOrders = orders.Where(o => SpendingStatuses.Contains(o.StatusName)).ToList();
+        var spendingItems = spendingOrders.SelectMany(o => o.Items).ToList();
 
         // Most purchased medicine by quantity (null if there are no orders)
-        var topMedicine = allItems
+        var topMedicine = spendingItems
             .GroupBy(i => i.MedicineName)
             .Select(g => new { Name = g.Key, Quantity = g.Sum(i => i.Quantity) })
             .OrderByDescending(x => x.Quantity)
             .FirstOrDefault();
 
-        var totalSpent = orders.Sum(o => o.Total);
+        var totalSpent = spendingOrders.Sum(o => o.Total);
 
         return new MyOrdersReportDto
         {
@@ -81,9 +89,11 @@ public sealed class MyOrdersReportQueryHandler(IAppDbContext ctx, IAppCurrentUse
             IncludeItems = request.IncludeItems,
             Orders = orders,
             OrdersCount = orders.Count,
-            ItemsCount = allItems.Sum(i => i.Quantity),
+            SpendingOrdersCount = spendingOrders.Count,
+            OrdersValue = orders.Sum(o => o.Total),
+            ItemsCount = spendingItems.Sum(i => i.Quantity),
             TotalSpent = totalSpent,
-            AverageOrder = orders.Count == 0 ? 0 : Math.Round(totalSpent / orders.Count, 2),
+            AverageOrder = spendingOrders.Count == 0 ? 0 : Math.Round(totalSpent / spendingOrders.Count, 2),
             TopMedicine = topMedicine is null ? null : $"{topMedicine.Name} ({topMedicine.Quantity} kom.)"
         };
     }
