@@ -1,6 +1,6 @@
 ﻿namespace MediCare.Application.Modules.Medicine.Medicine.Queries.List;
 
-public sealed class ListMedicineQueryHandler(IAppDbContext ctx)
+public sealed class ListMedicineQueryHandler(IAppDbContext ctx, IAppCurrentUser currentUser)
         : IRequestHandler<ListMedicineQuery, PageResult<ListMedicineQueryDto>>
 {
     public async Task<PageResult<ListMedicineQueryDto>> Handle(
@@ -13,10 +13,20 @@ public sealed class ListMedicineQueryHandler(IAppDbContext ctx)
             q = q.Where(x => x.Name.Contains(request.Search));
         }
 
-        if (request.OnlyEnabled is not null)
+        // The list endpoint is public: only the admin may see (and filter by) disabled medicines.
+        // Everyone else always gets active medicines, whatever the request says.
+        if (!currentUser.IsAdmin)
+            q = q.Where(x => x.isEnabled);
+        else if (request.OnlyEnabled is not null)
             q = q.Where(x => x.isEnabled == request.OnlyEnabled);
 
-        if (request.CategoryId.HasValue) 
+        if (request.MinPrice.HasValue)
+            q = q.Where(x => x.Price >= request.MinPrice.Value);
+
+        if (request.MaxPrice.HasValue)
+            q = q.Where(x => x.Price <= request.MaxPrice.Value);
+
+        if (request.CategoryId.HasValue)
             q = q.Where(x => x.MedicineCategoryId == request.CategoryId.Value);
 
         // Sort ALL rows on the server before paging (the table sends sortBy + sortDirection)

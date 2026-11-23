@@ -10,7 +10,7 @@ namespace MediCare.Infrastructure.Services;
 /// </summary>
 public sealed class SqlMedicineSearchService(IAppDbContext ctx) : IMedicineSearchService
 {
-    public async Task<MedicineSearchResultDto> SearchAsync(string query, int page, int pageSize, CancellationToken ct)
+    public async Task<MedicineSearchResultDto> SearchAsync(string query, int page, int pageSize, CancellationToken ct, int? categoryId = null)
     {
         var terms = query
             .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -18,6 +18,10 @@ public sealed class SqlMedicineSearchService(IAppDbContext ctx) : IMedicineSearc
             .ToList();
 
         var q = ctx.Medicine.AsNoTracking().Where(m => m.isEnabled);
+
+        // Category is filtered before counting and paging, so the total matches the returned pages
+        if (categoryId.HasValue)
+            q = q.Where(m => m.MedicineCategoryId == categoryId.Value);
 
         foreach (var term in terms)
         {

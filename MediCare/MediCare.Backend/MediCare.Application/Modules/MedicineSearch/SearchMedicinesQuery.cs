@@ -5,6 +5,7 @@ public sealed class SearchMedicinesQuery : IRequest<MedicineSearchResultDto>
     public string Query { get; init; } = string.Empty;
     public int Page { get; init; } = 1;
     public int PageSize { get; init; } = 10;
+    public int? CategoryId { get; init; }
 }
 
 public sealed class SearchMedicinesQueryValidator : AbstractValidator<SearchMedicinesQuery>
@@ -31,5 +32,5 @@ public sealed class SearchMedicinesQueryHandler(IMedicineSearchService search)
     private const int MaxPageSize = 1000;
 
     public Task<MedicineSearchResultDto> Handle(SearchMedicinesQuery request, CancellationToken ct)
-        => search.SearchAsync(request.Query.Trim(), request.Page, Math.Min(request.PageSize, MaxPageSize), ct);
+        => search.SearchAsync(request.Query.Trim(), request.Page, Math.Min(request.PageSize, MaxPageSize), ct, request.CategoryId);
 }
