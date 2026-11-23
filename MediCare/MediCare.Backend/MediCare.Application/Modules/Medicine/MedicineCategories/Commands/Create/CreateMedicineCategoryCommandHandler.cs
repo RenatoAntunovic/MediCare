@@ -21,7 +21,9 @@ public class CreateMedicineCategoryCommandHandler(IAppDbContext context)
 
         var medicineCategory = new MedicineCategories
         {
-            Name = request.Name!.Trim()
+            Name = request.Name!.Trim(),
+            // A new category is active, so it is shown in the default (active only) list and in the medicine forms
+            IsEnabled = true
         };
 
         context.MedicineCategories.Add(medicineCategory);

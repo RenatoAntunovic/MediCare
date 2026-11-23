@@ -98,8 +98,11 @@ protected save(): void {
   formData.append('name', formValue.name || this.model?.name);
   formData.append('description', formValue.description || this.model?.description);
   formData.append('price', (formValue.price ?? this.model?.price).toString());
-  formData.append('MedicineCategoryId', (formValue.medicineCategoryId ?? this.model?.medicineCategoryId).toString());
+  // The form control is called "categoryId" (see MedicineFormService), so read that one
+  formData.append('MedicineCategoryId', (formValue.categoryId ?? this.model?.medicineCategoryId).toString());
   formData.append('weight', (formValue.weight ?? this.model?.weight).toString());
+  // Status is not edited on this form – send the current one so saving does not change it
+  formData.append('isEnabled', String(this.model?.isEnabled ?? false));
 
 // Only a newly chosen image is sent – without one the backend keeps the existing image
 if (this.selectedFile) {

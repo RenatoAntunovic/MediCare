@@ -65,7 +65,8 @@ export class MedicineCategoriesComponent
 
   onToggleEnabledFilter(checked: boolean): void {
     this.showOnlyEnabled = checked;
-    this.request.onlyEnabled = checked;
+    // Toggle off = show all categories (null), not only the disabled ones
+    this.request.onlyEnabled = checked ? true : null;
     this.request.paging.page = 1;
     this.loadPagedData();
   }
