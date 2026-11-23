@@ -43,7 +43,7 @@
         <p class="mc-product__desc">{{ treatment.description }}</p>
 
         <div class="mc-product__foot">
-          <span class="mc-price">{{ treatment.price | number : '1.2-2' }} KM</span>
+          <span class="mc-price">{{ treatment.price | localNumber : '1.2-2' }} KM</span>
           <span class="mc-badge" [ngClass]="treatment.isEnabled ? 'mc-badge--success' : 'mc-badge--danger'">
             <mat-icon aria-hidden="true">{{ treatment.isEnabled ? 'check_circle' : 'block' }}</mat-icon>
             {{

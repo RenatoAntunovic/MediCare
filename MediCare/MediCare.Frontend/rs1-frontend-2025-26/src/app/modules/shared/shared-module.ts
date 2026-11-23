@@ -10,6 +10,7 @@ import { FitLoadingBarComponent } from './components/fit-loading-bar/fit-loading
 import { FitTableSkeletonComponent } from './components/fit-table-skeleton/fit-table-skeleton.component';
 import { MatIconModule } from '@angular/material/icon';
 import { ApiImagePipe } from './pipes/api-image.pipe';
+import { LocalDatePipe, LocalNumberPipe } from './pipes/local-format.pipes';
 import { ProfileCardComponent } from './components/profile-card/profile-card.component';
 import { ChangePasswordCardComponent } from './components/change-password-card/change-password-card.component';
 import { NotificationsCardComponent } from './components/notifications-card/notifications-card.component';
@@ -29,6 +30,8 @@ import { NotificationsCardComponent } from './components/notifications-card/noti
     TranslateModule,
     ...materialModules,
     ApiImagePipe,
+    LocalNumberPipe,
+    LocalDatePipe,
     ProfileCardComponent,
     ChangePasswordCardComponent,
     NotificationsCardComponent
@@ -46,6 +49,8 @@ import { NotificationsCardComponent } from './components/notifications-card/noti
     FitTableSkeletonComponent,
     ...materialModules,
     ApiImagePipe,
+    LocalNumberPipe,
+    LocalDatePipe,
     ProfileCardComponent,
     ChangePasswordCardComponent,
     NotificationsCardComponent

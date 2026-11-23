@@ -10,6 +10,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { MedicineApiService } from '../../../api-services/medicine/medicine-api.service';
 import { environment } from '../../../../environments/environment';
+import { LocalNumberPipe } from '../../shared/pipes/local-format.pipes';
 
 /** A single result from GET /api/search */
 export interface MedicineSearchItem {
@@ -37,7 +38,7 @@ const MIN_QUERY_LENGTH = 2;
   selector: 'app-search-medicine',
   templateUrl: './search-medicine.component.html',
   styleUrls: ['./search-medicine.component.scss'],
-  imports: [CommonModule, FormsModule, RouterLink, MatIconModule]
+  imports: [CommonModule, FormsModule, RouterLink, MatIconModule, LocalNumberPipe]
 })
 export class SearchMedicineComponent implements OnInit {
   private medicineApi = inject(MedicineApiService);

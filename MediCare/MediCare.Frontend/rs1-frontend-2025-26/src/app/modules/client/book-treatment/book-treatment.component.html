@@ -86,7 +86,7 @@
 
 <div mat-dialog-actions align="end" class="dialog-actions">
   <div class="total-text">
-    Cijena: {{ data.treatment.price | number: '1.2-2' }} KM
+    Cijena: {{ data.treatment.price | localNumber : '1.2-2' }} KM
   </div>
   <span class="flex-spacer"></span>
   <button mat-button type="button" mat-dialog-close [disabled]="isSaving">Otkaži</button>
